@@ -91,8 +91,9 @@
   var dpr = Math.min(window.devicePixelRatio || 1, 2)
   var W = 0
   var H = 0
-  var dotLayer = null      // 清晰点阵
-  var glowLayer = null     // 模糊辉光
+  var dotLayer = null      // 清晰方块层
+  var softLayer = null     // 轻微模糊层（软化方块边缘）
+  var glowLayer = null     // 大面积辉光层
   var curve = null         // 曲线采样点（用于流动亮点）
   var raf = 0
   var running = false
@@ -123,14 +124,21 @@
     }
     curve = { pts: pts, n: SAMPLES }
 
-    // 点阵：网格采样到曲线的最短距离
+    // 点阵：网格采样到曲线的最短距离，用「小方块」拼出形状（对齐 DSH 鲸鱼的 halftone 质感）
     var off = document.createElement('canvas')
     off.width = cv.width
     off.height = cv.height
     var octx = off.getContext('2d')
     octx.setTransform(dpr, 0, 0, dpr, 0, 0)
 
-    var STEP = 3
+    function hash(x, y) {
+      var n = (x * 374761393 + y * 668265263) | 0
+      n = (n ^ (n >> 13)) * 1274126177 | 0
+      return ((n ^ (n >> 16)) >>> 0) / 4294967295
+    }
+
+    var STEP = 7          // 方块网格间距
+    var BAND = 18         // 形状带的半宽（越大越厚）
     var stride = 2
     for (var y = 0; y < H; y += STEP) {
       for (var x = 0; x < W; x += STEP) {
@@ -142,33 +150,39 @@
           if (d2 < best) best = d2
         }
         var d = Math.sqrt(best)
-        if (d > 7.2) continue
-        // 中心实、边缘虚：让点阵读起来像一团有厚度的"粒子云"
-        var alpha = d < 2.4 ? 0.95 : Math.pow(1 - (d - 2.4) / 4.8, 1.7)
-        if (alpha <= 0.02) continue
-        var rad = d < 2.4 ? 1.55 : 1.35 * (1 - (d - 2.4) / 6.2) + 0.25
-        octx.fillStyle = 'rgba(186, 226, 255, ' + alpha.toFixed(3) + ')'
-        octx.beginPath()
-        octx.arc(x, y, rad, 0, 6.2832)
-        octx.fill()
+        if (d > BAND) continue
+        var falloff = 1 - d / BAND
+        // 颗粒感：相邻方块亮度略有差异
+        var noise = hash(x, y)
+        var alpha = Math.pow(falloff, 1.1) * 0.86 * (0.6 + noise * 0.62)
+        if (alpha < 0.03) continue
+        var size = 3.4 + falloff * 3.4          // 中间大、边缘小
+        var half = size / 2
+        octx.fillStyle = 'rgba(226, 240, 255, ' + alpha.toFixed(3) + ')'
+        octx.fillRect(x - half, y - half, size, size)
       }
     }
     dotLayer = off
 
-    // 辉光层：把点阵模糊一次
-    var gl = document.createElement('canvas')
-    gl.width = cv.width
-    gl.height = cv.height
-    var gctx = gl.getContext('2d')
-    gctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-    if ('filter' in gctx) {
-      gctx.filter = 'blur(' + (14 * dpr).toFixed(1) + 'px)'
-      gctx.drawImage(off, 0, 0, W, H)
-      gctx.filter = 'none'
-    } else {
-      gctx.drawImage(off, 0, 0, W, H)
+    // 软边层 + 辉光层：DSH 那种"方块本身也是虚的"质感
+    function blurCopy(src, px) {
+      var c = document.createElement('canvas')
+      c.width = cv.width
+      c.height = cv.height
+      var cx2 = c.getContext('2d')
+      cx2.setTransform(dpr, 0, 0, dpr, 0, 0)
+      if ('filter' in cx2) {
+        cx2.filter = 'blur(' + (px * dpr).toFixed(1) + 'px)'
+        cx2.drawImage(src, 0, 0, W, H)
+        cx2.filter = 'none'
+      } else {
+        cx2.drawImage(src, 0, 0, W, H)
+      }
+      return c
     }
-    glowLayer = gl
+
+    softLayer = blurCopy(off, 2.2)
+    glowLayer = blurCopy(off, 18)
   }
 
   function frame(now) {
@@ -184,29 +198,31 @@
     ctx.scale(breath, breath)
     ctx.translate(-W / 2, -H / 2)
 
-    ctx.globalAlpha = alpha * 0.9
+    ctx.globalAlpha = alpha * 0.85
     ctx.drawImage(glowLayer, 0, 0, W, H)
-    ctx.globalAlpha = alpha * 0.72
+    ctx.globalAlpha = alpha * 0.68
+    ctx.drawImage(softLayer, 0, 0, W, H)
+    ctx.globalAlpha = alpha * 0.78
     ctx.drawImage(dotLayer, 0, 0, W, H)
     ctx.restore()
 
-    // 沿曲线流动的亮点
+    // 沿曲线流动的亮点（克制版）
     if (curve && !reduced) {
       var pts = curve.pts
       var N = curve.n
-      for (var i = 0; i < 26; i++) {
-        var ph = (t * 0.055 + i / 26) % 1
+      for (var i = 0; i < 14; i++) {
+        var ph = (t * 0.045 + i / 14) % 1
         var idx = Math.floor(ph * N) * 2
         var x = pts[idx]
         var y = pts[idx + 1]
-        var r = 1.5 + 1.1 * Math.sin(t * 3 + i)
-        ctx.fillStyle = 'rgba(224, 250, 255, .9)'
+        var r = 1.3 + 0.9 * Math.sin(t * 2.4 + i)
+        ctx.fillStyle = 'rgba(232, 248, 255, .75)'
         ctx.beginPath()
         ctx.arc(x, y, r, 0, 6.2832)
         ctx.fill()
-        ctx.fillStyle = 'rgba(103, 232, 249, .22)'
+        ctx.fillStyle = 'rgba(103, 232, 249, .14)'
         ctx.beginPath()
-        ctx.arc(x, y, r * 3.4, 0, 6.2832)
+        ctx.arc(x, y, r * 3.6, 0, 6.2832)
         ctx.fill()
       }
     }
