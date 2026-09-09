@@ -106,7 +106,30 @@ git add -A && git commit -m "post: 文章标题" && git push
 默认仓库已指向 `008heshan/hexshane-blog`（可在页面里改）。
 请勿把长期有效的高权限 Token 保存在公共设备上。
 
-## 变更记录
+## 视觉主题：科幻 / 科技 / 极客皮肤
+
+皮肤文件：`source/custom/theme/sci-fi.css`，在主题 `_config.yml` 的 `inject.head` 中
+**最后**引入（覆盖 `theme-glass.css` / `nav-apple.css` 等既有样式），并注入视口 HUD 边框。
+
+| 设计要素 | 实现 |
+| --- | --- |
+| 深空底色 + 星云光斑 | 覆盖 `.bg-liquid`（青 / 紫径向渐变 + 纵向暗色渐变） |
+| 技术网格 | `.glass-bg::after` 46px 网格，四周渐隐（mask） |
+| 扫描光带 | `.glass-bg::before` 14s 缓速循环（`prefers-reduced-motion` 下自动关闭） |
+| 霓虹主色 | 青 `#22d3ee`，辅助紫 `#8b5cf6`，状态绿 `#34d399` |
+| 面板 HUD | 深色玻璃 + 1px 发丝边 + 左上/右下 L 形角标 + 顶部霓虹线 |
+| 视口 HUD | 四角括号 + 右下 `SYS · ONLINE ●`（纯 CSS，`aria-hidden`） |
+| 首页 HUD 状态行 | `#site-title::after` 输出 `SYSTEM · READY`（仅首页） |
+| 等宽字体 | 元信息 / 数字 / 标签 / 按钮 / 代码用 Fira Code，正文仍是苹方 |
+| 正文 | h2 左侧霓虹竖条、h3 紫色边条、行内代码青色胶囊、引用块青色发光 |
+| 代码块 | 近黑终端框 + 青色行号栏 |
+| 交互 | hover 边框增亮 + 外发光，过渡 120~220ms |
+
+- 默认深色：主题 `_config.yml` 的 `display_mode: dark`（右上角按钮仍可切到浅色）
+- 浅色模式为「实验室 / 蓝图」风，所有硬编码颜色都做了浅色覆盖，可正常阅读
+- 想恢复原皮肤：把 `inject.head` 里的 `sci-fi.css` 那行注释掉即可
+
+
 
 - 站点标题 `受命于天，既寿永昌` → `纪元`；作者 `l3AFovxs` → `HexShane`
 - 头像 `/img/l3afovxs.jpg` → `/img/hexshane.jpg`；页脚/公告/关于页 GitHub 链接 → `008heshan`
