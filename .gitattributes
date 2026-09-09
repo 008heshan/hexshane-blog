@@ -1,0 +1,9 @@
+# 统一使用 LF 换行，保证 Windows 本地与 Linux CI 构建结果一致
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
