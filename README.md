@@ -123,6 +123,8 @@ git add -A && git commit -m "post: 文章标题" && git push
 
 - 大标题字体：**iFonts 航天遨游体**，从 22.5MB TTF 子集化为 87KB woff2
   （`source/custom/assets/fonts/HangtianAoyou-subset.woff2`，含 32 个常用汉字 + ASCII）
+- 左上角品牌位：**莫比乌斯式无限图标**（`source/custom/assets/mobius.svg`，
+  双纽线 + 交叉处扭转 + 厚度偏移）替换站名文字；文字仍在 DOM 中，读屏与 SEO 不受影响
 - **浅色模式已关闭**：主题 `darkmode.button: false`，导航栏不再有明暗切换按钮
 - 头像已固定为圆形且禁用任何旋转（`transform/animation: none`）
 - 面板为克制的深色玻璃（1px 淡边 + 柔和投影），不使用 HUD 角标等装饰
