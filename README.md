@@ -1,4 +1,4 @@
-# 受命于天，既寿永昌
+# 纪元
 
 个人博客源码。由 [Hexo](https://hexo.io/) + [Butterfly](https://butterfly.js.org/) 构建，
 主站部署在 **Cloudflare Pages**，自定义域名 <https://hexshane.top>。
@@ -17,6 +17,17 @@
 | hexo-shiki-plugin-butterfly | 1.0.26（Shiki 代码高亮，明暗双主题） |
 | Node.js | 22（`.node-version` 固定） |
 
+## 站点信息
+
+| 字段 | 值 |
+| --- | --- |
+| 站点标题 | 纪元 |
+| 副标题 | 分享技巧与经验 |
+| 作者 | HexShane |
+| 头像 | `/img/hexshane.jpg` |
+| GitHub | <https://github.com/008heshan> |
+| keywords | Terraria / tModLoader / 模组开发 / Hexo / 前端 |
+
 ## 目录结构
 
 ```
@@ -32,9 +43,9 @@
 ├─ source/
 │  ├─ _posts/                    # 文章（Markdown）
 │  ├─ _data/announcement.yml     # 侧边栏公告
-│  ├─ about/index.md             # 关于页
+│  ├─ about/index.md             # 关于页（含版权声明）
 │  └─ custom/                    # 自定义样式/脚本/字体/光标等静态资源
-├─ themes/hexo-theme-butterfly/  # 主题（含站长改过的 _config.yml）
+├─ themes/hexo-theme-butterfly/  # 主题（含改过的 _config.yml）
 ├─ _config.yml                   # 站点配置：url = https://hexshane.top，root = /
 ├─ _config.ghpages.yml           # GitHub Pages 子路径覆盖配置（仅 CI 用）
 ├─ .node-version                 # Node 版本
@@ -50,6 +61,9 @@ npm run build          # 生成 public/（面向 https://hexshane.top，root = /
 npm run build:ghpages  # 生成 public/（面向 GitHub Pages 子路径）
 npm run clean          # 清理 public/ 与 db.json
 ```
+
+> 本地删掉 `public/` 后请用 `npm run clean && npm run build`，
+> 否则 Hexo 会依据残留的 `db.json` 判定文件未变更而跳过生成。
 
 ## 部署
 
@@ -72,7 +86,7 @@ npm run clean          # 清理 public/ 与 db.json
 
 `.github/workflows/pages.yml` 在推送时执行 `npm ci` → `npm run build:ghpages` → 发布。
 
-由于本站主题配置中大量资源使用根路径（`/custom/...`、`/img/...`），
+由于主题配置中大量资源使用根路径（`/custom/...`、`/img/...`），
 在 `https://008heshan.github.io/hexshane-blog/` 这样的子路径下，这部分自定义特效资源会 404。
 主站以 Cloudflare Pages 的根域名部署为准。
 
@@ -86,11 +100,25 @@ git add -A && git commit -m "post: 文章标题" && git push
 
 置顶：在文章 front-matter 里写 `sticky: 1`（数字越小越靠前，`0` 或不写表示不置顶）。
 
+## 管理后台
+
+访问 `/admin/`，写操作通过浏览器里的 GitHub Token 调 Contents API 完成，
+默认仓库已指向 `008heshan/hexshane-blog`（可在页面里改）。
+请勿把长期有效的高权限 Token 保存在公共设备上。
+
+## 变更记录
+
+- 站点标题 `受命于天，既寿永昌` → `纪元`；作者 `l3AFovxs` → `HexShane`
+- 头像 `/img/l3afovxs.jpg` → `/img/hexshane.jpg`；页脚/公告/关于页 GitHub 链接 → `008heshan`
+- 侧边栏个人信息卡由「双人切换」改为**单人卡片**（`visit-card.js` / `visit-card.css` 已移除，
+  头像与名字直接取主题 `avatar.img` 与 `config.author`）
+- 站点 keywords 由个人向词条改为技术关键词
+- `/admin/` 默认仓库由 `Leafmy/Leafmy_blogsource` → `008heshan/hexshane-blog`
+- 主题 `favicon` 指向实际存在的 `/img/favicon.ico`（原为不存在的 `.png`，会 404）
+- `package-lock.json` 的 tarball 地址由国内镜像改为官方 `registry.npmjs.org`，便于海外 CI 构建
+
 ## 已知事项
 
-- 主题配置中 `favicon: /img/favicon.png`，但主题 `source/img/` 下只有 `favicon.ico`，
-  因此浏览器标签图标会 404（与原始站点一致，未作改动）。
-- 未启用 `hexo-generator-feed` / `hexo-generator-sitemap`，站点没有 `atom.xml`、`sitemap.xml`
-  （与原始站点一致）。需要时可加插件并在 `_config.yml` 中补配置。
-- `/admin/` 是一个纯前端管理页，写操作通过浏览器里的 GitHub Token 调 Contents API 完成，
-  请勿把长期有效的高权限 Token 保存在公共设备上。
+- 未启用 `hexo-generator-feed` / `hexo-generator-sitemap`，站点没有 `atom.xml`、`sitemap.xml`。
+  需要时可加插件并在 `_config.yml` 中补配置。
+- `www.hexshane.top` 目前未签发证书/未绑定，如需使用请在 Cloudflare Pages 里再添加一次自定义域。

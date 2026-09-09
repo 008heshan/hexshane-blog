@@ -191,7 +191,7 @@
   var state = {
     meta: null,
     posts: [],
-    gh: { owner: 'Leafmy', name: 'Leafmy_blogsource', branch: 'main', token: '' },
+    gh: { owner: '008heshan', name: 'hexshane-blog', branch: 'main', token: '' },
     editing: null,
     filter: ''
   }
@@ -875,8 +875,8 @@
   }
 
   function saveGhConfig() {
-    var owner = $('#gh-owner').value.trim() || 'Leafmy'
-    var name = $('#gh-name').value.trim() || 'Leafmy_blogsource'
+    var owner = $('#gh-owner').value.trim() || '008heshan'
+    var name = $('#gh-name').value.trim() || 'hexshane-blog'
     var branch = $('#gh-branch').value.trim() || 'main'
     var token = $('#gh-token').value.trim()
     if (!token) { toast('请填入 GitHub Token', 'err'); return }

@@ -62,7 +62,7 @@ hexo.extend.generator.register('admin', function (locals) {
 
   const meta = {
     generatedAt: new Date().toISOString(),
-    repo: { owner: 'Leafmy', name: 'Leafmy_blogsource', branch: 'main' },
+    repo: { owner: '008heshan', name: 'hexshane-blog', branch: 'main' },
     postsDir: 'source/_posts',
     announceFile: 'source/_data/announcement.yml',
     keyFile: 'source/custom/admin/admin-key.js',
