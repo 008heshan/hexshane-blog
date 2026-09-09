@@ -194,7 +194,12 @@ html body #nav .nav-search.nav-search-open .nav-search-bar {
   border-color: rgba(120, 158, 184, .5) !important;
 }
 
-html body #nav .nav-search-ico,
+/* 注意：.nav-search-ico 是 Font Awesome 图标元素，
+   绝不能再给它设 font-family（否则图标私有码位落到等宽字体上变成方块乱码） */
+html body #nav .nav-search-ico {
+  color: #c3d3de !important;
+}
+
 html body #nav .nav-search-input,
 html body #nav .nav-search-marquee span {
   color: #c3d3de !important;
