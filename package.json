@@ -5,6 +5,7 @@
   "description": "Hexshane 的个人博客，基于 Hexo + NexT，部署于 GitHub Pages / Cloudflare Pages",
   "scripts": {
     "build": "hexo generate",
+    "build:ghpages": "hexo generate --config _config.yml,_config.ghpages.yml",
     "clean": "hexo clean",
     "deploy": "hexo deploy",
     "server": "hexo server"

@@ -13,10 +13,10 @@ timezone: 'Asia/Shanghai'
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-## 阶段一：GitHub Pages 项目站点（仓库 hexshane-blog）
-## 自定义域名 hexshane.top 生效后，改为 url: https://hexshane.top 且 root: /
-url: https://008heshan.github.io/hexshane-blog
-root: /hexshane-blog/
+## 生产环境（Cloudflare Pages + 自定义域名 hexshane.top）
+## GitHub Pages 项目站点使用额外的覆盖配置 _config.ghpages.yml，见该文件说明
+url: https://hexshane.top
+root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:

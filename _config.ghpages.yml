@@ -1,0 +1,11 @@
+# GitHub Pages 项目站点专用覆盖配置
+#
+# 用法（Hexo 支持多个配置文件按顺序合并，后者覆盖前者）：
+#   npx hexo generate --config _config.yml,_config.ghpages.yml
+#
+# 说明：
+# - 主配置 _config.yml 面向自定义域名 https://hexshane.top（root: /）
+# - 本文件只被 .github/workflows/pages.yml 使用，
+#   让站点在 https://008heshan.github.io/hexshane-blog/ 这类子路径下也能正确加载资源
+url: https://008heshan.github.io/hexshane-blog
+root: /hexshane-blog/
