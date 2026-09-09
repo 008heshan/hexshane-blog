@@ -125,6 +125,14 @@ git add -A && git commit -m "post: 文章标题" && git push
   （`source/custom/assets/fonts/HangtianAoyou-subset.woff2`，含 32 个常用汉字 + ASCII）
 - 左上角品牌位：**莫比乌斯式无限图标**（`source/custom/assets/mobius.svg`，
   双纽线 + 交叉处扭转 + 厚度偏移）替换站名文字；文字仍在 DOM 中，读屏与 SEO 不受影响
+- 顶部导航滚动动画（对齐 DSH）：页面顶部时导航**完全透明**（logo / 菜单浮在内容上），
+  向下滚动 80px 后玻璃底以 `0.4s ease-in-out` 淡入。
+  实现要点：玻璃底挂在 `#nav::before` 上，只过渡 `opacity`（直接过渡渐变背景无法动画）；
+  触发用 80px 哨兵元素 + `IntersectionObserver`（不占主线程，也不受 rAF 节流影响），
+  老浏览器回退到 scroll 监听。见 `source/custom/effects/nav-glass.js`
+- 特异性提醒：`nav-apple.css` 用 `html[data-theme='dark'] #nav`（1,1,1）带 `!important`
+  铺了渐变底，而 `#nav` 是 `<body>` 的直接子元素，所以本皮肤用 `html[data-theme] body #nav`
+  （1,1,2）覆盖它
 - **浅色模式已关闭**：主题 `darkmode.button: false`，导航栏不再有明暗切换按钮
 - 头像已固定为圆形且禁用任何旋转（`transform/animation: none`）
 - 面板为克制的深色玻璃（1px 淡边 + 柔和投影），不使用 HUD 角标等装饰
