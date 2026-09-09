@@ -142,21 +142,30 @@ html body #nav {
 }
 
 /* 左上角品牌位：用莫比乌斯式无限图标替换站名文字
-   （文字保留在 DOM 里但视觉隐藏，读屏与 SEO 仍能读到「纪元」） */
-html body #nav #blog-info .nav-site-title {
-  display: inline-flex;
+   （文字保留在 DOM 里但视觉隐藏，读屏与 SEO 仍能读到「纪元」）
+   注意：必须用 flex + block，inline-block 会按基线对齐导致图标偏离导航中线 */
+html body #nav #blog-info {
+  display: flex;
   align-items: center;
+  height: 100%;
+}
+
+html body #nav #blog-info .nav-site-title {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  line-height: 1;
   letter-spacing: 0 !important;
 }
 
 html body #nav #blog-info .nav-site-title .site-name {
-  display: inline-block;
+  display: block;
   width: 38px;
   height: 21px;
   overflow: hidden;
   white-space: nowrap;
   text-indent: -9999px;
-  background: url('/custom/assets/mobius.svg') no-repeat center / contain;
+  background: url('/custom/assets/mobius.svg') no-repeat center center / contain;
   filter: drop-shadow(0 0 7px rgba(157, 192, 212, .35));
   transition: filter .22s ease;
 }
