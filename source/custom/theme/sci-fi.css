@@ -133,12 +133,58 @@ html body {
 /* ---------------------------------------------------------------
    3. 顶部导航
    --------------------------------------------------------------- */
-html body #nav {
-  background: linear-gradient(150deg, rgba(7, 15, 28, .74), rgba(4, 10, 20, .7)) !important;
-  border: 1px solid rgba(150, 182, 202, .12) !important;
-  box-shadow: 0 10px 34px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(190, 214, 228, .05) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
-  backdrop-filter: blur(18px) saturate(140%);
+/* 滚动哨兵：贴在页面顶部，仅用于 IntersectionObserver 判定"已滚动"，
+   不参与布局（absolute + 1px 宽） */
+.sf-scroll-sentinel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 80px;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* 顶部导航：参照 DSH —— 玻璃底挂在伪元素上，滚动时只过渡它的 opacity
+   注意特异性：nav-apple.css 用 `html[data-theme='dark'] #nav`（特异性 1,1,1）
+   带 !important 铺了渐变底 / 描边 / 投影；而 #nav 是 <body> 的直接子元素
+   （不在 #body-wrap 内）。这里用 html[data-theme] body #nav（1,1,2）才能压住它。 */
+html[data-theme] body #nav {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+html body #nav::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(150deg, rgba(8, 16, 28, .8), rgba(4, 9, 17, .74));
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid rgba(150, 182, 202, .12);
+  box-shadow: 0 10px 34px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(190, 214, 228, .05);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .4s ease-in-out, visibility 0s .4s;
+  pointer-events: none;
+  z-index: -1;
+}
+
+html.is-scrolled body #nav::before {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .4s ease-in-out, visibility 0s;
+}
+
+/* 未滚动时导航完全隐形，指针光斑与边缘环也一并隐藏（没有玻璃底就没有可"反光"的表面） */
+html:not(.is-scrolled) body #nav .nav-edge,
+html:not(.is-scrolled) body #nav .nav-edge-light,
+html:not(.is-scrolled) body #nav .nav-glow-spot {
+  display: none !important;
 }
 
 /* 左上角品牌位：用莫比乌斯式无限图标替换站名文字
