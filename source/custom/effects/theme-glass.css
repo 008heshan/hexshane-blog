@@ -1,0 +1,962 @@
+/* ============================================================
+   Glass panels (custom inject, v5)
+   板块玻璃化：白色模式=通透玻璃 / 黑色模式=磨砂玻璃
+   v5 核心修复：backdrop-filter 只能模糊其后方的【真实 DOM
+   内容层】，body/html 的 background 不参与采样（此前 v3/v4
+   玻璃感不足的真正根因）。方案：由 glass-bg.js 注入的
+   .glass-bg 固定层承载全部彩色光斑 + 噪点，卡片透过它模糊，
+   玻璃感才真实可见。
+   ============================================================ */
+
+/* ---------- 背景装饰层（body 首子元素，垫在所有内容下方） ---------- */
+/* 液态玻璃：光斑缓慢漂移、流动融合，像一层流动的液体玻璃。
+   性能优化：把背景渐变放到比视口放大一圈的 .bg-liquid 子层上，用
+   transform: translate3d 做漂移动画（GPU 合成层，不触发 CPU 逐帧
+   重绘 background-position —— 后者是整屏掉帧主因）；外层 .glass-bg
+   仅做 fixed + overflow:hidden 裁切。视觉参数与之前完全一致。 */
+.glass-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* 液体层：放大到视口约 180%，承载全部彩色光斑渐变 + 漂移动画。
+   v6 light 调整：用户反馈原版本过亮刺眼、缺少高级感，改为"冷雾
+   液态玻璃"——基础色由高亮浅蓝降为低饱和冷雾蓝(灰蓝系), 降低白
+   色高光透明度, 光斑色差拉大(冷蓝/雾紫/雾青/一点暖橘点缀), 让
+   卡片 backdrop-filter 模糊后能透出明显光斑层次 = "通透高级"。
+   [v10 层次] 提高冷暖光斑对比度(颜色 alpha + 形状位置调整), 基础
+   底色降低亮度+加径向暗角(vignette), 让中央稍亮边缘暗 → 层次分明。 */
+.bg-liquid {
+  position: absolute;
+  inset: -40%;
+  background-image:
+    /* 四角主光斑: 冷蓝/雾紫/青绿/暖橘, 色相与 alpha 拉大增强对比 */
+    radial-gradient(1300px 1050px at 12% 14%, rgba(95, 130, 220, .62), transparent 70%),
+    radial-gradient(1400px 1080px at 88% 18%, rgba(155, 100, 220, .58), transparent 70%),
+    radial-gradient(1500px 1150px at 78% 84%, rgba(60, 200, 190, .52), transparent 72%),
+    radial-gradient(1350px 1000px at 14% 88%, rgba(248, 168, 120, .46), transparent 72%),
+    /* 中心雾青柔光(打破纯冷蓝紫, 拉冷暖中间色) */
+    radial-gradient(980px 760px at 50% 46%, rgba(190, 200, 230, .38), transparent 74%),
+    /* 中心高光与暗角叠加: 中央径向略亮、边缘径向渐暗(vignette) */
+    radial-gradient(1100px 800px at 50% 40%, rgba(255, 255, 255, .10), transparent 60%),
+    radial-gradient(900px 700px at 50% 55%, transparent 30%, rgba(20, 30, 60, .18) 80%, transparent 100%),
+    /* 冷雾蓝底(基础色降曝光 + 弱饱和, 避免奶亮刺眼) */
+    linear-gradient(160deg, #a8b4c8 0%, #8597b8 45%, #98a8c8 100%);
+  /* [性能] 静态光斑：不做漂移动画。此前 transform 逐帧移动会让
+     16 个卡片 + 全屏 hero 的 backdrop-filter 每帧重新模糊采样
+     (切标签页/唤醒卡顿主因)，改为静态后玻璃只需光栅化一次并可缓存。 */
+}
+
+/* 液态玻璃的光斑漂移（transform 平移，走 GPU 合成层） */
+@keyframes glass-liquid-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-7%, -5%, 0);
+  }
+  100% {
+    transform: translate3d(-15%, -10%, 0);
+  }
+}
+
+/* 噪点抖动(dither)：细微随机噪点打散 8-bit 渐变色带(banding)。
+   用内联 SVG feTurbulence 生成噪声，低透明度叠加，肉眼几乎不可见，
+   但足以让相邻色阶间的生硬边界被填平。
+   性能：噪点不再单独做背景位置动画（原 60s 循环），静态即可持续
+   打散色带，省掉一层的逐帧重绘。 */
+.bg-liquid::before {
+  content: '';
+  position: absolute;
+  inset: -10%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 240px 240px;
+  opacity: .045;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* 液态纹理/噪点：叠加一层细微的斑驳，增强"液体"质感（如玻璃上的水渍） */
+.bg-liquid::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(380px 280px at 18% 24%, rgba(255, 255, 255, .07), transparent 72%),
+    radial-gradient(520px 380px at 78% 58%, rgba(255, 255, 255, .05), transparent 72%),
+    radial-gradient(430px 320px at 42% 84%, rgba(255, 255, 255, .04), transparent 72%);
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+
+/* 液态旋涡：纹理缓慢旋转/位移，仿佛液体被搅动 */
+@keyframes glass-liquid-swirl {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  100% {
+    transform: translate3d(1.5%, -.8%, 0) rotate(4deg) scale(1.04);
+  }
+}
+
+/* dark：背景层换深色光斑(同样降透明度、拉长过渡去 banding)
+   [v10 层次] 提高冷暖光斑对比度, 中心高光+暗角叠加 → 层次分明 */
+html[data-theme='dark'] .bg-liquid {
+  background-image:
+    radial-gradient(1400px 1100px at 12% 8%, rgba(90, 135, 240, .58), transparent 70%),
+    radial-gradient(1600px 1200px at 90% 15%, rgba(180, 92, 245, .55), transparent 70%),
+    radial-gradient(1700px 1300px at 78% 82%, rgba(50, 200, 170, .52), transparent 72%),
+    radial-gradient(1500px 1150px at 15% 90%, rgba(245, 145, 82, .46), transparent 72%),
+    /* 中心雾光与暗角 */
+    radial-gradient(2000px 1500px at 50% 50%, rgba(255, 255, 255, .10), transparent 78%),
+    radial-gradient(900px 700px at 50% 60%, transparent 35%, rgba(0, 0, 0, .28) 85%, transparent 100%),
+    linear-gradient(160deg, #1a2138 0%, #121728 45%, #12182a 100%);
+}
+
+/* dark 的噪点抖动调低亮度 */
+html[data-theme='dark'] .bg-liquid::before {
+  opacity: .04;
+}
+
+/* dark 的液态纹理降低亮度 */
+html[data-theme='dark'] .bg-liquid::after {
+  background-image:
+    radial-gradient(380px 280px at 18% 24%, rgba(255, 255, 255, .035), transparent 72%),
+    radial-gradient(520px 380px at 78% 58%, rgba(120, 160, 255, .035), transparent 72%),
+    radial-gradient(430px 320px at 42% 84%, rgba(255, 255, 255, .03), transparent 72%);
+}
+
+/* 降低动画前提：用户开启减少动效时关闭流动 */
+@media (prefers-reduced-motion: reduce) {
+  .bg-liquid {
+    animation: none;
+  }
+  .bg-liquid::before,
+  .bg-liquid::after {
+    animation: none;
+  }
+}
+
+/* ---- 标签页不可见时暂停所有动画（降低切换/唤醒卡顿）----
+   tab-visibility.js 在 document.hidden 时给 <html> 加 .tab-hidden,
+   此处暂停全站 CSS 动画。浏览器从后台节流恢复时无需再重算动画,
+   大幅减轻「从别的网页切回 / 从后台叫起」时的重绘卡顿。 */
+html.tab-hidden *,
+html.tab-hidden *::before,
+html.tab-hidden *::after {
+  animation-play-state: paused !important;
+}
+
+/* ---------- 内容层：垫在背景层之上 ---------- */
+#body-wrap {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- body 兜底 ---------- */
+body {
+  /* light：冷雾灰蓝兜底，避免 .glass-bg 被覆盖/未注入时露出
+     高亮奶蓝刺眼 */
+  background-color: #b0bbcf;
+}
+html[data-theme='dark'] body {
+  background-color: #0f1116;
+}
+
+/* ---------- 全局页面滚动条（浏览器主内容）风格化 ----------
+   与下拉面板 / 搜索结果列表同款冷雾蓝玻璃质感：
+   - Firefox：标准 scrollbar-width + scrollbar-color
+   - WebKit/Chromium：窄轨 + 圆角半透明主题滑块 + 白色细描边 + hover 高亮
+   - dark 模式：冷蓝紫变体
+   注：html::-webkit-scrollbar 需用双冒号伪元素；body 溢出时归 html 管。 */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 170, 255, .40) rgba(120, 170, 255, .07);
+}
+html::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+html::-webkit-scrollbar-track {
+  background: rgba(120, 170, 255, .07);
+  border-radius: 999px;
+}
+html::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(130, 185, 255, .52), rgba(100, 160, 255, .42));
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .18);
+}
+html::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(150, 200, 255, .72), rgba(110, 170, 255, .58));
+}
+html[data-theme='dark'] {
+  scrollbar-color: rgba(110, 175, 255, .45) rgba(110, 175, 255, .06);
+}
+html[data-theme='dark']::-webkit-scrollbar-track {
+  background: rgba(110, 175, 255, .06);
+}
+html[data-theme='dark']::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(110, 175, 255, .58), rgba(90, 150, 250, .48));
+}
+html[data-theme='dark']::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(140, 195, 255, .78), rgba(110, 165, 250, .6));
+}
+
+/* ---- 代码块 / 表格滚动条：由主题的灰色 --hlscrollbar-bg 统一为玻璃蓝 ---- */
+
+/* ============================================================
+   快速滚动性能降级
+   ------------------------------------------------------------
+   当 body 带 .fast-scrolling 类时(由 scroll-perf.js 检测),
+   临时降低所有玻璃卡片的 backdrop-filter 模糊半径, 大幅减轻
+   GPU 合成压力。滚动停止后移除该类, 恢复完整效果。
+   选 4px 而非 0: 保留一丝模糊让视觉过渡不突兀。
+   ============================================================ */
+/* ---- 快速滚动性能降级 ----
+   v12 修正：只对【全屏 hero】降级 backdrop(它占满视口, 滚动时模糊重算最贵)。
+   卡片/文章(#post/#archive)不再参与降级切换 —— 因为滚动时把它们的
+   backdrop-filter 从 12px→4px→12px 来回切换, 会让大量卡片同时触发
+   backdrop 重采样(卡顿主因)。改为保持稳定, 靠 content-visibility
+   预渲染让它们滚动时零重绘。 */
+body.fast-scrolling #page-header.full_page,
+body.fast-scrolling #page-header.not-home-page::before,
+body.fast-scrolling #page-header.post-bg::before,
+body.fast-scrolling #footer {
+  -webkit-backdrop-filter: blur(4px) !important;
+  backdrop-filter: blur(4px) !important;
+  /* 降级时关闭投影动画, 省合成层 */
+  box-shadow: 0 2px 12px rgba(0, 0, 0, .12) !important;
+  transition: none !important;
+}
+
+/* 快速滚动时暂停 force-glow 光效(rAF 循环) */
+body.fast-scrolling .force-glow {
+  display: none !important;
+}
+figure.highlight table::-webkit-scrollbar-thumb,
+.container figure.highlight.default pre::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(130, 185, 255, .55), rgba(100, 160, 255, .45));
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .18);
+}
+figure.highlight table::-webkit-scrollbar-thumb:hover,
+.container figure.highlight.default pre::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(150, 200, 255, .75), rgba(110, 170, 255, .60));
+}
+html[data-theme='dark'] figure.highlight table::-webkit-scrollbar-thumb,
+html[data-theme='dark'] .container figure.highlight.default pre::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(110, 175, 255, .58), rgba(90, 150, 250, .48));
+}
+html[data-theme='dark'] figure.highlight table::-webkit-scrollbar-thumb:hover,
+html[data-theme='dark'] .container figure.highlight.default pre::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(140, 195, 255, .78), rgba(110, 165, 250, .6));
+}
+
+/* ================= 玻璃面板 ================= */
+
+/* ---- 卡片性能优化(预渲染优先) ----
+   v12 重构：去掉 will-change/translateZ 强合成层滥用。
+   巨型容器(#post 高达数十 px)强制成独立合成层 + backdrop-filter,
+   滚动时浏览器要持续维护这个大层且反复采样 → 卡顿主因。
+   改为：
+   - content-visibility:auto 让长文/屏外卡片跳过布局与绘制(文章预渲染),
+     进入视口才渲染, 滚动时 GPU 只合成已缓存层
+   - 不再强制合成层, 改由浏览器按需层化; 阴影仍走 ::after 预渲染 */
+.recent-post-item,
+.card-widget,
+#post,
+#archive {
+  position: relative;
+}
+/* 文章/归档长文预渲染: 屏外段落不布局不绘制, 滚入视口才渲染 */
+#post,
+#archive {
+  content-visibility: auto;
+  /* 用 auto + 合理估高占位滚动条, 实际高度由浏览器测量后回填
+     (内容渲染后再校准, 避免滚动条大幅跳动) */
+  contain-intrinsic-size: auto 3200px;
+  contain: layout style;
+}
+/* 阴影预渲染: ::after 承载外层光晕和落地投影，始终在 DOM 中 */
+.recent-post-item::after,
+.card-widget::after,
+#post::after,
+#archive::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  border-radius: inherit;
+  box-shadow:
+    0 0 0 1px rgba(180, 200, 235, .22),
+    0 0 24px rgba(140, 180, 235, .14),
+    0 0 48px rgba(140, 180, 235, .10),
+    0 24px 48px -12px rgba(48, 66, 104, .28),
+    0 8px 24px -8px rgba(48, 66, 104, .16);
+}
+html[data-theme='dark'] .recent-post-item::after,
+html[data-theme='dark'] .card-widget::after,
+html[data-theme='dark'] #post::after,
+html[data-theme='dark'] #archive::after {
+  box-shadow:
+    0 0 0 1px rgba(150, 180, 240, .16),
+    0 0 24px rgba(110, 150, 220, .14),
+    0 0 48px rgba(110, 150, 220, .10),
+    0 24px 48px -12px rgba(0, 0, 0, .50),
+    0 8px 24px -8px rgba(0, 0, 0, .32);
+}
+
+/* ---- light：真实磨砂玻璃卡片 ----
+   用户反馈旧版是"假玻璃"：卡片自身带半透明白色渐变(蒙层)，盖在
+   自身背景上，不是真磨砂。真玻璃关键：
+   - 背景【透明】(仅极低 alpha 白膜, 让背后 .bg-liquid 光斑透过来)
+   - 磨砂感完全由 backdrop-filter: blur() 承担(模糊背后光斑)
+   - 加多层柔和阴影 + 内阴影模拟玻璃厚度
+   - [v10 羽化边缘] 替代硬 1px border: 用多层 box-shadow 形成
+     "光晕边缘"(0 0 16-48px 渐变透明度的冷雾蓝/白色), 让卡片从
+     透明渐变到不透明柔和过渡, 与背景自然融合 */
+.recent-post-item,
+.card-widget {
+  background: linear-gradient(
+    155deg,
+    rgba(255, 255, 255, .10) 0%,
+    rgba(255, 255, 255, .04) 50%,
+    rgba(255, 255, 255, .08) 100%
+  ) !important;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 0 !important;
+  /* box-shadow 只保留 inset 高光, 外阴影由 ::after 伪元素预渲染 */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .48),
+    inset 0 -1px 0 rgba(255, 255, 255, .22) !important;
+}
+
+/* 文章/归档长文容器：静态预渲染磨砂(替代实时 backdrop)
+   v12 性能：#post 高数千px, 滚动时其 backdrop-filter 每帧重采样
+   背后光斑(全文最长最贵)。去除 blur, 用「已模糊光斑平均色」的
+   静态多层渐变模拟磨砂 → 可一次性预渲染, 滚动零重绘。 */
+#post,
+#archive {
+  background:
+    radial-gradient(1200px 900px at 20% 6%, rgba(140, 175, 235, .10), transparent 70%),
+    radial-gradient(1000px 800px at 88% 96%, rgba(120, 165, 220, .08), transparent 70%),
+    linear-gradient(
+      155deg,
+      rgba(255, 255, 255, .16) 0%,
+      rgba(255, 255, 255, .07) 50%,
+      rgba(255, 255, 255, .13) 100%
+    ) !important;
+  border: 0 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .48),
+    inset 0 -1px 0 rgba(255, 255, 255, .22) !important;
+}
+
+/* 顶部镜面高光已按用户要求去除（不再显示） */
+.recent-post-item::before,
+.card-widget::before,
+#post::before,
+#archive::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 20%;
+  background: none;
+  pointer-events: none;
+  border-radius: inherit;
+  display: none;
+}
+
+/* ---- dark：真实磨砂玻璃 ----
+   [v10 羽化边缘] 同 light: 替代硬 1px border, 用多层冷光晕 box-shadow 形成柔边 */
+html[data-theme='dark'] .recent-post-item,
+html[data-theme='dark'] .card-widget {
+  background: linear-gradient(
+    160deg,
+    rgba(30, 36, 54, .16) 0%,
+    rgba(16, 20, 34, .12) 52%,
+    rgba(24, 30, 46, .16) 100%
+  ) !important;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 0 !important;
+  /* box-shadow 只保留 inset 高光, 外阴影由 ::after 伪元素预渲染 */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18) !important;
+}
+
+/* dark 文章/归档长文容器：静态预渲染磨砂(去实时 backdrop) */
+html[data-theme='dark'] #post,
+html[data-theme='dark'] #archive {
+  background:
+    radial-gradient(1200px 900px at 20% 6%, rgba(90, 135, 240, .10), transparent 70%),
+    radial-gradient(1000px 800px at 88% 96%, rgba(50, 90, 180, .08), transparent 70%),
+    linear-gradient(
+      160deg,
+      rgba(30, 36, 54, .20) 0%,
+      rgba(14, 18, 32, .16) 52%,
+      rgba(24, 30, 46, .20) 100%
+    ) !important;
+  border: 0 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18) !important;
+}
+
+/* dark 顶部高光也已去除 */
+html[data-theme='dark'] .recent-post-item::before,
+html[data-theme='dark'] .card-widget::before,
+html[data-theme='dark'] #post::before,
+html[data-theme='dark'] #archive::before {
+  background: none;
+  display: none;
+}
+
+/* ---- 独立页面 #page（关于 / 标签 / 分类等）与首页卡片同款玻璃 ----
+   #page 默认是主题的不透明纯色卡片(rgb(255,255,255) / dark rgb(18,18,18))，
+   在整站玻璃风格里显得突兀。这里让它与卡片同款：低 alpha 渐变 + inset 高光
+   + ::after 预渲染阴影。排除 .nc（shuoshuo / 404 等无卡片布局页）。
+
+   性能：这里**不用**实时 backdrop-filter。实测 #page 高 2463px 时，
+   挂 blur(12px) 每帧多吃 7~8ms(20.3ms→12.9ms，49fps→72fps)。
+   与 #post/#archive 同理改用「已模糊光斑平均色」的静态多层渐变，
+   可一次性预渲染，滚动零重算，视觉上仍是磨砂玻璃。 */
+#page:not(.nc) {
+  position: relative;
+  background:
+    radial-gradient(1200px 900px at 20% 6%, rgba(140, 175, 235, .10), transparent 70%),
+    radial-gradient(1000px 800px at 88% 96%, rgba(120, 165, 220, .08), transparent 70%),
+    linear-gradient(
+      155deg,
+      rgba(255, 255, 255, .10) 0%,
+      rgba(255, 255, 255, .04) 50%,
+      rgba(255, 255, 255, .08) 100%
+    ) !important;
+  border: 0 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .48),
+    inset 0 -1px 0 rgba(255, 255, 255, .22) !important;
+}
+
+html[data-theme='dark'] #page:not(.nc) {
+  background:
+    radial-gradient(1200px 900px at 20% 6%, rgba(90, 135, 240, .10), transparent 70%),
+    radial-gradient(1000px 800px at 88% 96%, rgba(50, 90, 180, .08), transparent 70%),
+    linear-gradient(
+      160deg,
+      rgba(30, 36, 54, .16) 0%,
+      rgba(16, 20, 34, .12) 52%,
+      rgba(24, 30, 46, .16) 100%
+    ) !important;
+  border: 0 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18) !important;
+}
+
+/* 外阴影走 ::after 预渲染，与首页卡片同款 */
+#page:not(.nc)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  border-radius: inherit;
+  box-shadow:
+    0 0 0 1px rgba(180, 200, 235, .22),
+    0 0 24px rgba(140, 180, 235, .14),
+    0 0 48px rgba(140, 180, 235, .10),
+    0 24px 48px -12px rgba(48, 66, 104, .28),
+    0 8px 24px -8px rgba(48, 66, 104, .16);
+}
+
+html[data-theme='dark'] #page:not(.nc)::after {
+  box-shadow:
+    0 0 0 1px rgba(150, 180, 240, .16),
+    0 0 24px rgba(110, 150, 220, .14),
+    0 0 48px rgba(110, 150, 220, .10),
+    0 24px 48px -12px rgba(0, 0, 0, .50),
+    0 8px 24px -8px rgba(0, 0, 0, .32);
+}
+
+/* ---- 卡片定位（供 ::before 与展开浮层使用） ---- */
+.recent-post-item,
+.card-widget,
+#post,
+#archive {
+  position: relative;
+}
+
+/* 移动端：GPU 加速已启用, 恢复完整效果 */
+@media (max-width: 768px) {
+  .glass-bg {
+    display: block;
+  }
+  .recent-post-item,
+  .card-widget {
+    background: linear-gradient(
+      155deg,
+      rgba(255, 255, 255, .10) 0%,
+      rgba(255, 255, 255, .04) 50%,
+      rgba(255, 255, 255, .08) 100%
+    ) !important;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 0 !important;
+    box-shadow:
+      0 0 0 1px rgba(180, 200, 235, .20),
+      0 0 18px rgba(140, 180, 235, .10),
+      0 8px 20px -8px rgba(48, 66, 104, .18),
+      inset 0 1px 0 rgba(255, 255, 255, .40) !important;
+  }
+  /* 文章/归档长文容器：移动端同样静态预渲染(去 backdrop) */
+  #post,
+  #archive {
+    background:
+      radial-gradient(1000px 760px at 20% 6%, rgba(140, 175, 235, .12), transparent 70%),
+      linear-gradient(
+        155deg,
+        rgba(255, 255, 255, .14) 0%,
+        rgba(255, 255, 255, .07) 50%,
+        rgba(255, 255, 255, .12) 100%
+      ) !important;
+    border: 0 !important;
+    box-shadow:
+      0 0 0 1px rgba(180, 200, 235, .18),
+      inset 0 1px 0 rgba(255, 255, 255, .40) !important;
+  }
+  html[data-theme='dark'] #post,
+  html[data-theme='dark'] #archive {
+    background:
+      radial-gradient(1000px 760px at 20% 6%, rgba(90, 135, 240, .12), transparent 70%),
+      linear-gradient(
+        160deg,
+        rgba(30, 36, 54, .20) 0%,
+        rgba(14, 18, 32, .18) 52%,
+        rgba(24, 30, 46, .20) 100%
+      ) !important;
+    border: 0 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18) !important;
+  }
+  .recent-post-item::before,
+  .card-widget::before,
+  #post::before,
+  #archive::before {
+    display: none;
+  }
+}
+
+/* ============================================================
+   首页 hero（#page-header.full_page）玻璃化
+   原背景是主题纯色 $light-blue（蓝），用户要把首屏做成玻璃：
+   - light（白模式）：半透明亮色 + backdrop-filter 高斯模糊，
+     透过下方 .bg-liquid 光斑，呈「通透磨砂玻璃」
+   - dark（黑模式）：半透明深色 + 磨砂，呈「深色磨砂玻璃」
+   原理：与卡片玻璃同理——backdrop-filter 模糊其后方的真实 DOM
+   内容层（.bg-liquid 的光斑），而非 body/html 背景。
+   ============================================================ */
+
+/* ---- light：通透玻璃（高斯模糊） ----
+   注意：hero 标题是白色(--white)，背景必须偏深色才有对比度。
+   若用半透明白色玻璃，白字配白底会看不清（显示 bug）。
+   因此 light glass 采用蓝紫渐变压暗调，保留 backdrop 模糊的玻璃感，
+   同时让白色标题清晰可读。
+   [v9] 恢复空间层次(去扁平化)：不再用深蓝紫蒙层把光斑压死，改
+   「冷雾蓝灰」低饱和渐变 + 适中 alpha(.32)，配合增强后的 .bg-liquid
+   光斑(.52)，透出明显的磨砂玻璃纵深; 白字对比靠 text-shadow 保证。
+   [v11 通透修正] 用户反馈仍像纯色蒙层、光斑透不出。根因: 背景
+   linear-gradient 三层 alpha .28-.32 叠在 blur 上，几乎压死背后光斑。
+   改法: 大幅降蒙层 alpha(.32→.16/.10)，让 blur 模糊后的光斑色块
+   成为主要可见内容; 白字对比仍靠 text-shadow(已带 2px 投影)。 */
+#page-header.full_page {
+  background: linear-gradient(
+    150deg,
+    rgba(96, 120, 176, .20) 0%,
+    rgba(120, 138, 190, .12) 45%,
+    rgba(140, 158, 210, .16) 100%
+  ) !important;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+/* 原 hero ::before 压暗遮罩 → 去掉(玻璃已透光斑, 无需再压暗) */
+#page-header.full_page:not(.not-top-img)::before {
+  display: none !important;
+}
+
+/* ---- dark：深色磨砂玻璃 ----
+   [v11] 同 light 通透修正: 降蒙层 alpha, 透出深色光斑 */
+html[data-theme='dark'] #page-header.full_page {
+  background: linear-gradient(
+    150deg,
+    rgba(40, 52, 84, .22) 0%,
+    rgba(18, 24, 40, .24) 48%,
+    rgba(28, 38, 62, .20) 100%
+  ) !important;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+html[data-theme='dark'] #page-header.full_page:not(.not-top-img)::before {
+  display: none !important;
+}
+
+/* ---- hero 底部羽化（fade-out），与下方内容区柔和融合 ----
+   用 mask 渐变让 hero 玻璃在底部渐透明，消除与内容区相切的生硬水平分界线。
+   同时作用于 light（白模式）与 dark（黑模式）。
+   「色彩断层」优化：原 150px 线性 0→100% 在透明端偏生硬，且 hero 的
+   backdrop-filter 在 mask 快透明处会突然剥离，形成可见断层。
+   改法：① 拉长羽化区到 260px，② 加入 60%/80% 中间停点做更平缓的 S 形衰减，
+   让 glass + backdrop 随 alpha 同步、平滑地淡出。 */
+#page-header.full_page {
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 calc(100% - 260px),
+    rgba(0, 0, 0, .82) calc(100% - 180px),
+    rgba(0, 0, 0, .46) calc(100% - 120px),
+    rgba(0, 0, 0, .18) calc(100% - 70px),
+    rgba(0, 0, 0, .04) calc(100% - 34px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 calc(100% - 260px),
+    rgba(0, 0, 0, .82) calc(100% - 180px),
+    rgba(0, 0, 0, .46) calc(100% - 120px),
+    rgba(0, 0, 0, .18) calc(100% - 70px),
+    rgba(0, 0, 0, .04) calc(100% - 34px),
+    transparent 100%
+  );
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+/* 移动端：hero 玻璃保留(用户要求与桌面一致), 仅降 blur 半径省 GPU */
+@media (max-width: 768px) {
+  #page-header.full_page,
+  html[data-theme='dark'] #page-header.full_page {
+    /* 与桌面 v11 通透玻璃一致(light/dark 各自渐变在上方已定义),
+       此处仅降模糊半径 18→12 并保留底部 mask 羽化 */
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+  #page-header.full_page:not(.not-top-img)::before,
+  html[data-theme='dark'] #page-header.full_page:not(.not-top-img)::before {
+    display: none !important;
+  }
+}
+
+/* ============================================================
+   附属页 header（文章详情 .post-bg / 归档·标签·分类 .not-home-page）
+   玻璃化 + 与首页 hero 完全一致的底部羽化
+   用户要求："这种副页面都要实现羽化，做到与首页 hero 完全一致"。
+   ------------------------------------------------------------
+   关键难点：文章页标题(.post-title) 与 归档页标题(#site-title) 都在
+   header 底部 / 中部，若像首页 hero 那样把 mask 用在 #page-header
+   本体上做底部淡出，会把标题文字一起淡成透明。
+   解法：把「玻璃渐变 + 底部羽化 mask」全部放在 ::before 背景层上，
+   ::before 是绝对定位、z 在文字之下(header 自身 z 序: ::before 默认在
+   子元素下方)，因此 mask 只淡出背景、永不伤文字 → 可与 hero 参数逐项一致。
+   ============================================================ */
+
+/* ---- light：通透深蓝玻璃（与 hero light 完全一致） ----
+   关键：isolation:isolate 强制 #page-header 形成独立 stacking context，
+   否则 ::before/::after 的 z-index:-1 会相对祖先 #body-wrap(z=1) 定位，
+   被推到页面 body 深色底之后 → 玻璃渐变与底部羽化在像素上不可见(无效)。
+   [v7 修复] 玻璃渐变只保留在 ::before 单层：本体会背景改透明+去掉backdrop，
+   避免「本体渐变 + ::before 渐变」两层 alpha≈.40 叠加压死背后 .bg-liquid
+   彩色光斑（此前文章页标题区呈纯色平渐变的根因）。 */
+#page-header.not-home-page,
+#page-header.post-bg {
+  isolation: isolate;
+  background: transparent !important;
+}
+
+/* 背景 + 底部羽化 mask 全部放在 ::before（绝对定位，占满 header） */
+#page-header.not-home-page::before,
+#page-header.post-bg::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;              /* 置于文字/导航之下 */
+  pointer-events: none;
+  /* 玻璃背景复刻到背景层，保证 ::before 自己也是一块"玻璃"
+     [v9] 与首页 hero light 同步: 冷雾蓝灰 + 适中 alpha(.32), 透出光斑纵深 */
+  background: linear-gradient(
+    150deg,
+    rgba(64, 84, 128, .32) 0%,
+    rgba(78, 98, 142, .28) 50%,
+    rgba(88, 106, 150, .32) 100%
+  ) !important;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  /* 底部 260px S 形羽化（与首页 hero 完全相同） */
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 calc(100% - 260px),
+    rgba(0, 0, 0, .82) calc(100% - 180px),
+    rgba(0, 0, 0, .46) calc(100% - 120px),
+    rgba(0, 0, 0, .18) calc(100% - 70px),
+    rgba(0, 0, 0, .04) calc(100% - 34px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 calc(100% - 260px),
+    rgba(0, 0, 0, .82) calc(100% - 180px),
+    rgba(0, 0, 0, .46) calc(100% - 120px),
+    rgba(0, 0, 0, .18) calc(100% - 70px),
+    rgba(0, 0, 0, .04) calc(100% - 34px),
+    transparent 100%
+  );
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+/* 遮罩羽化渐变（覆盖在 ::before 玻璃之上，保留标题区轻微压暗保白字对比；
+   与 hero 的 ::before 高光渐变同一语言，但底部稍回深以承载贴底标题） */
+#page-header.not-home-page::after,
+#page-header.post-bg::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;              /* 在 ::before 之上、文字之下 */
+  pointer-events: none;
+  /* [v9] 压暗层保持轻盈(比 v7 略弱), 配合增强光斑透出纵深; 标题对比
+     已由 text-shadow 保证 */
+  background: linear-gradient(
+    180deg,
+    rgba(20, 30, 60, .14) 0%,
+    rgba(30, 45, 90, .10) 40%,
+    rgba(20, 30, 60, .08) 68%,
+    rgba(14, 22, 48, .16) 100%
+  ) !important;
+}
+
+/* ---- dark：深色磨砂玻璃（与 hero dark 完全一致） ---- */
+html[data-theme='dark'] #page-header.not-home-page,
+html[data-theme='dark'] #page-header.post-bg {
+  isolation: isolate;
+  /* [v7] 玻璃只留 ::before 单层，本体改透明避免双层叠加压死光斑 */
+  background: transparent !important;
+}
+
+html[data-theme='dark'] #page-header.not-home-page::before,
+html[data-theme='dark'] #page-header.post-bg::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    150deg,
+    rgba(30, 40, 66, .32) 0%,
+    rgba(12, 16, 28, .34) 48%,
+    rgba(22, 30, 48, .30) 100%
+  ) !important;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 calc(100% - 260px),
+    rgba(0, 0, 0, .82) calc(100% - 180px),
+    rgba(0, 0, 0, .46) calc(100% - 120px),
+    rgba(0, 0, 0, .18) calc(100% - 70px),
+    rgba(0, 0, 0, .04) calc(100% - 34px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 calc(100% - 260px),
+    rgba(0, 0, 0, .82) calc(100% - 180px),
+    rgba(0, 0, 0, .46) calc(100% - 120px),
+    rgba(0, 0, 0, .18) calc(100% - 70px),
+    rgba(0, 0, 0, .04) calc(100% - 34px),
+    transparent 100%
+  );
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+html[data-theme='dark'] #page-header.not-home-page::after,
+html[data-theme='dark'] #page-header.post-bg::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  /* [v7] 大幅减弱压暗层（此前 .14/.20 把光斑压得太实，标题对比
+     已由 text-shadow 保证），让 ::before 玻璃透出的彩色光斑更多显现 */
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, .03) 0%,
+    rgba(16, 24, 44, .07) 40%,
+    rgba(10, 14, 26, .11) 100%
+  ) !important;
+}
+
+/* 标题文字：玻璃底上加强投影/柔光（与 hero 标题一致的清晰度） */
+#page-header.not-home-page #site-title,
+#page-header.not-home-page #site-subtitle,
+#page-header.post-bg .post-title,
+#page-header.post-bg #post-meta {
+  text-shadow:
+    0 2px 10px rgba(0, 0, 0, .55),
+    0 0 2px rgba(0, 0, 0, .35);
+}
+
+/* 移动端：附属页 header 玻璃保留(与 hero 一致), 仅降 blur 半径 */
+@media (max-width: 768px) {
+  #page-header.not-home-page::before,
+  #page-header.post-bg::before,
+  html[data-theme='dark'] #page-header.not-home-page::before,
+  html[data-theme='dark'] #page-header.post-bg::before {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+  #page-header.not-home-page::after,
+  #page-header.post-bg::after,
+  html[data-theme='dark'] #page-header.not-home-page::after,
+  html[data-theme='dark'] #page-header.post-bg::after {
+    background: linear-gradient(
+      180deg,
+      rgba(20, 30, 60, .10) 0%,
+      transparent 60%
+    ) !important;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
+/* ============================================================
+   文章底部 前一篇/后一篇 + 相关推荐 磨砂玻璃化
+   ------------------------------------------------------------
+   #pagination.pagination-post 的 .pagination-related(上一篇/下一篇)
+   与 .relatedPosts-list 的 .pagination-related(相关推荐) 共用主题
+   黑底( $dark-black )白字样式。这里改为玻璃面板：
+   - light(白模式) = 白色毛玻璃(半透明白膜, 透出背后光斑模糊)
+   - dark (黑模式) = 黑色磨砂玻璃(半透明深色膜)
+   站点文章均无封面, .cover 只是默认色块 → 玻璃化时隐藏, 让模糊
+   光斑成为主要视觉。文字在 light 反转为深色保证对比(主题默认白字
+   在白色玻璃上不可读)。
+   ============================================================ */
+
+/* prev/next 两块从贴合的整块改为两块独立玻璃卡(间隙 + 圆角) */
+#pagination.pagination-post {
+  overflow: visible;
+  gap: 10px;
+}
+#pagination.pagination-post a.pagination-related,
+.relatedPosts-list a.pagination-related {
+  border-radius: 10px;
+}
+
+/* 封面色块隐藏(无封面帖子的 .cover 仅是 var(--default-bg-color) 色块) */
+#pagination.pagination-post a.pagination-related .cover,
+.relatedPosts-list a.pagination-related .cover {
+  display: none;
+}
+
+/* ---- light：白色毛玻璃 ---- */
+#pagination.pagination-post a.pagination-related,
+.relatedPosts-list a.pagination-related {
+  background: linear-gradient(
+    150deg,
+    rgba(255, 255, 255, .52) 0%,
+    rgba(255, 255, 255, .20) 55%,
+    rgba(255, 255, 255, .38) 100%
+  ) !important;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, .32),
+    inset 0 1px 0 rgba(255, 255, 255, .72),
+    inset 0 -1px 0 rgba(255, 255, 255, .22),
+    0 10px 28px -14px rgba(48, 66, 104, .32);
+}
+
+/* light 文字反转为深色(默认 .info 白字在白色玻璃上看不见) */
+#pagination.pagination-post a.pagination-related .info,
+.relatedPosts-list a.pagination-related .info {
+  color: #242c3f;
+}
+#pagination.pagination-post a.pagination-related .info-1 .info-item-1,
+.relatedPosts-list a.pagination-related .info-1 .info-item-1 {
+  color: #6a7488;
+}
+#pagination.pagination-post a.pagination-related .info-1 .info-item-2,
+#pagination.pagination-post a.pagination-related .info-2 .info-item-1,
+.relatedPosts-list a.pagination-related .info-1 .info-item-2,
+.relatedPosts-list a.pagination-related .info-2 .info-item-1 {
+  color: #1f2739;
+}
+/* hover 时玻璃提亮 + 轻微上浮, 替代封面缩放反馈 */
+#pagination.pagination-post a.pagination-related:hover,
+.relatedPosts-list a.pagination-related:hover {
+  background: linear-gradient(
+    150deg,
+    rgba(255, 255, 255, .62) 0%,
+    rgba(255, 255, 255, .30) 55%,
+    rgba(255, 255, 255, .46) 100%
+  ) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, .42),
+    inset 0 1px 0 rgba(255, 255, 255, .85),
+    inset 0 -1px 0 rgba(255, 255, 255, .30),
+    0 14px 32px -12px rgba(48, 66, 104, .42);
+  transform: translateY(-2px);
+}
+
+/* ---- dark：黑色磨砂玻璃 ----
+   文字需显式覆盖(light 的文字规则未限定主题, 会串到 dark) */
+html[data-theme='dark'] #pagination.pagination-post a.pagination-related,
+html[data-theme='dark'] .relatedPosts-list a.pagination-related {
+  background: linear-gradient(
+    160deg,
+    rgba(34, 42, 68, .36) 0%,
+    rgba(10, 14, 26, .34) 55%,
+    rgba(22, 28, 48, .38) 100%
+  ) !important;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow:
+    0 0 0 1px rgba(150, 180, 240, .14),
+    inset 0 1px 0 rgba(255, 255, 255, .16),
+    inset 0 -1px 0 rgba(255, 255, 255, .04),
+    0 12px 30px -16px rgba(0, 0, 0, .60) !important;
+}
+/* dark 文字: 深色玻璃上恢复白字/浅灰标签 */
+html[data-theme='dark'] #pagination.pagination-post a.pagination-related .info,
+html[data-theme='dark'] .relatedPosts-list a.pagination-related .info {
+  color: #eef1f8;
+}
+html[data-theme='dark'] #pagination.pagination-post a.pagination-related .info-1 .info-item-1,
+html[data-theme='dark'] .relatedPosts-list a.pagination-related .info-1 .info-item-1 {
+  color: #9aa4bf;
+}
+html[data-theme='dark'] #pagination.pagination-post a.pagination-related .info-1 .info-item-2,
+html[data-theme='dark'] #pagination.pagination-post a.pagination-related .info-2 .info-item-1,
+html[data-theme='dark'] .relatedPosts-list a.pagination-related .info-1 .info-item-2,
+html[data-theme='dark'] .relatedPosts-list a.pagination-related .info-2 .info-item-1 {
+  color: #eef1f8;
+}
+html[data-theme='dark'] #pagination.pagination-post a.pagination-related:hover,
+html[data-theme='dark'] .relatedPosts-list a.pagination-related:hover {
+  background: linear-gradient(
+    160deg,
+    rgba(46, 56, 90, .44) 0%,
+    rgba(16, 22, 40, .42) 55%,
+    rgba(30, 38, 64, .46) 100%
+  ) !important;
+  box-shadow:
+    0 0 0 1px rgba(170, 195, 250, .22),
+    inset 0 1px 0 rgba(255, 255, 255, .24),
+    inset 0 -1px 0 rgba(255, 255, 255, .06),
+    0 16px 36px -14px rgba(0, 0, 0, .70) !important;
+  transform: translateY(-2px);
+}
+
+/* 快速滚动性能降级: 前/后篇+相关推荐卡不再参与 backdrop 切换(同卡片,
+   滚动时来回切 12px→4px 会触发重采样卡顿)。保持稳定玻璃即可。 */

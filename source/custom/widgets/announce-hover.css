@@ -1,0 +1,125 @@
+/* ============================================================
+   Announcement card: title always visible + body expand on hover
+   公告卡默认显示：标题行「📢 公告」+ 公告首段标题(常驻)。
+   鼠标悬浮(或触屏点击)时，正文在卡片内部向下展开。
+   不溢出卡片边界，保留圆角裁切。非线性缓动。
+   ※ 侧栏卡片 .card-widget 自带 overflow:hidden，不能在卡片外
+   弹浮层(会被裁掉)——一律卡片内部展开。
+   结构(由 announce-hover.js 生成)：
+     .card-announcement
+       .item-headline        「📢 公告」
+       .announcement_title   公告首段(常驻标题)
+       .announcement_body    其余正文(默认折叠，hover/open 展开)
+   ============================================================ */
+
+.card-announcement {
+  position: relative;
+}
+
+/* ---- 标题行：强制始终可见、醒目 ---- */
+.card-announcement .item-headline {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  visibility: visible !important;
+  opacity: 1 !important;
+  font-size: 1.02em;
+  font-weight: 600;
+  line-height: 1.6;
+  min-height: 0;
+}
+
+/* 图标加载失败时仍有可读标题文字 */
+.card-announcement .item-headline span {
+  color: inherit;
+}
+
+/* ---- 喇叭标识：默认静止，仅"新公告"时才播放 shake 动画 ---- */
+/* 覆盖 Font Awesome 的 .fa-shake，默认不播 */
+.card-announcement .item-headline i.fa-bullhorn.fa-shake {
+  animation: none !important;
+}
+/* 当 JS 判定为新公告时，加上 .is-new 类才允许晃 */
+.card-announcement .item-headline i.fa-bullhorn.fa-shake.is-new {
+  animation: fa-shake 1s ease-in-out !important;
+}
+
+/* ---- 常驻公告标题（首段）---- */
+.card-announcement .announcement_title {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.95em;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--theme-color, #49b1f5);
+  word-break: break-word;
+}
+
+/* ---- 正文：卡片内折叠展开 ---- */
+.card-announcement .announcement_body {
+  overflow: hidden;                     /* 配合 max-height 做折叠动画 */
+  max-height: 0;                        /* 默认折叠 */
+  opacity: 0;
+  margin-top: 0;
+  padding: 0 2px;
+  font-size: 0.92em;
+  line-height: 1.8;
+  text-align: left;
+  transition:
+    max-height 0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 0.3s ease,
+    margin-top 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
+    padding 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* 悬浮 或 触屏 .open：正文向下展开 */
+.card-announcement:hover .announcement_body,
+.card-announcement.open .announcement_body {
+  max-height: 720px;                    /* 足够容纳长文 */
+  opacity: 1;
+  margin-top: 6px;
+  padding: 2px;
+}
+
+/* ---- 触屏/无 hover 设备: 禁用 :hover 展开, 只由 .open 类控制 ----
+   原因: 触屏点击会触发 sticky :hover, 点一次后 :hover 一直粘住, 即便
+   .open 被 toggle 掉, :hover 仍让正文保持展开 → "点第二次收不起来"。
+   所以在 (hover:none) 设备上把 :hover 规则关掉, 展开/收起完全交给
+   JS 的 .open toggle。桌面 hover 设备保持原样(鼠标移入展开/移出收起)。 */
+@media (hover: none) {
+  .card-announcement:hover .announcement_body {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+    padding: 0 2px;
+  }
+}
+
+/* ---- 标题与正文之间的分隔线（展开时可见） ---- */
+.card-announcement .announcement_body {
+  border-top: 1px solid transparent;
+}
+.card-announcement:hover .announcement_body,
+.card-announcement.open .announcement_body {
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+html[data-theme='dark'] .card-announcement:hover .announcement_body,
+html[data-theme='dark'] .card-announcement.open .announcement_body {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ---- 正文排版细节 ---- */
+.card-announcement .announcement_body p {
+  margin: 0.4em 0;
+}
+.card-announcement .announcement_body ul {
+  margin: 0.2em 0 0.2em 1.2em;
+  padding: 0;
+}
+.card-announcement .announcement_body li {
+  margin: 0.15em 0;
+}
+.card-announcement .announcement_body blockquote {
+  margin: 0.5em 0;
+  padding: 0.2em 0.8em;
+}

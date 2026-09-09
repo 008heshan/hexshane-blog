@@ -1,0 +1,62 @@
+/* ============================================================
+   Visit card — swap text (custom inject, v10)
+   双人切换：默认站主 l3AFovxs，hover 换 HexShane 头像+名字+简介「卡密」。
+   - 去掉头像 hover 常驻旋转（覆盖主题 rotate(360deg)）
+   - 头像切换时（old -> new）旋转一下（spin 过渡）
+   - 名字/简介文字切换加"模糊遮罩"过渡，无整卡折叠动画
+   ============================================================ */
+
+/* 卡片保持相对定位，避免切换时布局跳动 */
+html.js .card-info {
+  position: relative;
+}
+
+/* 去掉头像 hover 常驻旋转：覆盖主题 .avatar-img img:hover rotate(360deg)。
+   注意：不要用 !important —— 否则会在 hover 时把下方 @keyframes spin 动画的 transform
+   一同压掉（!important 优先级高于动画），导致头像切换旋转失效、视觉静止。
+   这里仅覆盖主题的 rotate(360deg)，spin 动画自带更高优先级。 */
+html.js .card-info .avatar-img img:hover,
+html.js .card-info:hover .avatar-img img {
+  transform: none;
+}
+/* 头像基础：无常驻 transition（避免移除 spin 时逆时针回退） */
+html.js .card-info .avatar-img img {
+  transition: none;
+}
+
+/* 头像切换到新图时的旋转动画：用 @keyframes 播放一圈，
+   播完自动停在最终帧，移除类时无回退（不像 transition 会倒转） */
+@keyframes avatar-spin {
+  from { transform: rotate(0deg) scale(1); }
+  to   { transform: rotate(360deg) scale(1); }
+}
+html.js .card-info .avatar-img img.spin,
+html.js .card-info:hover .avatar-img img.spin {
+  animation: avatar-spin 0.6s ease-in-out forwards;
+}
+
+/* 文字区容器：相对定位，承载单一文本元素 */
+html.js .card-info .swap-text {
+  position: relative;
+}
+
+/* 名字/简介文字切换时的"模糊遮罩"过渡：柔和不硬变 */
+html.js .card-info .swap-text {
+  transition: filter 0.28s ease,
+              opacity 0.28s ease;
+  will-change: filter, opacity;
+}
+
+/* 切换瞬间的模糊态（配合 JS 在换字前后短暂应用） */
+html.js .card-info .swap-text.swapping {
+  filter: blur(6px);
+  opacity: 0.25;
+}
+
+/* 名片文字复用主题样式，确保视觉一致 */
+html.js .card-info .swap-text .author-info-name {
+  font-weight: 500;
+}
+html.js .card-info .swap-text .author-info-description {
+  margin-top: -.42em;
+}

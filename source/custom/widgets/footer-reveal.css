@@ -1,0 +1,141 @@
+/* ============================================================
+   Footer — normal document-flow footer (custom inject, v6 → v7)
+   普通网站形态：footer 跟随内容排版在页面最底部，默认直接显示。
+   视觉：明亮通透的浅玻璃底 + 分层居中排版（参考 BakaXL 站底声明区）。
+   v7 light 调整：与 v6 冷雾液态玻璃大背景/高斯模糊卡片同调,
+   footer 不再做奶白亮带(α.82 白→奶亮突兀), 改为低饱和冷雾半透明
+   玻璃(浅灰蓝半透, 与大背景同色相), backdrop 模糊后形成柔和
+   "底部玻璃", 不抢主体卡片, 但仍与背景区分。
+   保留毛玻璃背景，与整站玻璃风统一。JS 仅用于标记 html.js。
+   ============================================================ */
+
+/* 还原 footer 占位：不再需要底部 150px 垫高（之前是给悬浮 footer 留位） */
+html.js body {
+  padding-bottom: 0;
+}
+
+/* ---------- Footer 玻璃背景（light/dark 适配） ---------- */
+
+/* light：冷雾同调半透明玻璃(浅灰蓝, 与 .bg-liquid 冷雾底色同色相,
+   backdrop 模糊后融于背景而非奶白亮带) */
+#footer {
+  background: linear-gradient(
+    180deg,
+    rgba(232, 234, 242, .62) 0%,
+    rgba(210, 216, 232, .50) 100%
+  ) !important;
+  /* 恢复完整模糊效果: GPU 加速已启用 */
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255, 255, 255, .45);
+  /* box-shadow 只保留 inset 高光, 外阴影由 ::after 伪元素预渲染 */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55);
+  position: relative;
+  /* 强制 GPU 加速: backdrop-filter 必须走 GPU 合成层 */
+  will-change: transform;
+  transform: translateZ(0);
+}
+/* 阴影预渲染: ::after 伪元素始终在 DOM 中, 消除快速滚动时阴影延迟 */
+#footer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  box-shadow: 0 -14px 40px rgba(40, 54, 88, .18);
+}
+
+/* dark：深色磨砂玻璃 */
+[data-theme='dark'] #footer {
+  background: linear-gradient(180deg, rgba(34, 38, 53, .62) 0%, rgba(12, 14, 21, .46) 100%) !important;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255, 255, 255, .10);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14);
+}
+/* dark 外阴影预渲染 */
+[data-theme='dark'] #footer::after {
+  box-shadow: 0 -16px 44px rgba(0, 0, 0, .50);
+}
+
+/* 移除主题自带的 footer 遮罩层，避免盖住玻璃 */
+#footer::before {
+  display: none !important;
+}
+
+/* ---------- 分层排版结构 ---------- */
+
+/* 整体：footer-other 用 flex 纵向排布，内容靠右下沉对齐（版权/框架/声明都到右下） */
+#footer .footer-other {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  min-height: 96px;
+  padding: 28px 24px 14px;
+  text-align: right;
+}
+
+/* 版权行（© 年份 By 站主）+ 框架行（Hexo | Butterfly）：都右对齐靠底 */
+#footer .footer-copyright {
+  line-height: 1.9;
+}
+
+/* 框架/主题信息行单独成块，随版权一起右对齐 */
+#footer .framework-info {
+  display: block;
+}
+
+/* 声明区：来自 custom_text，跟版权一样右对齐，叠在其下方 */
+#footer .footer_custom_text {
+  margin-top: 6px;
+}
+
+#footer .footer-site-meta {
+  position: static;
+  font-size: .88em;
+  line-height: 1.8;
+  text-align: right;
+  max-width: 100%;
+}
+#footer .footer-statement {
+  opacity: .82;
+}
+
+/* dark 下把声明行透明度略降，避免过亮 */
+[data-theme='dark'] #footer .footer-statement {
+  opacity: .68;
+}
+
+/* ---------- Footer 文字颜色适配（玻璃背景会改变底色，需同步文字） ---------- */
+/* light：冷雾玻璃配稍深文字, 保证可读(冷雾底比之前奶白底深一点, 文字加深) */
+#footer .copyright,
+#footer .framework-info,
+#footer .footer_custom_text {
+  color: rgba(38, 44, 60, .86) !important;
+}
+#footer a {
+  color: #3d5fa6 !important;
+}
+
+/* dark：深色磨砂玻璃配浅色文字 */
+[data-theme='dark'] #footer .copyright,
+[data-theme='dark'] #footer .framework-info,
+[data-theme='dark'] #footer .footer_custom_text {
+  color: rgba(255, 255, 255, .78) !important;
+}
+[data-theme='dark'] #footer a {
+  color: #7aa2f0 !important;
+}
+
+/* 移动端：收紧内边距，内容仍靠右居中（flex 对齐不变） */
+@media (max-width: 768px) {
+  #footer .footer-other {
+    padding: 22px 16px 18px;
+    min-height: 0;
+  }
+  #footer .footer-site-meta {
+    margin-top: 8px;
+  }
+}
+

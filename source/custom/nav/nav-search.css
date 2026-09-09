@@ -1,0 +1,611 @@
+/* ============================================================
+   顶部导航栏 一体式胶囊检索 (custom inject)
+   - 常态: 一个圆角胶囊，内含放大镜图标(+提示文字)。
+     背景为轻量毛玻璃，无任何光晕/遮罩装饰(用户要求简洁)。
+   - 点击胶囊 → 输入区在图标右侧平滑滑出(宽度非线性展开)，
+     图标保持在胶囊内左侧 = "搜索栏把图标包起来"。
+   - 无输入时不下拉任何提示浮层；只有检索产生内容
+     (结果 / 无结果 / 索引失败) 时才显示结果浮层。
+   - 再次点击胶囊 / Esc / 点击空白处收起。
+   ============================================================ */
+
+/* ---- 容器: 放 #menus 内最右 ---- */
+#nav .nav-search {
+  position: relative;
+  margin-left: auto;
+  margin-right: 0;      /* 贴导航最右缘 */
+  order: 10;
+  z-index: 1002;
+  display: flex;
+  align-items: center;
+  /* 桌面端显式宽度 + 过冲缓动 = "回收惯性"手感(与手机端同款结构)。
+     若把过冲放在输入框 width 上, 收到 0 时会被钳制无法下冲 → 惯性消失;
+     故把过冲放在容器 width 上(可下冲到 43px 以下再回弹), 胶囊体 100% 填充。
+     过冲量取 ~1.3%(y1=1.20): 1.15(0.6%,2px)时"不会弹"、1.25(2%,6px)时
+     "抖动太夸张", 取中间值使边框明显回弹又不夸张。 */
+  width: 43px;
+  transition: width .4s cubic-bezier(.3, 1.20, .3, 1);
+}
+#nav .nav-search.nav-search-open {
+  /* 展开态总宽: 输入 290 + 图标 19 + 左右 padding 22 + 边框 2 = 333 */
+  width: 333px;
+}
+
+/* ---- 一体胶囊本体(图标 + 输入同盒) ----
+   常态只显示图标(输入区宽度0, overflow裁掉)。
+   展开态 .nav-search-open: 输入区 width 0→290px, 图标仍居左。
+   收起是同一胶囊: 不占位不遮挡, 不推挤菜单项(绝对定位外层无, 由
+   #menus flex 提供; 胶囊自身宽度会变, 但胶囊在最右, 左侧是空白区)。 */
+#nav .nav-search-bar {
+  position: relative;      /* 供跑马灯/marquee absolute 定位 */
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  gap: 0;
+  width: 100%;             /* 撑满 .nav-search 容器, 由容器宽度过渡带动过冲惯性 */
+  min-width: 0;
+  box-sizing: border-box;
+  height: 38px;
+  padding: 0 11px;        /* 左右对称, 默认图标水平居中 */
+  border-radius: 999px;
+  cursor: pointer;
+  /* 与顶部导航栏统一的 macOS 毛玻璃语言 */
+  background: linear-gradient(150deg, rgba(246, 248, 252, .50), rgba(232, 238, 248, .40));
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, .60);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .6),
+    0 2px 8px rgba(40, 54, 88, .08);
+  /* 收起态: 只容纳图标+对称padding */
+  transition:
+    background-color .2s ease,
+    border-color .2s ease;
+}
+
+/* ---- 边框流光跑马灯 ----
+   效果：冷雾蓝渐变沿搜索栏边框旋转流动
+   结构：::before 覆盖整个胶囊，用 mask 裁出边框环 */
+@property --nav-flow {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes nav-flow-rotate {
+  to { --nav-flow: 360deg }
+}
+
+/* 默认态不显示；收起时快速淡出 */
+#nav .nav-search-bar::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 999px;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .18s ease;
+  /* 冷雾蓝渐变跑马灯 */
+  background: conic-gradient(
+    from var(--nav-flow),
+    rgba(30, 58, 138, 0) 0%,
+    rgba(37, 99, 235, .95) 18%,
+    rgba(124, 58, 237, .95) 32%,
+    rgba(8, 145, 178, .92) 50%,
+    rgba(234, 88, 12, .92) 68%,
+    rgba(37, 99, 235, .95) 82%,
+    rgba(30, 58, 138, 0) 100%
+  );
+  /* 裁出边框环：只显示边缘 2px */
+  padding: 2px;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+
+/* 展开态：直接渐显 + 旋转，不做放大 */
+#nav .nav-search-open .nav-search-bar::before {
+  opacity: 1;
+  transition: opacity .6s cubic-bezier(.3, .02, .2, 1) .5s;
+  animation: nav-flow-rotate 7s linear infinite;
+}
+
+/* dark: 跑马灯取深色玻璃主色 */
+html[data-theme='dark'] #nav .nav-search-bar::before {
+  background: conic-gradient(
+    from var(--nav-flow),
+    rgba(90, 135, 240, 0) 0%,
+    rgba(120, 160, 250, .85) 18%,
+    rgba(180, 120, 245, .88) 32%,
+    rgba(60, 200, 180, .80) 50%,
+    rgba(245, 145, 82, .78) 68%,
+    rgba(120, 160, 250, .85) 82%,
+    rgba(90, 135, 240, 0) 100%
+  );
+}
+html[data-theme='dark'] #nav .nav-search-bar::after {
+  background: conic-gradient(
+    from var(--nav-flow),
+    rgba(90, 135, 240, 0) 0%,
+    rgba(120, 160, 250, .6) 18%,
+    rgba(180, 120, 245, .55) 32%,
+    rgba(60, 200, 180, .5) 50%,
+    rgba(245, 145, 82, .48) 68%,
+    rgba(120, 160, 250, .6) 82%,
+    rgba(90, 135, 240, 0) 100%
+  );
+}
+#nav .nav-search-bar:hover {
+  background: linear-gradient(150deg, rgba(255, 255, 255, .46), rgba(255, 255, 255, .22));
+}
+
+/* 放大镜图标: 固定在胶囊右侧(最右), 展开时不移动 */
+#nav .nav-search-ico {
+  flex: 0 0 auto;
+  order: 3;                     /* 放最右 */
+  color: rgba(70, 84, 116, .85);
+  font-size: 15px;
+  line-height: 1;
+  transition: color .2s ease;
+}
+#nav .nav-search-open .nav-search-ico,
+#nav .nav-search-bar:hover .nav-search-ico {
+  color: var(--theme-color, #49b1f5);
+}
+
+/* 输入框: 常态宽0不可见; 展开后从图标左侧向左滑出 */
+#nav .nav-search-input {
+  order: 1;                     /* 放图标左侧 */
+  flex: 1 1 0%;                 /* 恒 grow 填满图标左侧空间(收起时无剩余空间=0) */
+  width: 0;
+  min-width: 0;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: rgba(40, 44, 60, .92);
+  font-size: 13.5px;
+  font-family: inherit;
+  opacity: 0;
+  pointer-events: none;
+  cursor: text;
+  /* [美化] 隐藏原生光标: 由 .nav-search-caret 自定义光标接管 */
+  caret-color: transparent;
+  /* 宽度不再自行过渡: 由 .nav-search 容器 width 过渡统一驱动(过冲惯性),
+     输入框用 flex-grow 填满图标左侧空间。
+     关键: flex-grow 必须恒为 1(不能在收起态改成 0), 否则收起瞬间 flex-grow
+     从 1 跳回 0, 输入框宽度瞬缩, 图标向左猛跳约 250px(抽搐)。 */
+  transition:
+    opacity .28s ease .06s,
+    padding .28s ease .06s;
+}
+#nav .nav-search-open .nav-search-input {
+  width: auto;
+  padding: 0 30px 0 10px;   /* 右 padding 30px 给绝对定位的清除按钮留位, 避免文字穿到×下 */
+  opacity: 1;
+  pointer-events: auto;
+}
+#nav .nav-search-input::placeholder {
+  color: rgba(90, 100, 130, .72);
+}
+/* 原生清除按钮已弃用(type=text), 隐藏任何残留 */
+#nav .nav-search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+#nav .nav-search-input::-ms-clear {
+  display: none;
+}
+
+/* ---- 自定义光标: 渐变 + 柔和光晕 + 呼吸动画 ----
+   取代原生生硬闪烁条。定位由 nav-search.js 的 positionCaret()
+   精确设到文字之后; 仅在输入框聚焦且展开时(.on)显示。 */
+#nav .nav-search-caret {
+  position: absolute;
+  top: 50%;
+  left: 0;                  /* JS 动态写入 */
+  width: 2px;
+  height: 18px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  /* 可见性由 .on 控制: visibility 硬开关 + opacity 柔和淡入淡出。
+     渐变/光晕/闪烁动画全部放在 ::before 上, 与外层可见性彻底解耦
+     (否则动画 opacity 会覆盖可见性控制, 导致光标展开前就可见)。 */
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity .15s ease, visibility 0s linear .15s;
+}
+#nav .nav-search-caret.on {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity .15s ease, visibility 0s;
+}
+/* 渐变填充 + 光晕 + 呼吸闪烁: 全部放在 ::before 独立层 */
+#nav .nav-search-caret::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  /* light: 冷雾蓝 → 深靛蓝渐变 */
+  background: linear-gradient(180deg, #8fb6ff 0%, #4a7df0 100%);
+  box-shadow:
+    0 0 0 .5px rgba(255, 255, 255, .45),
+    0 0 7px rgba(90, 150, 255, .60),
+    0 0 16px rgba(90, 150, 255, .30);
+  animation: nav-caret-breathe 1.15s ease-in-out infinite;
+}
+/* 呼吸闪烁: opacity 淡入淡出(1↔.28), 比原生 step 闪烁柔和高级 */
+@keyframes nav-caret-breathe {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: .28; }
+}
+/* dark: 光晕偏冷紫, 与深色玻璃协调 */
+html[data-theme='dark'] #nav .nav-search-caret::before {
+  background: linear-gradient(180deg, #b6c9ff 0%, #7d9cf5 100%);
+  box-shadow:
+    0 0 0 .5px rgba(255, 255, 255, .22),
+    0 0 8px rgba(130, 170, 255, .65),
+    0 0 18px rgba(140, 120, 255, .35);
+}
+
+/* ---- 检索栏提示文字(静止, 不走马灯) ----
+   未输入时显示一段静态提示; 输入后隐藏。
+   颜色取大背景主色(实色, 避免渐变文字降级出黑)。 */
+#nav .nav-search-marquee {
+  position: absolute;
+  left: 30px;              /* 右移避开输入框文字起点/光标区(闪烁条) */
+  right: 48px;             /* 给清除按钮/图标留位 */
+  height: 100%;
+  display: none;           /* 仅展开态显示, 常态(只剩图标)不出现 */
+  align-items: center;
+  overflow: hidden;
+  pointer-events: none;    /* 不拦截输入框点击 */
+  white-space: nowrap;
+  /* 用明确实色(取大背景冷雾蓝主色), 不用 background-clip:text 渐变,
+     避免 color:transparent 在降级时渲染成黑色伪影 */
+  color: rgba(108, 130, 175, .95);
+}
+#nav .nav-search-open .nav-search-marquee {
+  display: flex;
+}
+#nav .nav-search-marquee span {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  opacity: .88;
+}
+#nav .nav-search-marquee.hidden {
+  display: none;           /* 有输入时覆盖展开态, 隐藏提示文字 */
+}
+
+/* ---- 清除按钮: 真实可点击, 有输入才显示 ----
+   用绝对定位锚在输入框右侧/图标左侧, 不参与 flex 布局,
+   这样输入前后胶囊宽度恒定(不因出现清除按钮而变宽)。 */
+#nav .nav-search-clear {
+  position: absolute;
+  right: 42px;             /* 图标宽18.8 + bar右padding 11 ~ 30, 取42避图标 */
+  top: 50%;
+  transform: translateY(-50%);
+  order: 2;
+  width: 22px;
+  height: 22px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: rgba(90, 104, 140, .80);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color .18s ease, background-color .18s ease;
+}
+#nav .nav-search-clear.show {
+  display: flex;
+}
+#nav .nav-search-clear:hover {
+  color: var(--theme-color, #49b1f5);
+  background: rgba(120, 170, 255, .16);
+}
+
+/* ---- dark 跑马灯: 取深色玻璃主色(实色) ---- */
+html[data-theme='dark'] #nav .nav-search-marquee {
+  color: rgba(150, 175, 235, .88);
+}
+
+/* ---- 结果浮层(仅检索有内容才出现) ----
+   毛玻璃冷雾面板, 默认隐藏; 展开且输入有效才显示 */
+#nav .nav-search-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 400px;
+  max-width: min(88vw, 400px);
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(160deg, rgba(250, 252, 255, .82), rgba(230, 236, 248, .76));
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, .50);
+  /* 投影与顶部导航栏下拉面板(.nav-drop)同款(无内高光);
+     发光由 .nav-drop-edge(边缘环) + .nav-drop-glow(指针光斑) 承担 */
+  box-shadow: 0 18px 50px rgba(40, 54, 88, .28), 0 4px 14px rgba(40, 54, 88, .10);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px) scale(.98);
+  transition:
+    opacity .26s ease,
+    transform .32s cubic-bezier(.22, 1, .36, 1),
+    visibility .26s;
+  text-align: left;
+}
+#nav .nav-search.show-panel .nav-search-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+/* 结果内容浮在光效(edge/glow)之上 */
+#nav .nav-search-status,
+#nav .nav-search-results {
+  position: relative;
+  z-index: 1;
+}
+/* 光效元素(.nav-drop-edge/.nav-drop-glow)复用 nav-apple.css 的冷雾蓝
+   质感, 但可见性改为"进入光效范围才发光、移出渐灭":
+   - 默认 opacity 0(熄灭)
+   - JS 判定指针是否在面板范围内, 在范围内写 opacity(edge=1, glow=.9),
+     范围外写 0, 由 transition 平滑渐亮/渐灭
+   - 位置仍由 JS clamp 到面板内跟随指针
+   - z-index: 边缘环提到 2(在结果列表 1 之上), 避免被结果列表的毛玻璃
+     背景遮住左/右边框环发光(否则左侧环会被结果列表的白膜+blur 糊掉) */
+#nav .nav-search-panel .nav-drop-edge {
+  z-index: 2;
+}
+#nav .nav-search-panel .nav-drop-edge,
+#nav .nav-search-panel .nav-drop-glow {
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+/* 熄灭中: 快速响应(用户要求熄灭更及时). JS 追踪 alpha 下降趋势时
+   给面板加 .glow-fading, 切换到 .1s 快过渡; 发光时(上升/稳定)
+   移除该类, 恢复 .25s 自然过渡 */
+#nav .nav-search-panel.glow-fading .nav-drop-edge,
+#nav .nav-search-panel.glow-fading .nav-drop-glow {
+  transition: opacity .1s ease-out;
+}
+
+/* 状态(loading/无结果/错误) */
+#nav .nav-search-status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 22px 18px;
+  color: rgba(60, 70, 96, .85);
+  font-size: 13px;
+  line-height: 1.6;
+}
+#nav .nav-search-status .nav-s-ico {
+  color: rgba(120, 150, 210, .7);
+  font-size: 15px;
+}
+#nav .nav-search-status b {
+  color: rgba(38, 44, 60, .95);
+  font-weight: 600;
+}
+#nav .nav-search-loading { color: rgba(90, 110, 150, .8) }
+#nav .nav-search-loading .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(120, 170, 255, .75);
+  animation: nav-search-bounce .9s ease-in-out infinite;
+}
+#nav .nav-search-loading .dot:nth-child(2) { animation-delay: .15s }
+#nav .nav-search-loading .dot:nth-child(3) { animation-delay: .3s }
+#nav .nav-search-loading .ns-text { margin-left: 4px; font-size: 12.5px; color: rgba(90,110,150,.8) }
+@keyframes nav-search-bounce {
+  0%, 100% { transform: translateY(0); opacity: .45 }
+  50% { transform: translateY(-4px); opacity: 1 }
+}
+
+/* 结果列表 */
+#nav .nav-search-results {
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+  max-height: 420px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 170, 255, .45) rgba(120, 170, 255, .08);
+  /* 毛玻璃结果层：把背后透上来的指针光斑(.nav-drop-glow)模糊成
+     柔和磨砂光晕(而非实心浅蓝色块糊住文字), 文字浮于其上保持清晰 */
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, .14);
+  border-radius: 12px;
+  /* 上下边缘渐隐遮罩：文字滚向列表边缘时先渐隐模糊过渡，再完全消失，
+     而非被生硬截断。顶部/底部各留 20px 渐变区。 */
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
+}
+/* WebKit/Chromium 滚动条: 窄轨 + 圆角半透明主题色滑块(与下拉面板同款) */
+#nav .nav-search-results::-webkit-scrollbar { width: 7px }
+#nav .nav-search-results::-webkit-scrollbar-track { background: rgba(120, 170, 255, .07); border-radius: 999px }
+#nav .nav-search-results::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(130, 185, 255, .55), rgba(100, 160, 255, .45));
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .18);
+}
+#nav .nav-search-results::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(150, 200, 255, .75), rgba(110, 170, 255, .60));
+}
+html[data-theme='dark'] #nav .nav-search-results {
+  scrollbar-color: rgba(110, 175, 255, .5) rgba(110, 175, 255, .06);
+  /* dark 磨砂玻璃结果层：深色薄雾膜, 光斑模糊成柔光, 文字清晰 */
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  background: rgba(20, 26, 42, .30);
+}
+html[data-theme='dark'] #nav .nav-search-results::-webkit-scrollbar-track {
+  background: rgba(110, 175, 255, .06);
+}
+html[data-theme='dark'] #nav .nav-search-results::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(110, 175, 255, .6), rgba(90, 150, 250, .5));
+}
+#nav .nav-search-item a {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background-color .18s ease, box-shadow .18s ease;
+}
+#nav .nav-search-item a:hover {
+  background: linear-gradient(150deg, rgba(120, 180, 250, .20), rgba(160, 210, 255, .13));
+  /* 悬停态描边发光: 与面板边框发光同色系, 光影层次递进 */
+  box-shadow: inset 0 0 0 1px rgba(120, 160, 235, .22);
+}
+#nav .nav-search-item .ns-title {
+  display: block;
+  color: rgba(31, 45, 61, .96);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#nav .nav-search-item .ns-meta {
+  display: block;
+  margin-top: 3px;
+  font-size: 11.5px;
+  color: rgba(90, 100, 130, .85);
+}
+#nav .nav-search-item .ns-meta time,
+#nav .nav-search-item .ns-meta .ns-cat,
+#nav .nav-search-item .ns-meta .ns-tags { margin-right: 8px }
+#nav .nav-search-item .ns-excerpt {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+  color: rgba(70, 80, 110, .85);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+#nav .nav-search-item mark,
+#nav .nav-search-status mark {
+  background: rgba(120, 180, 255, .30);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 1px;
+}
+
+/* ---- dark ---- */
+html[data-theme='dark'] #nav .nav-search-bar {
+  /* 与顶部导航栏 dark 风格统一：同系深色毛玻璃 */
+  background: linear-gradient(150deg, rgba(36, 42, 60, .55), rgba(20, 24, 36, .52));
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border-color: rgba(255, 255, 255, .12);   /* 导航同款细白边 */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 2px 8px rgba(0, 0, 0, .3);
+}
+html[data-theme='dark'] #nav .nav-search-bar:hover {
+  background: linear-gradient(150deg, rgba(44, 52, 74, .58), rgba(26, 32, 46, .55));
+  border-color: rgba(255, 255, 255, .16);
+}
+html[data-theme='dark'] #nav .nav-search-ico { color: rgba(200, 212, 235, .85) }
+html[data-theme='dark'] #nav .nav-search-input { color: rgba(255, 255, 255, .9) }
+html[data-theme='dark'] #nav .nav-search-input::placeholder { color: rgba(190, 200, 225, .58) }
+html[data-theme='dark'] #nav .nav-search-panel {
+  background: linear-gradient(160deg, rgba(40, 46, 64, .9), rgba(18, 22, 34, .88));
+  border-color: rgba(255, 255, 255, .12);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, .55);
+}
+html[data-theme='dark'] #nav .nav-search-status { color: rgba(205, 214, 235, .85) }
+html[data-theme='dark'] #nav .nav-search-status b { color: rgba(255, 255, 255, .95) }
+html[data-theme='dark'] #nav .nav-search-item .ns-title { color: rgba(255, 255, 255, .92) }
+html[data-theme='dark'] #nav .nav-search-item .ns-meta { color: rgba(170, 180, 205, .8) }
+html[data-theme='dark'] #nav .nav-search-item .ns-excerpt { color: rgba(180, 190, 215, .8) }
+html[data-theme='dark'] #nav .nav-search-item a:hover {
+  background: linear-gradient(150deg, rgba(90, 150, 255, .24), rgba(70, 110, 200, .13));
+  box-shadow: inset 0 0 0 1px rgba(120, 170, 255, .20);
+}
+
+/* ---- 移动端 ---- */
+@media (max-width: 768px) {
+  /* 导航栏最右功能组: 汉堡(#toggle-menu, order 3)最右, 搜索胶囊(order 2)贴其左。
+     胶囊宽度过渡: 收起 39px(仅图标), 展开 = --nav-search-expand-w(JS 量算
+     汉堡左缘 - 菜单左缘, 注入 CSS 变量)。右缘固定贴汉堡左侧, 左缘向左生长
+     → "输入框从右向左展开, 占据导航栏剩余空间"。width px→px 过渡可靠。 */
+  #nav .nav-search {
+    flex: 0 0 auto;
+    width: 39px;
+    transition: width .4s cubic-bezier(.3, 1.20, .3, 1);
+  }
+  #nav .nav-search.nav-search-open {
+    /* 不用 flex-grow:1 —— 否则会把 darkmode 切换键右侧的空隙也吸走,
+       检索栏左缘贴到切换键(碰到)。改为纯 width 定宽, 空隙交给切换键的
+       margin-right:auto 吸收, 检索栏与切换键保持 6px 间距。 */
+    width: var(--nav-search-expand-w, 260px);
+  }
+  /* 胶囊本体: 撑满容器 */
+  #nav .nav-search-bar {
+    height: 34px;
+    padding: 0 8px 0 10px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  /* 输入框: 收起 width:0 消除固有宽度贡献; 展开 flex-basis 0 撑满图标左侧。
+     关键: padding 必须与容器 width 同步过渡(0→40px), 否则点击瞬间 padding
+     瞬跳到 40px 会把图标向右挤出约 40px(图标抽搐), 再被容器展开拉回。 */
+  #nav .nav-search-input {
+    flex: 1 1 0%;
+    width: 0;
+    min-width: 0;
+    opacity: 0;
+    pointer-events: none;
+    padding: 0;
+    transition: opacity .28s ease .06s, padding .28s ease .06s;
+  }
+  #nav .nav-search-open .nav-search-input {
+    flex: 1 1 0%;
+    width: auto;
+    padding: 0 30px 0 10px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #nav .nav-search-panel {
+    position: fixed;
+    top: 62px;
+    right: 12px;
+    width: calc(100vw - 24px);
+    max-width: none;
+  }
+  /* 移动端跑马灯提示与清除按钮留位(图标右侧固定, 无需变) */
+  #nav .nav-search-marquee {
+    left: 26px;
+    right: 40px;
+  }
+}
+/* ---- 触屏设备光效居中(无 hover, 光斑跟随无意义) ----
+   在 (hover: none) + (pointer: coarse) 设备上, 光效不依赖鼠标, JS 只写
+   alpha=1 常亮; 光心位置由 CSS 固定居中(top:50% left:50% + translate
+   -50% -50%), 不受面板展开前尺寸未定的影响 */
+@media (hover: none) and (pointer: coarse) {
+  #nav .nav-search-panel .nav-drop-glow,
+  #nav .nav-search-panel .nav-drop-edge-light {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}

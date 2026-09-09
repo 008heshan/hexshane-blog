@@ -3,20 +3,21 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexshane
-subtitle: 记录、折腾与分享
-description: Hexshane 的个人博客
-keywords: Hexo,博客,Hexshane
-author: Hexshane
+title: 受命于天，既寿永昌
+subtitle: '分享技巧与经验'
+description: '一个关于技术、编程和生活的个人博客'
+keywords:
+- 月抛
+- 男男
+- 百合
+- 猎奇
+author: l3AFovxs
 language: zh-CN
 timezone: 'Asia/Shanghai'
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-## 生产环境（Cloudflare Pages + 自定义域名 hexshane.top）
-## GitHub Pages 项目站点使用额外的覆盖配置 _config.ghpages.yml，见该文件说明
 url: https://hexshane.top
-root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
@@ -46,17 +47,44 @@ render_drafts: false
 post_asset_folder: false
 relative_link: false
 future: true
-syntax_highlighter: highlight.js
+# 关闭原生高亮, 改用 hexo-shiki-plugin-butterfly (Shiki 高亮, 内置 github-light/dark)
+# Hexo 7.0+ 需将 syntax_highlighter 置空, 避免与 Shiki 冲突
+syntax_highlighter: ''
 highlight:
+  enable: false
   line_number: true
   auto_detect: false
   tab_replace: ''
   wrap: true
-  hljs: false
+  hljs: true
 prismjs:
+  enable: false
   preprocess: true
   line_number: true
   tab_replace: ''
+
+ # --- Hexo Shiki Plugin (hexo-shiki-plugin-butterfly) 配置 ---
+shiki:
+  # 用 css-variables 主题让 Shiki 输出 var(--shiki-token-*) 变量,
+  # 再由 code-highlight.css 按 data-theme 明/暗分别填 GitHub Light / GitHub Dark 色值。
+  # 这样同一份代码块 html 能随主题切换: 浅色=github-light 白卡, 深色=github-dark 黑卡。
+  theme: css-variables
+  line_number: true          # 显示行号
+  beautify: true             # 启用代码块工具条(复制/语言/折叠), 依赖 font-awesome (Butterfly 已内置)
+  colorized_brackets: true   # 嵌套括号着色 (@shikijs/colorized-brackets)
+  highlight_copy: true       # 显示复制按钮
+  highlight_lang: true       # 显示代码语言
+  highlight_height_limit: 0 # 0 = 不限高，代码块完整显示(不折叠)
+  is_highlight_shrink: false # false=默认展开
+  # 本地化 CSS/JS, 避免依赖 jsdelivr CDN (博客可离线/自托管)
+  css_cdn: /custom/effects/shiki-codeblock.css
+  js_cdn: /custom/effects/shiki-codeblock.js
+  skip_languages:            # 不应由 shiki 高亮的语言(交由 Butterfly 处理)
+    - mermaid
+  copy:                      # 复制提示文案
+    success: '复制成功'
+    error: '复制失败'
+    no_support: '浏览器不支持'
 
 # Home page setting
 # path: Root path for your blogs index page. (default = '')
@@ -99,24 +127,12 @@ ignore:
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: next
+theme: hexo-theme-butterfly
 
 # Deployment
-## 本站使用 GitHub Actions / Cloudflare Pages 自动构建部署，无需 hexo-deployer-git
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
-  type: ''
-
-# RSS Feed (hexo-generator-feed)
-feed:
-  type: atom
-  path: atom.xml
-  limit: 20
-  content:
-
-# Sitemap (hexo-generator-sitemap)
-sitemap:
-  path: sitemap.xml
-  rel: false
-  tags: true
-  categories: true
+  type: 
+  repo: 
+  branch: 
+  message: 

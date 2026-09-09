@@ -1,8 +1,7 @@
 {
-  "name": "hexshane-blog",
-  "version": "1.0.0",
+  "name": "hexo-site",
+  "version": "0.0.0",
   "private": true,
-  "description": "Hexshane 的个人博客，基于 Hexo + NexT，部署于 GitHub Pages / Cloudflare Pages",
   "scripts": {
     "build": "hexo generate",
     "build:ghpages": "hexo generate --config _config.yml,_config.ghpages.yml",
@@ -10,25 +9,22 @@
     "deploy": "hexo deploy",
     "server": "hexo server"
   },
-  "engines": {
-    "node": ">=20"
-  },
   "hexo": {
-    "version": "8.1.2"
+    "version": "7.3.0"
   },
   "dependencies": {
-    "hexo": "^8.1.2",
+    "hexo": "^7.0.0",
+    "hexo-deployer-git": "^4.0.0",
     "hexo-generator-archive": "^2.0.0",
     "hexo-generator-category": "^2.0.0",
-    "hexo-generator-feed": "^4.0.0",
-    "hexo-generator-index": "^4.0.0",
-    "hexo-generator-searchdb": "^1.5.0",
-    "hexo-generator-sitemap": "^3.0.1",
+    "hexo-generator-index": "^3.0.0",
     "hexo-generator-tag": "^2.0.0",
     "hexo-renderer-ejs": "^2.0.0",
-    "hexo-renderer-marked": "^7.0.0",
-    "hexo-renderer-stylus": "^3.0.1",
+    "hexo-renderer-marked": "^6.0.0",
+    "hexo-renderer-stylus": "^3.0.0",
     "hexo-server": "^3.0.0",
-    "hexo-theme-next": "^8.29.0"
+    "hexo-shiki-plugin-butterfly": "^1.0.26",
+    "hexo-theme-butterfly": "^5.7.0",
+    "hexo-theme-landscape": "^1.0.0"
   }
 }

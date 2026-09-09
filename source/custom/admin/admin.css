@@ -1,0 +1,1054 @@
+/* ============================================================
+   管理控制台样式 /admin/ —— 现代 · 简约 · 宇宙感
+   ------------------------------------------------------------
+   - 字体：与站点一致（PingFangMedium）
+   - 背景：canvas 宇宙（银河 / 恒星 / 黑洞 / 星链 / 流星，见 admin-space.js）
+   - 卡片：真玻璃（backdrop-filter）+ 柔和阴影 + 导航栏同款指针光效
+   - 单主题：深色
+   ============================================================ */
+
+@font-face {
+  font-family: 'PingFangMedium';
+  src: url('/custom/assets/fonts/PingFang-Medium.woff2') format('woff2');
+  font-display: swap;
+}
+
+:root {
+  --adm-bg: #04060d;
+  --adm-glass:
+    linear-gradient(160deg, rgba(255, 255, 255, .055) 0%, rgba(255, 255, 255, .015) 40%, rgba(255, 255, 255, 0) 68%),
+    linear-gradient(160deg, rgba(12, 19, 34, .58), rgba(6, 10, 20, .52));
+  --adm-glass-solid: rgba(11, 17, 30, .82);
+  --adm-line: rgba(140, 180, 240, .14);
+  --adm-line-hi: rgba(120, 200, 255, .42);
+  --adm-text: #e2ebf8;
+  --adm-dim: rgba(184, 205, 234, .6);
+  --adm-accent: #62d8ff;
+  --adm-accent2: #8b8bff;
+  --adm-danger: #ff7b72;
+  --adm-ok: #5ad48c;
+  --adm-radius: 16px;
+  --adm-radius-sm: 10px;
+  --adm-glow: rgba(96, 208, 255, .26);
+  --adm-glow-hi: rgba(150, 230, 255, .9);
+  --adm-shadow:
+    0 1px 0 rgba(255, 255, 255, .06) inset,
+    0 20px 46px -26px rgba(0, 0, 0, .9),
+    0 4px 14px -8px rgba(0, 0, 0, .5);
+  --adm-font: 'PingFangMedium', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  --adm-mono: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; min-height: 100%; }
+
+body.admin-body {
+  position: relative;
+  font-family: var(--adm-font);
+  color: var(--adm-text);
+  background: var(--adm-bg);
+  font-size: 14px;
+  line-height: 1.65;
+  /* 抗锯齿：字体 + 图层 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-kerning: normal;
+}
+
+/* 卡片/按钮等浮层走独立合成层 → 边缘由 GPU 做抗锯齿，圆角与高光更顺滑 */
+.adm-card,
+.admin-btn,
+.admin-input,
+.admin-textarea,
+.admin-tab {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* 图标与文字统一基线，保证内容真正居中 */
+.admin-btn i,
+.admin-brand i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  line-height: 1;
+}
+
+/* ============================================================
+   背景：canvas 液态玻璃 + 星链 + 流星（见 admin-space.js）
+   ============================================================ */
+#admin-space {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ============================================================
+   卡片光效：一个光源照亮范围内所有卡片
+   ------------------------------------------------------------
+   结构（JS 注入到每张卡片里）：
+     .adm-glow-blob        软光斑（transform 跟随指针）
+     .adm-edge             1px 边缘环（固定 mask）
+       └ .adm-edge-light   环上的高光层（transform 跟随指针）
+   与顶部导航栏同款做法：**光心只做 transform 平移**（走合成器），
+   不在 radial-gradient 的位置上改 CSS 变量 —— 那会让浏览器每帧重绘渐变，
+   快速移动时出现拖影/跳动。透明度由 --glow(0~1) 控制。
+   ============================================================ */
+.adm-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+/* 卡片内容压在光斑之上（光斑是背景洗光，不能盖住文字） */
+.adm-card > *:not(.adm-glow-blob):not(.adm-edge) {
+  position: relative;
+  z-index: 1;
+}
+
+/* 软光斑：正圆 + 强羽化（多层渐隐，边缘几乎无硬边） */
+.adm-glow-blob {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle closest-side,
+    rgba(96, 208, 255, .34) 0%,
+    rgba(96, 208, 255, .26) 16%,
+    rgba(96, 208, 255, .17) 32%,
+    rgba(96, 208, 255, .095) 50%,
+    rgba(96, 208, 255, .045) 68%,
+    rgba(96, 208, 255, .015) 84%,
+    rgba(96, 208, 255, 0) 100%
+  );
+  transform: translate3d(-999px, -999px, 0);
+  /* 洗光整体降一档：避免光斑被卡片边缘硬切出一道生硬的边 */
+  opacity: calc(var(--glow, 0) * .62);
+  transition: opacity .18s ease;
+  z-index: 0;
+}
+
+.adm-edge {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  /* 环宽 1.6px + 亚像素模糊：1px 的 mask 环在胶囊曲线上会有锯齿，看着"毛躁" */
+  padding: 1.6px;
+  pointer-events: none;
+  overflow: hidden;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  filter: blur(.5px);
+  opacity: var(--glow, 0);
+  transition: opacity .18s ease;
+  z-index: 2;
+}
+
+/* 环上高光层：同样正圆 + 强羽化 */
+.adm-edge-light {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle closest-side,
+    var(--adm-glow-hi) 0%,
+    rgba(140, 220, 255, .58) 22%,
+    rgba(130, 210, 255, .26) 44%,
+    rgba(120, 200, 255, .085) 66%,
+    rgba(120, 200, 255, 0) 100%
+  );
+  transform: translate3d(-999px, -999px, 0);
+}
+
+/* ============================================================
+   流光文字：彩色文字用缓慢流动的渐变填充
+   （统计数字 / 置顶徽章）
+   ============================================================ */
+.adm-flow-text,
+.admin-stat-num,
+.admin-pill {
+  background-image: linear-gradient(
+    100deg,
+    #62d8ff 0%,
+    #8b8bff 18%,
+    #c48cff 36%,
+    #62d8ff 54%,
+    #6fe3ff 72%,
+    #8b8bff 88%,
+    #62d8ff 100%
+  );
+  background-size: 260% 100%;
+  background-repeat: repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  text-shadow: none;
+  animation: adm-flow 14s linear infinite;
+}
+
+@keyframes adm-flow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 260% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .adm-flow-text,
+  .admin-stat-num,
+  .admin-pill {
+    animation: none;
+    -webkit-text-fill-color: currentColor;
+    color: var(--adm-accent);
+  }
+}
+
+/* ============================================================
+   门禁
+   ============================================================ */
+.admin-gate {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.admin-gate-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 36px 32px 32px;
+  border-radius: 20px;
+  border: 1px solid var(--adm-line);
+  background: var(--adm-glass-solid);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: var(--adm-shadow);
+  text-align: center;
+}
+
+.admin-gate-icon {
+  font-size: 26px;
+  color: var(--adm-accent);
+  margin-bottom: 12px;
+  text-shadow: 0 0 26px var(--adm-glow-hi);
+}
+
+.admin-gate-card h1 {
+  margin: 0 0 8px;
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: .04em;
+}
+
+.admin-gate-desc {
+  margin: 0 0 22px;
+  color: var(--adm-dim);
+  font-size: 13px;
+}
+
+/* 输入框与「进入」按钮之间留出呼吸感（之前贴在一起，容易误点） */
+.admin-gate-card .admin-input { margin-bottom: 18px; }
+
+.admin-gate-card .admin-btn {
+  width: 100%;
+  padding: 11px 18px;
+  font-size: 13.5px;
+}
+
+.admin-gate-msg {
+  min-height: 20px;
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: var(--adm-danger);
+}
+
+/* ============================================================
+   控件
+   ============================================================ */
+.admin-input,
+.admin-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--adm-radius-sm);
+  border: 1px solid var(--adm-line);
+  background: rgba(0, 0, 0, .26);
+  color: var(--adm-text);
+  font-size: 13.5px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+/* 门禁输入框居中，表单输入框左对齐 */
+.admin-gate .admin-input,
+.admin-toolbar .admin-input { text-align: center; }
+
+.admin-form .admin-input,
+.admin-field .admin-input,
+.admin-textarea { text-align: left; }
+
+.admin-textarea {
+  resize: vertical;
+  line-height: 1.75;
+  font-family: var(--adm-mono);
+  font-size: 12.5px;
+  tab-size: 2;
+}
+
+.admin-input:focus,
+.admin-textarea:focus {
+  border-color: var(--adm-line-hi);
+  box-shadow: 0 0 0 3px rgba(98, 216, 255, .12), 0 0 20px -8px var(--adm-glow-hi);
+}
+
+.admin-input::placeholder,
+.admin-textarea::placeholder { color: var(--adm-dim); opacity: .65; }
+
+/* 按钮：内容一律居中 */
+.admin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: var(--adm-radius-sm);
+  border: 1px solid var(--adm-line);
+  background: rgba(255, 255, 255, .04);
+  color: var(--adm-text);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1;
+  text-align: center;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color .2s ease, background .2s ease, color .2s ease, box-shadow .2s ease, transform .12s ease;
+}
+
+.admin-btn i { font-size: 12.5px; line-height: 1; }
+
+.admin-btn:hover {
+  border-color: var(--adm-line-hi);
+  background: rgba(98, 216, 255, .1);
+  box-shadow: 0 0 20px -8px var(--adm-glow-hi);
+}
+
+.admin-btn:active { transform: translateY(1px); }
+.admin-btn[disabled] { opacity: .45; cursor: not-allowed; }
+
+.admin-btn-primary {
+  border-color: rgba(120, 200, 255, .45);
+  background: linear-gradient(160deg, rgba(70, 140, 240, .55), rgba(110, 90, 235, .5));
+  color: #fff;
+  box-shadow: 0 0 24px -10px var(--adm-glow-hi);
+}
+
+.admin-btn-primary:hover {
+  background: linear-gradient(160deg, rgba(84, 158, 255, .68), rgba(126, 104, 250, .62));
+}
+
+.admin-btn-danger {
+  border-color: rgba(255, 123, 114, .38);
+  color: #ffb0aa;
+  background: rgba(255, 90, 80, .08);
+}
+
+.admin-btn-danger:hover {
+  border-color: rgba(255, 123, 114, .7);
+  background: rgba(255, 90, 80, .16);
+  box-shadow: 0 0 20px -8px rgba(255, 123, 114, .7);
+}
+
+/* ============================================================
+   顶栏
+   ============================================================ */
+.admin-app {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 22px 96px;
+}
+
+.admin-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 14px 20px;
+  border-radius: var(--adm-radius);
+  border: 1px solid var(--adm-line);
+  background: var(--adm-glass);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  box-shadow: var(--adm-shadow);
+}
+
+.admin-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  letter-spacing: .03em;
+}
+
+.admin-brand i {
+  color: var(--adm-accent);
+  text-shadow: 0 0 16px var(--adm-glow-hi);
+}
+
+.admin-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-repo {
+  font-size: 12px;
+  color: var(--adm-dim);
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--adm-line);
+  background: rgba(0, 0, 0, .22);
+  max-width: 360px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   标签页（分段胶囊）
+   ============================================================ */
+.admin-tabs {
+  position: relative;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 16px 0 18px;
+  padding: 5px;
+  border-radius: 999px;
+  border: 1px solid var(--adm-line);
+  background: rgba(0, 0, 0, .22);
+  width: fit-content;
+  max-width: 100%;
+}
+
+.admin-tab {
+  position: relative;
+  z-index: 1;
+  padding: 8px 20px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--adm-dim);
+  font-family: inherit;
+  font-size: 13px;
+  text-align: center;
+  cursor: pointer;
+  transition: color .32s ease, text-shadow .32s ease;
+}
+
+.admin-tab:hover { color: var(--adm-text); }
+
+/* 选中：不加任何底/框，只把文字点亮（带一层冷色光晕） */
+.admin-tab.is-active {
+  color: #fff;
+  background-color: transparent;
+  box-shadow: none;
+  font-weight: 500;
+  text-shadow:
+    0 0 10px rgba(140, 210, 255, .65),
+    0 0 24px rgba(96, 170, 255, .35);
+}
+
+.admin-pane { display: none; }
+.admin-pane.is-active { display: block; }
+
+/* ============================================================
+   卡片 / 面板
+   ============================================================ */
+.admin-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.admin-stat,
+.admin-panel {
+  border-radius: var(--adm-radius);
+  border: 1px solid var(--adm-line);
+  background: var(--adm-glass);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  box-shadow: var(--adm-shadow);
+}
+
+.admin-stat {
+  padding: 22px 18px;
+  text-align: center;
+}
+
+.admin-stat-num {
+  font-size: 30px;
+  /* 数字加粗：字体只自带 Medium 一档，浏览器会合成粗体（字形明显更实） */
+  font-weight: 700;
+  color: var(--adm-accent);
+  line-height: 1.15;
+  letter-spacing: .01em;
+  /* 再"加粗"一档：合成粗体到 700 就封顶了（实测 900 与 700 渲染完全一样），
+     所以用**四向 0.4px 同色调阴影**把笔画再撑粗一圈——不破坏 background-clip
+     的流光渐变（阴影是单色，用接近渐变的浅蓝，视觉上就是更粗的字）。 */
+  text-shadow:
+    0 0 26px var(--adm-glow),
+    .4px 0 0 rgba(185, 228, 255, .85),
+    -.4px 0 0 rgba(185, 228, 255, .85),
+    0 .4px 0 rgba(185, 228, 255, .85),
+    0 -.4px 0 rgba(185, 228, 255, .85);
+}
+
+.admin-stat-label {
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: var(--adm-dim);
+}
+
+.admin-panel {
+  margin-bottom: 16px;
+  padding: 22px;
+}
+
+.admin-panel-title {
+  margin-bottom: 14px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.admin-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.admin-toolbar .admin-input { flex: 1 1 220px; width: auto; }
+
+.admin-hint {
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: var(--adm-dim);
+}
+
+.admin-hint code {
+  padding: 1px 7px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, .3);
+  border: 1px solid var(--adm-line);
+  font-family: var(--adm-mono);
+  font-size: 11.5px;
+}
+
+.admin-hint a { color: var(--adm-accent); }
+
+/* ============================================================
+   列表项
+   ============================================================ */
+.admin-list { display: flex; flex-direction: column; gap: 8px; }
+
+.admin-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  border-radius: var(--adm-radius-sm);
+  border: 1px solid var(--adm-line);
+  background: rgba(255, 255, 255, .035);
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease, transform .15s ease;
+}
+
+.admin-item:hover {
+  border-color: var(--adm-line-hi);
+  background: rgba(98, 216, 255, .07);
+  transform: translateX(2px);
+}
+
+.admin-item-main { flex: 1; min-width: 0; }
+
+.admin-item-title {
+  font-size: 14px;
+  color: var(--adm-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-item-meta {
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--adm-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+.admin-pill {
+  display: inline-block;
+  padding: 1px 8px;
+  margin-left: 6px;
+  border-radius: 999px;
+  border: 1px solid var(--adm-line-hi);
+  color: var(--adm-accent);
+  font-size: 11px;
+}
+
+.admin-empty {
+  padding: 28px 0;
+  text-align: center;
+  color: var(--adm-dim);
+  font-size: 13px;
+}
+
+/* ============================================================
+   表单
+   ============================================================ */
+.admin-form { display: flex; flex-direction: column; gap: 14px; }
+
+.admin-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.admin-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+
+.admin-field label {
+  font-size: 12.5px;
+  color: var(--adm-dim);
+}
+
+.admin-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.admin-editor-file {
+  flex: 1 1 100%;
+  font-family: var(--adm-mono);
+  font-size: 11.5px;
+  color: var(--adm-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   写作页（文章编辑器）
+   ------------------------------------------------------------
+   - 容器用细边框 + 深色底，**不挂 .adm-card** → 没有指针光效环
+   - 输入框/按钮去掉 focus 光晕与外发光，长时间写作不刺眼
+   - 正文区：Markdown 工具栏 + 编辑/分栏/预览 + 字数统计 + 草稿
+   ============================================================ */
+.admin-editor {
+  padding: 20px 22px 22px;
+  border-radius: var(--adm-radius);
+  border: 1px solid rgba(140, 180, 240, .1);
+  background: rgba(8, 13, 24, .66);
+}
+
+/* --- 去掉写作页里所有边框炫光 --- */
+#post-editor-view .admin-input,
+#post-editor-view .admin-textarea {
+  background: rgba(0, 0, 0, .2);
+  border-color: rgba(140, 180, 240, .12);
+}
+
+#post-editor-view .admin-input:focus,
+#post-editor-view .admin-textarea:focus {
+  border-color: rgba(140, 180, 240, .3);
+  background: rgba(0, 0, 0, .3);
+  box-shadow: none;
+}
+
+#post-editor-view .admin-btn,
+#post-editor-view .admin-btn:hover,
+#post-editor-view .admin-btn-primary,
+#post-editor-view .admin-btn-primary:hover {
+  box-shadow: none;
+}
+
+#post-editor-view .admin-editor-file { flex: 1 1 auto; min-width: 0; }
+
+.admin-input-lg {
+  font-size: 17px;
+  padding: 12px 15px;
+  letter-spacing: .01em;
+}
+
+/* ---------- 置顶权重 ---------- */
+.admin-sticky-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 去掉 number 输入框的原生上下箭头：深色主题下它是个扎眼的白块。
+   （去掉后仍可用键盘 ↑/↓ 调数值，只是不再显示原生步进器） */
+.admin-input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.admin-input[type='number']::-webkit-outer-spin-button,
+.admin-input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+.admin-sticky-row .admin-input {
+  width: 104px;
+  flex: 0 0 auto;
+  text-align: center;
+}
+
+.admin-sticky-state {
+  padding: 4px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--adm-line);
+  color: var(--adm-dim);
+  font-size: 11.5px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.admin-sticky-state.is-on {
+  border-color: rgba(120, 200, 255, .42);
+  background: rgba(98, 216, 255, .1);
+  color: #cdf1ff;
+}
+
+.admin-field-hint {
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: var(--adm-dim);
+}
+
+.admin-field-hint b { color: #cfe6ff; font-weight: 500; }
+
+/* ---------- 编辑器状态 / 草稿条 ---------- */
+.admin-editor-state {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--adm-dim);
+  white-space: nowrap;
+}
+
+.admin-editor-state.is-dirty { color: #ffd48a; }
+.admin-editor-state.is-saved { color: #8fe0ac; }
+
+.editor-draft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border-radius: var(--adm-radius-sm);
+  border: 1px solid rgba(255, 212, 138, .32);
+  background: rgba(255, 190, 90, .07);
+  font-size: 12.5px;
+  color: #ffe2b0;
+}
+
+.editor-draft-btn {
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 212, 138, .42);
+  background: transparent;
+  color: #ffe2b0;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.editor-draft-btn:hover { background: rgba(255, 190, 90, .14); }
+
+/* ---------- 正文区 ---------- */
+.editor-body { display: flex; flex-direction: column; }
+
+.editor-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.editor-tools { display: flex; gap: 4px; flex-wrap: wrap; }
+
+.editor-tool {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, .04);
+  color: var(--adm-dim);
+  font-size: 12px;
+  cursor: pointer;
+  transition: color .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.editor-tool:hover {
+  color: var(--adm-text);
+  background: rgba(255, 255, 255, .08);
+  border-color: rgba(140, 180, 240, .22);
+}
+
+.editor-tools-sep {
+  width: 1px;
+  height: 18px;
+  margin: 0 3px;
+  align-self: center;
+  background: var(--adm-line);
+}
+
+.editor-modes {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid var(--adm-line);
+  background: rgba(0, 0, 0, .2);
+}
+
+.editor-mode {
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: var(--adm-dim);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color .2s ease, background .2s ease;
+}
+
+.editor-mode:hover { color: var(--adm-text); }
+.editor-mode.is-active { color: #fff; background: rgba(98, 216, 255, .14); }
+
+.editor-panes { display: grid; grid-template-columns: 1fr; }
+
+.editor-body.mode-split .editor-panes { grid-template-columns: 1fr 1fr; gap: 14px; }
+.editor-body.mode-edit .editor-preview { display: none; }
+.editor-body.mode-preview .admin-textarea { display: none; }
+
+#post-editor-view .admin-textarea { min-height: 380px; }
+
+.editor-preview {
+  min-height: 380px;
+  max-height: 660px;
+  overflow: auto;
+  padding: 14px 18px;
+  border-radius: var(--adm-radius-sm);
+  border: 1px solid rgba(140, 180, 240, .12);
+  background: rgba(0, 0, 0, .2);
+  font-size: 13.5px;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+
+.editor-preview:empty::before { content: '预览区 · 开始写点什么…'; color: var(--adm-dim); }
+
+.editor-preview > :first-child { margin-top: 0; }
+
+.editor-preview h1,
+.editor-preview h2,
+.editor-preview h3,
+.editor-preview h4 {
+  margin: 1.3em 0 .6em;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #fff;
+}
+
+.editor-preview h1 { font-size: 20px; }
+.editor-preview h2 { font-size: 17px; }
+.editor-preview h3 { font-size: 15px; }
+.editor-preview p { margin: .8em 0; }
+
+.editor-preview ul,
+.editor-preview ol { margin: .8em 0; padding-left: 1.5em; }
+
+.editor-preview li { margin: .3em 0; }
+
+.editor-preview blockquote {
+  margin: .9em 0;
+  padding: .2em 0 .2em 14px;
+  border-left: 3px solid rgba(140, 180, 240, .3);
+  color: #cfe0f5;
+}
+
+.editor-preview code {
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, .4);
+  border: 1px solid rgba(140, 180, 240, .14);
+  font-family: var(--adm-mono);
+  font-size: 12px;
+}
+
+.editor-preview pre {
+  margin: .9em 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, .42);
+  border: 1px solid rgba(140, 180, 240, .14);
+  overflow-x: auto;
+}
+
+.editor-preview pre code {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.editor-preview hr {
+  margin: 1.4em 0;
+  border: 0;
+  border-top: 1px solid rgba(140, 180, 240, .18);
+}
+
+.editor-preview a {
+  color: var(--adm-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.editor-preview img { max-width: 100%; border-radius: 8px; }
+
+.editor-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: .9em 0;
+  font-size: 12.5px;
+}
+
+.editor-preview th,
+.editor-preview td {
+  padding: 6px 10px;
+  border: 1px solid rgba(140, 180, 240, .16);
+  text-align: left;
+}
+
+.editor-preview th { background: rgba(255, 255, 255, .04); font-weight: 500; }
+
+.editor-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: var(--adm-dim);
+}
+
+.editor-stats { font-family: var(--adm-mono); letter-spacing: .02em; }
+
+@media (max-width: 900px) {
+  .editor-body.mode-split .editor-panes { grid-template-columns: 1fr; }
+  .editor-modes { margin-left: 0; }
+}
+
+/* ============================================================
+   标签 / 分类
+   ============================================================ */
+.admin-tax { display: flex; flex-direction: column; gap: 8px; }
+
+.admin-tax-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: var(--adm-radius-sm);
+  border: 1px solid var(--adm-line);
+  background: rgba(255, 255, 255, .035);
+}
+
+.admin-tax-name { flex: 1; font-size: 13.5px; }
+
+.admin-tax-count {
+  font-size: 12px;
+  color: var(--adm-dim);
+  margin-right: 6px;
+}
+
+/* ============================================================
+   Toast
+   ============================================================ */
+.admin-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 30px;
+  transform: translate(-50%, 18px);
+  max-width: min(580px, calc(100vw - 32px));
+  padding: 12px 20px;
+  border-radius: var(--adm-radius-sm);
+  border: 1px solid var(--adm-line-hi);
+  background: var(--adm-glass-solid);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  box-shadow: var(--adm-shadow);
+  font-size: 13px;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .28s ease, transform .28s ease;
+  z-index: 9999;
+}
+
+.admin-toast.show { opacity: 1; transform: translate(-50%, 0); }
+.admin-toast.ok { border-color: rgba(90, 212, 140, .5); color: #b6f0cd; }
+.admin-toast.err { border-color: rgba(255, 123, 114, .5); color: #ffc0bb; }
+
+/* ============================================================
+   移动端
+   ============================================================ */
+@media (max-width: 720px) {
+  .admin-app { padding: 16px 14px 80px; }
+  .admin-row { grid-template-columns: 1fr; }
+  .admin-repo { display: none; }
+  .admin-tabs { overflow-x: auto; flex-wrap: nowrap; width: 100%; }
+  .admin-tab { flex-shrink: 0; }
+  .admin-item { flex-wrap: wrap; }
+}
