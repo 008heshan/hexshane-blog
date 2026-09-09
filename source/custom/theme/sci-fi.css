@@ -155,6 +155,24 @@ html[data-theme] body #nav {
   box-shadow: none !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
+  /* 滚动时左右边距变化（= 宽度收窄），用带轻微回弹的缓动模拟 DSH 的 spring */
+  transition: opacity .3s ease,
+              left .55s cubic-bezier(.34, 1.36, .44, 1),
+              right .55s cubic-bezier(.34, 1.36, .44, 1) !important;
+}
+
+/* 滚动后：导航收窄并居中（对应 DSH 的 maxWidth 1280 → 980） */
+html.is-scrolled body #nav {
+  left: max(16px, calc(50vw - 490px)) !important;
+  right: max(16px, calc(50vw - 490px)) !important;
+}
+
+@media (max-width: 768px) {
+  /* 窄屏不做收窄，保持 nav-apple 原本的 10px 边距 */
+  html.is-scrolled body #nav {
+    left: 10px !important;
+    right: 10px !important;
+  }
 }
 
 html body #nav::before {

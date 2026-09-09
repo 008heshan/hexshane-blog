@@ -125,11 +125,15 @@ git add -A && git commit -m "post: 文章标题" && git push
   （`source/custom/assets/fonts/HangtianAoyou-subset.woff2`，含 32 个常用汉字 + ASCII）
 - 左上角品牌位：**莫比乌斯式无限图标**（`source/custom/assets/mobius.svg`，
   双纽线 + 交叉处扭转 + 厚度偏移）替换站名文字；文字仍在 DOM 中，读屏与 SEO 不受影响
-- 顶部导航滚动动画（对齐 DSH）：页面顶部时导航**完全透明**（logo / 菜单浮在内容上），
-  向下滚动 80px 后玻璃底以 `0.4s ease-in-out` 淡入。
-  实现要点：玻璃底挂在 `#nav::before` 上，只过渡 `opacity`（直接过渡渐变背景无法动画）；
-  触发用 80px 哨兵元素 + `IntersectionObserver`（不占主线程，也不受 rAF 节流影响），
-  老浏览器回退到 scroll 监听。见 `source/custom/effects/nav-glass.js`
+- 顶部导航滚动动画（对齐 DSH）：
+  - **透明态**：页面顶部时导航完全透明（logo / 菜单浮在内容上）
+  - **玻璃底**：向下滚动 80px 后以 `0.4s ease-in-out` 淡入
+  - **收窄**：同时左右边距收窄到居中 980px 宽（DSH 是 `maxWidth: 1280 → 980`），
+    用 `cubic-bezier(.34,1.36,.44,1)` 模拟它的 spring 回弹
+  - 实现要点：玻璃底挂在 `#nav::before` 上只过渡 `opacity`（直接过渡渐变背景无法动画）；
+    宽度靠过渡 `left`/`right`（`max(16px, calc(50vw - 490px))`）实现居中收窄；
+    触发用 80px 哨兵元素 + `IntersectionObserver`（不占主线程，也不受 rAF 节流影响），
+    老浏览器回退到 scroll 监听。见 `source/custom/effects/nav-glass.js`
 - 特异性提醒：`nav-apple.css` 用 `html[data-theme='dark'] #nav`（1,1,1）带 `!important`
   铺了渐变底，而 `#nav` 是 `<body>` 的直接子元素，所以本皮肤用 `html[data-theme] body #nav`
   （1,1,2）覆盖它
