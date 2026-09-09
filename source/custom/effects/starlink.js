@@ -72,7 +72,7 @@
         if (d2 > LINK * LINK) continue
         d = Math.sqrt(d2)
         var a = (1 - d / LINK) * 0.44
-        ctx.strokeStyle = 'rgba(120, 200, 255, ' + a.toFixed(3) + ')'
+        ctx.strokeStyle = 'rgba(150, 185, 205, ' + a.toFixed(3) + ')'
         ctx.beginPath()
         ctx.moveTo(n.x, n.y)
         ctx.lineTo(m.x, m.y)
@@ -90,7 +90,7 @@
         if (d2 > POINTER_LINK * POINTER_LINK) continue
         d = Math.sqrt(d2)
         var pa = (1 - d / POINTER_LINK) * 0.5
-        ctx.strokeStyle = 'rgba(103, 232, 249, ' + pa.toFixed(3) + ')'
+        ctx.strokeStyle = 'rgba(203, 226, 239, ' + pa.toFixed(3) + ')'
         ctx.beginPath()
         ctx.moveTo(n.x, n.y)
         ctx.lineTo(pointer.x, pointer.y)
@@ -102,7 +102,7 @@
     for (i = 0; i < nodes.length; i++) {
       n = nodes[i]
       var twinkle = 0.55 + 0.45 * Math.sin(t * n.ts + n.tw)
-      ctx.fillStyle = 'rgba(196, 232, 255, ' + (0.34 + twinkle * 0.5).toFixed(3) + ')'
+      ctx.fillStyle = 'rgba(210, 226, 236, ' + (0.34 + twinkle * 0.5).toFixed(3) + ')'
       ctx.beginPath()
       ctx.arc(n.x, n.y, n.r, 0, 6.2832)
       ctx.fill()

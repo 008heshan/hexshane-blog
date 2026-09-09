@@ -113,10 +113,13 @@ git add -A && git commit -m "post: 文章标题" && git push
 
 | 层 | 实现 | 文件 |
 | --- | --- | --- |
-| 底色 | 深海军蓝渐变 + 大面积柔和蓝色辉光 + 64px 淡网格 | `sci-fi.css` |
+| 底色 | 冷黑渐变（`#0a141d → #03070b`）+ 克制的钢青辉光 + 64px 淡网格 | `sci-fi.css` |
 | 星链网络 | 卫星节点缓慢漂移、距离阈值内自动连线、指针附近点亮链路 | `source/custom/effects/starlink.js` |
-| 粒子无限符号 ∞ | 双纽线点阵（离屏预渲染：模糊辉光层 + 清晰点阵层），呼吸缩放 + 沿曲线流动亮点 + 指针视差 | `source/custom/effects/hero-fx.js` |
-| 幽灵代码 | 大标题背后逐字"打字"的代码片段，低透明度 + 轻微模糊 + 上下渐隐遮罩 | `source/custom/effects/hero-fx.js` |
+| 粒子无限符号 ∞ | 双纽线方形点阵 halftone（清晰 + 软化 + 辉光三层 + 颗粒噪声），呼吸缩放 + 沿曲线流动亮点 + 指针视差 | `source/custom/effects/hero-fx.js` |
+| 幽灵代码 | 两处独立打字循环：大标题背后、大标题右下角 | `source/custom/effects/hero-fx.js` |
+
+**配色（冷峻）**：近黑冷底 `#03060a`；强调色钢青 `#9dc0d4`，亮态 `#cbe2ef`，辅助石墨蓝 `#5b7285`；
+正文冷白 `#d9e4ec`，次要文字冷灰 `#7c8a95`。全部去掉了高饱和霓虹与紫色，辉光强度也压到最低。
 
 - 大标题字体：**iFonts 航天遨游体**，从 22.5MB TTF 子集化为 87KB woff2
   （`source/custom/assets/fonts/HangtianAoyou-subset.woff2`，含 32 个常用汉字 + ASCII）

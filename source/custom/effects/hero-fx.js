@@ -189,7 +189,7 @@
         if (alpha < 0.03) continue
         var size = 3.4 + falloff * 3.4          // 中间大、边缘小
         var half = size / 2
-        octx.fillStyle = 'rgba(226, 240, 255, ' + alpha.toFixed(3) + ')'
+        octx.fillStyle = 'rgba(226, 236, 243, ' + alpha.toFixed(3) + ')'
         octx.fillRect(x - half, y - half, size, size)
       }
     }
@@ -247,11 +247,11 @@
         var x = pts[idx]
         var y = pts[idx + 1]
         var r = 1.3 + 0.9 * Math.sin(t * 2.4 + i)
-        ctx.fillStyle = 'rgba(232, 248, 255, .75)'
+        ctx.fillStyle = 'rgba(238, 246, 250, .75)'
         ctx.beginPath()
         ctx.arc(x, y, r, 0, 6.2832)
         ctx.fill()
-        ctx.fillStyle = 'rgba(103, 232, 249, .14)'
+        ctx.fillStyle = 'rgba(203, 226, 239, .14)'
         ctx.beginPath()
         ctx.arc(x, y, r * 3.6, 0, 6.2832)
         ctx.fill()
