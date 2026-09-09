@@ -18,13 +18,75 @@
 
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-  /* ---------------- 幽灵代码层 ---------------- */
+  /* ---------------- 幽灵代码层（两处：大标题背后 + 大标题右下角） ---------------- */
+  function makeTypist(el, list, opts) {
+    opts = opts || {}
+    var speed = opts.speed || 26
+    var hold = opts.hold || 2200
+    var idx = 0
+    var ci = 0
+    var typing = true
+    var holdUntil = 0
+    var timer = null
+
+    function paint() {
+      el.textContent = list[idx].slice(0, ci) + (typing && !reduced ? '▌' : '')
+    }
+
+    function tick() {
+      var now = Date.now()
+      if (holdUntil && now < holdUntil) {
+        timer = setTimeout(tick, 120)
+        return
+      }
+      holdUntil = 0
+      var full = list[idx]
+      if (typing) {
+        ci++
+        paint()
+        if (ci >= full.length) {
+          typing = false
+          holdUntil = now + hold
+        }
+        timer = setTimeout(tick, speed + Math.random() * 40)
+      } else {
+        ci -= 3
+        if (ci <= 0) {
+          ci = 0
+          typing = true
+          idx = (idx + 1) % list.length
+          paint()
+          holdUntil = now + 420
+        } else {
+          paint()
+        }
+        timer = setTimeout(tick, 14)
+      }
+    }
+
+    return {
+      start: function (delay) {
+        paint()
+        timer = setTimeout(tick, delay || 0)
+      },
+      stop: function () { if (timer) clearTimeout(timer); timer = null },
+      staticText: function () { el.textContent = list[0] }
+    }
+  }
+
+  // ① 大标题背后
   var codeEl = document.createElement('div')
   codeEl.className = 'sf-code'
   codeEl.setAttribute('aria-hidden', 'true')
   hero.insertBefore(codeEl, hero.firstChild)
 
-  var snippets = [
+  // ② 大标题右下角
+  var codeBR = document.createElement('div')
+  codeBR.className = 'sf-code sf-code--br'
+  codeBR.setAttribute('aria-hidden', 'true')
+  hero.insertBefore(codeBR, hero.firstChild)
+
+  var snippetsMain = [
     'const kernel = await createKernel({\n  plugins: [model, tools, sandbox],\n  hot: true,\n})\nawait kernel.start()',
     'function infinity(t) {\n  const s = Math.sin(t)\n  return [Math.cos(t) / (1 + s * s),\n          s * Math.cos(t) / (1 + s * s)]\n}',
     '$ npx @deepseek-ai/dsh web\n  ➜  ready  http://127.0.0.1:53900',
@@ -32,53 +94,22 @@
     'git add -A && git commit -m "post: 新文章"\ngit push   # → Cloudflare Pages'
   ]
 
-  var si = 0
-  var ci = 0
-  var typing = true
-  var holdUntil = 0
-  var codeTimer = null
+  var snippetsBR = [
+    '$ npm run build\n  ➜  generated 81 files in 1.9s\n  ➜  deployed  hexshane.top',
+    'interface Post {\n  title: string\n  tags: string[]\n  sticky?: number\n}',
+    '[dsh] plugin loaded  ui.terminal\n[dsh] plugin loaded  tools.shell\n[dsh] ready  ●',
+    'export const INFINITY = (t: number) => [\n  Math.cos(t) / (1 + Math.sin(t) ** 2),\n  (Math.sin(t) * Math.cos(t)) / (1 + Math.sin(t) ** 2),\n]'
+  ]
 
-  function paintCode() {
-    var text = snippets[si].slice(0, ci)
-    codeEl.textContent = text + (typing && !reduced ? '▌' : '')
-  }
-
-  function tickCode() {
-    var now = Date.now()
-    if (holdUntil && now < holdUntil) {
-      codeTimer = setTimeout(tickCode, 120)
-      return
-    }
-    holdUntil = 0
-    var full = snippets[si]
-    if (typing) {
-      ci++
-      paintCode()
-      if (ci >= full.length) {
-        typing = false
-        holdUntil = now + 2200
-      }
-      codeTimer = setTimeout(tickCode, 26 + Math.random() * 46)
-    } else {
-      ci -= 3
-      if (ci <= 0) {
-        ci = 0
-        typing = true
-        si = (si + 1) % snippets.length
-        paintCode()
-        holdUntil = now + 420
-      } else {
-        paintCode()
-      }
-      codeTimer = setTimeout(tickCode, 14)
-    }
-  }
+  var typistMain = makeTypist(codeEl, snippetsMain, { speed: 26, hold: 2200 })
+  var typistBR = makeTypist(codeBR, snippetsBR, { speed: 30, hold: 2600 })
 
   if (!reduced) {
-    paintCode()
-    codeTimer = setTimeout(tickCode, 900)
+    typistMain.start(900)
+    typistBR.start(2400)
   } else {
-    codeEl.textContent = snippets[0]
+    typistMain.staticText()
+    typistBR.staticText()
   }
 
   /* ---------------- 粒子无限符号 ---------------- */
@@ -268,10 +299,14 @@
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) {
       stop()
-      if (codeTimer) clearTimeout(codeTimer)
+      typistMain.stop()
+      typistBR.stop()
     } else {
       start()
-      if (!reduced) codeTimer = setTimeout(tickCode, 600)
+      if (!reduced) {
+        typistMain.start(600)
+        typistBR.start(1400)
+      }
     }
   })
 })()
