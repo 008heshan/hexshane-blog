@@ -397,8 +397,8 @@ readmode: true
 # Dark Mode
 darkmode:
   enable: true
-  # Toggle Button to switch dark/light mode
-  button: true
+  # 已关闭浅色模式：不渲染切换按钮
+  button: false
   # Switch dark/light mode automatically
   # autoChangeMode: 1  Following System Settings, if the system doesn't support dark mode, it will switch dark mode between 6 pm to 6 am
   # autoChangeMode: 2  Switch dark mode between 6 pm to 6 am
@@ -1129,9 +1129,9 @@ inject:
     - <script src="/custom/cursor/site-cursor.js"></script>
     # --- widgets 翻译按钮 ---
     - <script src="/custom/widgets/translate-btn.js?v=20260908b"></script>
-    # --- 科幻皮肤：视口 HUD 边框 + 状态标签 ---
-    - <div class="sf-frame" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-    - <div class="sf-status" aria-hidden="true">SYS · ONLINE <b>●</b></div>
+    # --- 科幻皮肤：星链背景 + 首页粒子无限符号 / 幽灵代码 ---
+    - <script src="/custom/effects/starlink.js?v=20260909b"></script>
+    - <script src="/custom/effects/hero-fx.js?v=20260909b"></script>
 
 # CDN Settings
 # Don't modify the following settings unless you know how they work

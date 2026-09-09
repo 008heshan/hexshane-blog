@@ -106,28 +106,28 @@ git add -A && git commit -m "post: 文章标题" && git push
 默认仓库已指向 `008heshan/hexshane-blog`（可在页面里改）。
 请勿把长期有效的高权限 Token 保存在公共设备上。
 
-## 视觉主题：科幻 / 科技 / 极客皮肤
+## 视觉主题：深空科幻皮肤
 
-皮肤文件：`source/custom/theme/sci-fi.css`，在主题 `_config.yml` 的 `inject.head` 中
-**最后**引入（覆盖 `theme-glass.css` / `nav-apple.css` 等既有样式），并注入视口 HUD 边框。
+皮肤文件 `source/custom/theme/sci-fi.css`（在 `inject.head` 中**最后**引入），
+动态背景由两个 canvas 脚本提供，视觉参考 <https://www.deepseek.com/harness/> 的克制风格。
 
-| 设计要素 | 实现 |
-| --- | --- |
-| 深空底色 + 星云光斑 | 覆盖 `.bg-liquid`（青 / 紫径向渐变 + 纵向暗色渐变） |
-| 技术网格 | `.glass-bg::after` 46px 网格，四周渐隐（mask） |
-| 扫描光带 | `.glass-bg::before` 14s 缓速循环（`prefers-reduced-motion` 下自动关闭） |
-| 霓虹主色 | 青 `#22d3ee`，辅助紫 `#8b5cf6`，状态绿 `#34d399` |
-| 面板 HUD | 深色玻璃 + 1px 发丝边 + 左上/右下 L 形角标 + 顶部霓虹线 |
-| 视口 HUD | 四角括号 + 右下 `SYS · ONLINE ●`（纯 CSS，`aria-hidden`） |
-| 首页 HUD 状态行 | `#site-title::after` 输出 `SYSTEM · READY`（仅首页） |
-| 等宽字体 | 元信息 / 数字 / 标签 / 按钮 / 代码用 Fira Code，正文仍是苹方 |
-| 正文 | h2 左侧霓虹竖条、h3 紫色边条、行内代码青色胶囊、引用块青色发光 |
-| 代码块 | 近黑终端框 + 青色行号栏 |
-| 交互 | hover 边框增亮 + 外发光，过渡 120~220ms |
+| 层 | 实现 | 文件 |
+| --- | --- | --- |
+| 底色 | 深海军蓝渐变 + 大面积柔和蓝色辉光 + 64px 淡网格 | `sci-fi.css` |
+| 星链网络 | 卫星节点缓慢漂移、距离阈值内自动连线、指针附近点亮链路 | `source/custom/effects/starlink.js` |
+| 粒子无限符号 ∞ | 双纽线点阵（离屏预渲染：模糊辉光层 + 清晰点阵层），呼吸缩放 + 沿曲线流动亮点 + 指针视差 | `source/custom/effects/hero-fx.js` |
+| 幽灵代码 | 大标题背后逐字"打字"的代码片段，低透明度 + 轻微模糊 + 上下渐隐遮罩 | `source/custom/effects/hero-fx.js` |
 
-- 默认深色：主题 `_config.yml` 的 `display_mode: dark`（右上角按钮仍可切到浅色）
-- 浅色模式为「实验室 / 蓝图」风，所有硬编码颜色都做了浅色覆盖，可正常阅读
-- 想恢复原皮肤：把 `inject.head` 里的 `sci-fi.css` 那行注释掉即可
+- 大标题字体：**iFonts 航天遨游体**，从 22.5MB TTF 子集化为 87KB woff2
+  （`source/custom/assets/fonts/HangtianAoyou-subset.woff2`，含 32 个常用汉字 + ASCII）
+- **浅色模式已关闭**：主题 `darkmode.button: false`，导航栏不再有明暗切换按钮
+- 头像已固定为圆形且禁用任何旋转（`transform/animation: none`）
+- 面板为克制的深色玻璃（1px 淡边 + 柔和投影），不使用 HUD 角标等装饰
+- 尊重 `prefers-reduced-motion`：星链只画一帧静态图，粒子 ∞ 静态渲染，幽灵代码不打字
+- 标签页隐藏时两个 canvas 都会暂停；节点数按视口面积自适应（38~110）
+
+想换回朴素样式：把 `inject.head` 里的 `sci-fi.css`、`inject.bottom` 里的
+`starlink.js` / `hero-fx.js` 三行注释掉即可。
 
 
 

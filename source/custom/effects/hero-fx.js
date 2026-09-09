@@ -1,0 +1,261 @@
+/* ============================================================
+   首页 Hero 特效（custom inject）
+   ------------------------------------------------------------
+   1) .sf-infinity —— 粒子点阵拼出的「无限符号 ∞」，位于大标题之后（背景层）
+      · 用双纽线（lemniscate of Bernoulli）参数方程采样成点阵
+      · 离屏 canvas 预渲染：一层模糊辉光 + 一层清晰点阵，逐帧只做两次 drawImage
+      · 呼吸缩放 + 沿曲线流动的亮点 + 指针视差
+   2) .sf-code —— 大标题背后时不时"被编辑"的幽灵代码段
+      · 打字机逐字输出，停顿后擦除换下一段，低透明度 + 轻微模糊
+   3) prefers-reduced-motion 下：只渲染一帧静态 ∞，不跑动画与打字
+   ============================================================ */
+(function () {
+  'use strict'
+
+  var hero = document.querySelector('#page-header.full_page')
+  if (!hero) return
+  if (hero.querySelector('.sf-infinity')) return
+
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  /* ---------------- 幽灵代码层 ---------------- */
+  var codeEl = document.createElement('div')
+  codeEl.className = 'sf-code'
+  codeEl.setAttribute('aria-hidden', 'true')
+  hero.insertBefore(codeEl, hero.firstChild)
+
+  var snippets = [
+    'const kernel = await createKernel({\n  plugins: [model, tools, sandbox],\n  hot: true,\n})\nawait kernel.start()',
+    'function infinity(t) {\n  const s = Math.sin(t)\n  return [Math.cos(t) / (1 + s * s),\n          s * Math.cos(t) / (1 + s * s)]\n}',
+    '$ npx @deepseek-ai/dsh web\n  ➜  ready  http://127.0.0.1:53900',
+    "blog.on('publish', (post) => {\n  cdn.invalidate(post.path)\n  sitemap.rebuild()\n})",
+    'git add -A && git commit -m "post: 新文章"\ngit push   # → Cloudflare Pages'
+  ]
+
+  var si = 0
+  var ci = 0
+  var typing = true
+  var holdUntil = 0
+  var codeTimer = null
+
+  function paintCode() {
+    var text = snippets[si].slice(0, ci)
+    codeEl.textContent = text + (typing && !reduced ? '▌' : '')
+  }
+
+  function tickCode() {
+    var now = Date.now()
+    if (holdUntil && now < holdUntil) {
+      codeTimer = setTimeout(tickCode, 120)
+      return
+    }
+    holdUntil = 0
+    var full = snippets[si]
+    if (typing) {
+      ci++
+      paintCode()
+      if (ci >= full.length) {
+        typing = false
+        holdUntil = now + 2200
+      }
+      codeTimer = setTimeout(tickCode, 26 + Math.random() * 46)
+    } else {
+      ci -= 3
+      if (ci <= 0) {
+        ci = 0
+        typing = true
+        si = (si + 1) % snippets.length
+        paintCode()
+        holdUntil = now + 420
+      } else {
+        paintCode()
+      }
+      codeTimer = setTimeout(tickCode, 14)
+    }
+  }
+
+  if (!reduced) {
+    paintCode()
+    codeTimer = setTimeout(tickCode, 900)
+  } else {
+    codeEl.textContent = snippets[0]
+  }
+
+  /* ---------------- 粒子无限符号 ---------------- */
+  var cv = document.createElement('canvas')
+  cv.className = 'sf-infinity'
+  cv.setAttribute('aria-hidden', 'true')
+  hero.insertBefore(cv, codeEl.nextSibling)
+  var ctx = cv.getContext('2d')
+
+  var dpr = Math.min(window.devicePixelRatio || 1, 2)
+  var W = 0
+  var H = 0
+  var dotLayer = null      // 清晰点阵
+  var glowLayer = null     // 模糊辉光
+  var curve = null         // 曲线采样点（用于流动亮点）
+  var raf = 0
+  var running = false
+  var px = 0               // 指针视差
+  var py = 0
+
+  function buildLayers() {
+    W = Math.max(120, Math.round(cv.clientWidth))
+    H = Math.max(80, Math.round(cv.clientHeight))
+    cv.width = Math.round(W * dpr)
+    cv.height = Math.round(H * dpr)
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+    var a = Math.min(W * 0.4, H * 1.32)
+    var cx = W / 2
+    var cy = H / 2
+
+    // 双纽线采样
+    var SAMPLES = 1100
+    var pts = new Float32Array(SAMPLES * 2)
+    for (var i = 0; i < SAMPLES; i++) {
+      var t = (i / SAMPLES) * Math.PI * 2
+      var s = Math.sin(t)
+      var c = Math.cos(t)
+      var den = 1 + s * s
+      pts[i * 2] = cx + (a * c) / den
+      pts[i * 2 + 1] = cy + (a * s * c) / den
+    }
+    curve = { pts: pts, n: SAMPLES }
+
+    // 点阵：网格采样到曲线的最短距离
+    var off = document.createElement('canvas')
+    off.width = cv.width
+    off.height = cv.height
+    var octx = off.getContext('2d')
+    octx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+    var STEP = 3
+    var stride = 2
+    for (var y = 0; y < H; y += STEP) {
+      for (var x = 0; x < W; x += STEP) {
+        var best = 1e9
+        for (var k = 0; k < SAMPLES; k += stride) {
+          var dx = x - pts[k * 2]
+          var dy = y - pts[k * 2 + 1]
+          var d2 = dx * dx + dy * dy
+          if (d2 < best) best = d2
+        }
+        var d = Math.sqrt(best)
+        if (d > 7.2) continue
+        // 中心实、边缘虚：让点阵读起来像一团有厚度的"粒子云"
+        var alpha = d < 2.4 ? 0.95 : Math.pow(1 - (d - 2.4) / 4.8, 1.7)
+        if (alpha <= 0.02) continue
+        var rad = d < 2.4 ? 1.55 : 1.35 * (1 - (d - 2.4) / 6.2) + 0.25
+        octx.fillStyle = 'rgba(186, 226, 255, ' + alpha.toFixed(3) + ')'
+        octx.beginPath()
+        octx.arc(x, y, rad, 0, 6.2832)
+        octx.fill()
+      }
+    }
+    dotLayer = off
+
+    // 辉光层：把点阵模糊一次
+    var gl = document.createElement('canvas')
+    gl.width = cv.width
+    gl.height = cv.height
+    var gctx = gl.getContext('2d')
+    gctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    if ('filter' in gctx) {
+      gctx.filter = 'blur(' + (14 * dpr).toFixed(1) + 'px)'
+      gctx.drawImage(off, 0, 0, W, H)
+      gctx.filter = 'none'
+    } else {
+      gctx.drawImage(off, 0, 0, W, H)
+    }
+    glowLayer = gl
+  }
+
+  function frame(now) {
+    var t = now * 0.001
+    ctx.clearRect(0, 0, W, H)
+    if (!dotLayer) return
+
+    var breath = 1 + 0.014 * Math.sin(t * 0.55)
+    var alpha = 0.82 + 0.18 * Math.sin(t * 0.42 + 1.2)
+
+    ctx.save()
+    ctx.translate(W / 2 + px, H / 2 + py)
+    ctx.scale(breath, breath)
+    ctx.translate(-W / 2, -H / 2)
+
+    ctx.globalAlpha = alpha * 0.9
+    ctx.drawImage(glowLayer, 0, 0, W, H)
+    ctx.globalAlpha = alpha * 0.72
+    ctx.drawImage(dotLayer, 0, 0, W, H)
+    ctx.restore()
+
+    // 沿曲线流动的亮点
+    if (curve && !reduced) {
+      var pts = curve.pts
+      var N = curve.n
+      for (var i = 0; i < 26; i++) {
+        var ph = (t * 0.055 + i / 26) % 1
+        var idx = Math.floor(ph * N) * 2
+        var x = pts[idx]
+        var y = pts[idx + 1]
+        var r = 1.5 + 1.1 * Math.sin(t * 3 + i)
+        ctx.fillStyle = 'rgba(224, 250, 255, .9)'
+        ctx.beginPath()
+        ctx.arc(x, y, r, 0, 6.2832)
+        ctx.fill()
+        ctx.fillStyle = 'rgba(103, 232, 249, .22)'
+        ctx.beginPath()
+        ctx.arc(x, y, r * 3.4, 0, 6.2832)
+        ctx.fill()
+      }
+    }
+
+    if (running) raf = requestAnimationFrame(frame)
+  }
+
+  function start() {
+    if (running || reduced) return
+    running = true
+    raf = requestAnimationFrame(frame)
+  }
+
+  function stop() {
+    running = false
+    if (raf) cancelAnimationFrame(raf)
+    raf = 0
+  }
+
+  function rebuild() {
+    buildLayers()
+    if (reduced) frame(0)
+  }
+
+  // 等布局稳定后再测量尺寸
+  setTimeout(rebuild, 60)
+  setTimeout(function () { rebuild(); start() }, 700)
+
+  var rt = 0
+  window.addEventListener('resize', function () {
+    clearTimeout(rt)
+    rt = setTimeout(rebuild, 220)
+  }, { passive: true })
+
+  window.addEventListener('pointermove', function (e) {
+    if (reduced) return
+    var nx = (e.clientX / window.innerWidth - 0.5) * 26
+    var ny = (e.clientY / window.innerHeight - 0.5) * 14
+    px += (nx - px) * 0.06
+    py += (ny - py) * 0.06
+  }, { passive: true })
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+      stop()
+      if (codeTimer) clearTimeout(codeTimer)
+    } else {
+      start()
+      if (!reduced) codeTimer = setTimeout(tickCode, 600)
+    }
+  })
+})()
