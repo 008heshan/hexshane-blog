@@ -213,17 +213,17 @@ git add -A && git commit -m "post: 文章标题" && git push
 | # | Wiki 页面 | 本地文件 | 状态 |
 | --- | --- | --- | --- |
 | 1 | [Basic-Prerequisites](https://github.com/tModLoader/tModLoader/wiki/Basic-Prerequisites) | `tmodloader-basic-prerequisites.md` | ✅ 已译 |
-| 2 | [Spriting](https://github.com/tModLoader/tModLoader/wiki/Spriting) | — | ⬜ 待搬 |
-| 3 | [Basic-Ammo](https://github.com/tModLoader/tModLoader/wiki/Basic-Ammo) | — | ⬜ 待搬 |
-| 4 | [Basic-Autoload](https://github.com/tModLoader/tModLoader/wiki/Basic-Autoload) | — | ⬜ 待搬 |
-| 5 | [Coordinates](https://github.com/tModLoader/tModLoader/wiki/Coordinates) | — | ⬜ 待搬 |
-| 6 | [Geometry](https://github.com/tModLoader/tModLoader/wiki/Geometry) | — | ⬜ 待搬 |
-| 7 | [Basic-glowmask-guide](https://github.com/tModLoader/tModLoader/wiki/Basic-glowmask-guide) | — | ⬜ 待搬 |
-| 8 | [IEntitySource](https://github.com/tModLoader/tModLoader/wiki/IEntitySource) | — | ⬜ 待搬 |
-| 9 | [Localization](https://github.com/tModLoader/tModLoader/wiki/Localization) | — | ⬜ 待搬 |
-| 10 | [Logging](https://github.com/tModLoader/tModLoader/wiki/Logging) | — | ⬜ 待搬 |
-| 11 | [Basic-Minion-Guide](https://github.com/tModLoader/tModLoader/wiki/Basic-Minion-Guide) | — | ⬜ 待搬 |
-| 12 | [Basic-JSON-&-ModConfigs](https://github.com/tModLoader/tModLoader/wiki/Basic-JSON-%26-ModConfigs) | — | ⬜ 待搬 |
+| 2 | [Spriting](https://github.com/tModLoader/tModLoader/wiki/Spriting) | `tmodloader-spriting.md` | 🚧 已译 · 11 张图待补（代理限流） |
+| 3 | [Basic-Ammo](https://github.com/tModLoader/tModLoader/wiki/Basic-Ammo) | `tmodloader-basic-ammo.md` | ✅ 已译（无图） |
+| 4 | [Basic-Autoload](https://github.com/tModLoader/tModLoader/wiki/Basic-Autoload) | `tmodloader-basic-autoload.md` | 🚧 进行中 |
+| 5 | [Coordinates](https://github.com/tModLoader/tModLoader/wiki/Coordinates) | `tmodloader-coordinates.md` | ✅ 已译（1 张图缺，正文已说明） |
+| 6 | [Geometry](https://github.com/tModLoader/tModLoader/wiki/Geometry) | `tmodloader-geometry.md` | 🚧 已译 · 6 张图待补（代理限流） |
+| 7 | [Basic-glowmask-guide](https://github.com/tModLoader/tModLoader/wiki/Basic-glowmask-guide) | `tmodloader-basic-glowmask-guide.md` | ✅ 已译（2 张图待补） |
+| 8 | [IEntitySource](https://github.com/tModLoader/tModLoader/wiki/IEntitySource) | `tmodloader-ientitysource.md` | ✅ 已译（无图） |
+| 9 | [Localization](https://github.com/tModLoader/tModLoader/wiki/Localization) | `tmodloader-localization.md` | 🚧 进行中 |
+| 10 | [Logging](https://github.com/tModLoader/tModLoader/wiki/Logging) | `tmodloader-logging.md` | ✅ 已译（图已本地化 ×2） |
+| 11 | [Basic-Minion-Guide](https://github.com/tModLoader/tModLoader/wiki/Basic-Minion-Guide) | `tmodloader-basic-minion-guide.md` | ✅ 已译（无图） |
+| 12 | [Basic-JSON-&-ModConfigs](https://github.com/tModLoader/tModLoader/wiki/Basic-JSON-%26-ModConfigs) | `tmodloader-basic-json-modconfigs.md` | ✅ 已译（无图） |
 | 13 | [Basic-Dust](https://github.com/tModLoader/tModLoader/wiki/Basic-Dust) | — | ⬜ 待搬 |
 | 14 | [Basic-Item](https://github.com/tModLoader/tModLoader/wiki/Basic-Item) | — | ⬜ 待搬 |
 | 15 | [Basic-Projectile](https://github.com/tModLoader/tModLoader/wiki/Basic-Projectile) | `tmodloader-basic-modprojectile.md` | 🚧 原文已搬、待重译 |
@@ -233,7 +233,7 @@ git add -A && git commit -m "post: 文章标题" && git push
 | 19 | [Basic-Tile-Entity](https://github.com/tModLoader/tModLoader/wiki/Basic-Tile-Entity) | — | ⬜ 待搬 |
 | 20 | [Basic-Netcode](https://github.com/tModLoader/tModLoader/wiki/Basic-Netcode) | — | ⬜ 待搬 |
 | 21 | [Basic-NPC-Drops-and-Loot-1.4](https://github.com/tModLoader/tModLoader/wiki/Basic-NPC-Drops-and-Loot-1.4) | — | ⬜ 待搬 |
-| 22 | [Basic-NPC-Spawning](https://github.com/tModLoader/tModLoader/wiki/Basic-NPC-Spawning) | `tmodloader-basic-npc-spawning.md` | 🚧 原文已搬、待重译 |
+| 22 | [Basic-NPC-Spawning](https://github.com/tModLoader/tModLoader/wiki/Basic-NPC-Spawning) | `tmodloader-basic-npc-spawning.md` | ✅ 已重译（21 个代码块逐字保留） |
 | 23 | [Basic-Sounds](https://github.com/tModLoader/tModLoader/wiki/Basic-Sounds) | — | ⬜ 待搬 |
 | 24 | [Time-and-Timers](https://github.com/tModLoader/tModLoader/wiki/Time-and-Timers) | — | ⬜ 待搬 |
 | 25 | [Basic-UI-Element](https://github.com/tModLoader/tModLoader/wiki/Basic-UI-Element) | — | ⬜ 待搬 |
