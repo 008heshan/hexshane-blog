@@ -168,11 +168,11 @@ Tile entity 本身是不可见的，除非所属的 `ModTile` 拿它来做自定
 
 最快的验证办法：在 `ModTileEntity.Update` 里加上 `Dust.QuickDust(Position.X, Position.Y, Color.Red);`，实体存在的话就会在那里冒红点：
 
-![在 ModTileEntity.Update 里用 Dust.QuickDust 画出的红点，用来确认实体存在](https://github.com/user-attachments/assets/2f883cef-f818-493f-a549-a6e7eb122eb5)
+![在 ModTileEntity.Update 里用 Dust.QuickDust 画出的红点，用来确认实体存在](/img/posts/tmodloader-basic-tile-entity/2f883cef-f818-493f-a549-a6e7eb122eb5.png)
 
 另一个选择是装 [Modders Toolkit](https://steamcommunity.com/sharedfiles/filedetails/?id=2573569299) 这类模组，它带一个开关，能把所有 tile entity 的位置都可视化出来：
 
-![Modders Toolkit 的 tile entity 可视化开关效果](https://github.com/user-attachments/assets/9e3012a0-b9d9-4f84-835d-d8e87fde42f3)
+![Modders Toolkit 的 tile entity 可视化开关效果](/img/posts/tmodloader-basic-tile-entity/9e3012a0-b9d9-4f84-835d-d8e87fde42f3.png)
 
 # 示例
 
