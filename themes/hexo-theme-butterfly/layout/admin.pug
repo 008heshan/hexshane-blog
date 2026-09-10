@@ -50,6 +50,7 @@ html(lang='zh-CN' data-theme='dark')
         button.admin-tab.is-active(type='button' data-tab='overview') 概览
         button.admin-tab(type='button' data-tab='posts') 文章
         button.admin-tab(type='button' data-tab='announce') 公告
+        button.admin-tab(type='button' data-tab='copy') 站点文案
         button.admin-tab(type='button' data-tab='taxonomy') 标签 / 分类
         button.admin-tab(type='button' data-tab='archives') 归档
         button.admin-tab(type='button' data-tab='settings') 设置
@@ -246,6 +247,96 @@ html(lang='zh-CN' data-theme='dark')
               button#btn-clear-announce.admin-btn(type='button') 清空
             .admin-hint 保存后写入 <code>source/_data/announcement.yml</code>。站点用 <b>Markdown</b> 渲染这段内容（底层 marked）：工具栏写的 <code>**加粗**</code>、<code>- 列表</code>、<code>[链接](…)</code> 都会生效，<b>HTML 标签原样保留</b>，两种写法可混用；预览为近似效果，最终以构建后的侧栏为准。图片会自动上传到 <code>source/img/announce/</code> 并以 <code>/img/announce/…</code> 引用。
 
+        //- ---------- 站点文案 ----------
+        section#tab-copy.admin-pane
+          .admin-panel
+            .admin-panel-title 关于页正文
+            .admin-editor-head
+              span#about-state.admin-editor-state
+            .editor-body.mode-edit#about-editor(data-editor='about')
+              .editor-bar
+                .editor-tools
+                  button.editor-tool(type='button' data-act='undo' title='撤回（Ctrl+Z）')
+                    i.fas.fa-rotate-left
+                  button.editor-tool(type='button' data-act='redo' title='重做（Ctrl+Shift+Z / Ctrl+Y）')
+                    i.fas.fa-rotate-right
+                  span.editor-tools-sep
+                  button.editor-tool(type='button' data-md='bold' title='加粗（Ctrl+B）')
+                    i.fas.fa-bold
+                  button.editor-tool(type='button' data-md='italic' title='斜体（Ctrl+I）')
+                    i.fas.fa-italic
+                  button.editor-tool(type='button' data-md='strike' title='删除线')
+                    i.fas.fa-strikethrough
+                  span.editor-tools-sep
+                  button.editor-tool(type='button' data-md='h2' title='二级标题')
+                    i.fas.fa-heading
+                  button.editor-tool(type='button' data-md='quote' title='引用')
+                    i.fas.fa-quote-left
+                  button.editor-tool(type='button' data-md='ul' title='无序列表')
+                    i.fas.fa-list-ul
+                  button.editor-tool(type='button' data-md='ol' title='有序列表')
+                    i.fas.fa-list-ol
+                  span.editor-tools-sep
+                  button.editor-tool(type='button' data-md='code' title='行内代码')
+                    i.fas.fa-code
+                  button.editor-tool(type='button' data-md='link' title='链接（Ctrl+K）')
+                    i.fas.fa-link
+                  button.editor-tool(type='button' data-md='image' title='插入图片：选文件上传到仓库（或直接把图片粘贴 / 拖进来）')
+                    i.fas.fa-image
+                  button.editor-tool(type='button' data-md='image-url' title='插入外链图片（手填图片网址）')
+                    i.fas.fa-link
+                  button.editor-tool(type='button' data-md='hr' title='分割线')
+                    i.fas.fa-minus
+                .editor-modes
+                  button.editor-mode.is-active(type='button' data-mode='edit') 编辑
+                  button.editor-mode(type='button' data-mode='split') 分栏
+                  button.editor-mode(type='button' data-mode='preview') 预览
+              .editor-panes
+                textarea#about-body.admin-textarea(rows='18' spellcheck='false' placeholder='写关于页正文（Markdown）。「关于本站 / 版权声明 / 免责声明」这些小节都在这里，可以直接改。')
+                .editor-preview#about-preview
+              input#about-image-file(type='file' accept='image/*' multiple hidden)
+              .editor-foot
+                span#about-stats.editor-stats 0 字 · 0 行
+                span.editor-tip Ctrl+B 加粗 · Ctrl+K 链接 · Ctrl+S 保存 · Tab 缩进 · 插图：点图钉选文件，或 Ctrl+V 粘贴 / 拖进来
+            .admin-actions
+              button#btn-save-about.admin-btn.admin-btn-primary(type='button')
+                i.fas.fa-floppy-disk
+                span 保存关于页
+              button#btn-reload-copy.admin-btn(type='button') 重新拉取
+            .admin-hint 保存后写入 <code>source/about/index.md</code>。页头的 front-matter（标题、日期、<code>comments: false</code>）会<b>原样保留</b>，正文由这里覆盖；图片自动上传到 <code>source/img/about/</code>。
+
+          .admin-panel
+            .admin-panel-title 站点文案（根 <code>_config.yml</code>）
+            .admin-form
+              .admin-field
+                label(for='copy-subtitle') 站点副标题（subtitle）
+                input#copy-subtitle.admin-input(type='text' placeholder='写点代码，也写点生活')
+                .admin-field-hint 用于浏览器标签页标题、分享卡片等位置
+              .admin-field
+                label(for='copy-description') 站点简介（description）
+                input#copy-description.admin-input(type='text' placeholder='Terraria 模组开发 / 前端折腾 / 一些不想忘掉的笔记')
+                .admin-field-hint 用于首页 meta 描述与搜索结果摘要
+            .admin-actions
+              button#btn-save-site.admin-btn.admin-btn-primary(type='button')
+                i.fas.fa-floppy-disk
+                span 保存站点文案
+
+          .admin-panel
+            .admin-panel-title 主题文案（首页标语 / 作者卡片）
+            .admin-form
+              .admin-field
+                label(for='copy-subtitle-lines') 首页打字机标语（一行一句）
+                textarea#copy-subtitle-lines.admin-textarea(rows='4' spellcheck='false' placeholder='写点代码，也写点生活')
+                .admin-field-hint 首页「纪元」下面轮流打出来的那几句，改几行就轮播几句
+              .admin-field
+                label(for='copy-author-desc') 作者卡片简介
+                input#copy-author-desc.admin-input(type='text' placeholder='写点代码，也写点生活 ✨')
+            .admin-actions
+              button#btn-save-theme.admin-btn.admin-btn-primary(type='button')
+                i.fas.fa-floppy-disk
+                span 保存主题文案
+            .admin-hint 这两项属于主题配置（<code>themes/hexo-theme-butterfly/_config.yml</code>）。后台只改这两处文本，<b>文件里其它配置与注释一律不动</b>。
+
         //- ---------- 标签 / 分类 ----------
         section#tab-taxonomy.admin-pane
           .admin-panel
@@ -310,4 +401,4 @@ html(lang='zh-CN' data-theme='dark')
     script(src=url_for('/custom/cursor/site-cursor.js'))
     script(src=url_for('/custom/admin/admin-key.js'))
     script(src=url_for('/custom/admin/admin-space.js'))
-    script(src=url_for('/custom/admin/admin.js') + '?v=20260910j')
+    script(src=url_for('/custom/admin/admin.js') + '?v=20260910q')

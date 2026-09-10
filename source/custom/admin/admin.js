@@ -937,6 +937,7 @@
 
   function imageDirFor(body) {
     if (body && body.getAttribute('data-editor') === 'announce') return 'source/img/announce'
+    if (body && body.getAttribute('data-editor') === 'about') return 'source/img/about'
     var ed = state.editing
     var name = ''
     if (ed && ed.mode === 'edit' && ed.path) {
@@ -1183,6 +1184,15 @@
       var el = $(sel)
       if (el) el.addEventListener('input', afterEdit)
     })
+    var aboutTa = $('#about-body')
+    if (aboutTa) {
+      aboutTa.addEventListener('input', aboutAfterEdit)
+      aboutTa.addEventListener('keydown', function (e) { onEditorKeydown(e, aboutEditor(), aboutAfterEdit) })
+      bindImageDrop(aboutEditor())
+      var aboutHist = historyFor(aboutEditor())
+      if (aboutHist) aboutHist.onChange = aboutAfterEdit
+    }
+
     var postBody = $('#editor-body')
     $('#ed-body').addEventListener('input', afterEdit)
     $('#ed-body').addEventListener('keydown', function (e) { onEditorKeydown(e, postBody, afterEdit) })
@@ -1214,6 +1224,8 @@
         }
         if (body && body.getAttribute('data-editor') === 'announce') {
           insertMarkdown(kind, announceBody(), announceAfterEdit)
+        } else if (body && body.getAttribute('data-editor') === 'about') {
+          insertMarkdown(kind, aboutBody(), aboutAfterEdit)
         } else {
           insertMarkdown(kind)
         }
@@ -1235,6 +1247,17 @@
       if (announcePane && announcePane.classList.contains('is-active')) {
         e.preventDefault()
         saveAnnouncement()
+        return
+      }
+      var copyPane = $('#tab-copy')
+      if (copyPane && copyPane.classList.contains('is-active')) {
+        e.preventDefault()
+        var ae = document.activeElement
+        var aboutEd = $('#about-editor')
+        if (ae && aboutEd && aboutEd.contains(ae)) saveAbout()
+        else if (ae && (ae.id === 'copy-subtitle-lines' || ae.id === 'copy-author-desc')) saveThemeCopy()
+        else if (ae && (ae.id === 'copy-subtitle' || ae.id === 'copy-description')) saveSiteCopy()
+        else saveAbout()
         return
       }
       var view = $('#post-editor-view')
@@ -1685,6 +1708,209 @@
     }).catch(function (e) { toast('公告保存失败：' + e.message, 'err') })
   }
 
+  /* ==================== 站点文案（关于页 + 站点 / 主题文案）====================
+     为什么要做成后台标签页：这几处文案原先只能改文件 ——
+     关于页正文在 source/about/index.md、站点副标题/简介在根 _config.yml、
+     首页四句标语与作者卡片简介在 themes/hexo-theme-butterfly/_config.yml。
+     改一句话要开编辑器找文件，太麻烦。
+     实现原则和公告一致：**只做外科手术式的行替换**，文件里其它配置、缩进、注释
+     一律原样保留 —— 整份重写会把这些注释和别人的配置全吃掉。
+     ============================================================ */
+  var ABOUT_FILE = 'source/about/index.md'
+  var SITE_CFG_FILE = '_config.yml'
+  var THEME_CFG_FILE = 'themes/hexo-theme-butterfly/_config.yml'
+
+  function aboutBody() { return $('#about-body') }
+  function aboutEditor() { return $('#about-editor') }
+
+  function aboutStats() {
+    var el = $('#about-stats')
+    var ta = aboutBody()
+    if (!el || !ta) return
+    var s = statsText(ta.value)
+    el.textContent = s.count + ' 字 · ' + s.lines + ' 行'
+  }
+
+  function markAboutDirty(v, label) {
+    var el = $('#about-state')
+    if (!el) return
+    if (!v) { el.className = 'admin-editor-state'; el.textContent = label || ''; return }
+    el.className = 'admin-editor-state is-dirty'
+    el.textContent = '● 有未保存的修改'
+  }
+
+  function aboutAfterEdit() {
+    markAboutDirty(true)
+    aboutStats()
+    var b = aboutEditor()
+    if (b && b.__mode && b.__mode !== 'edit') schedulePreviewFor(b)
+  }
+
+  // ---- YAML 小工具：按行取值 / 按行写值，绝不重排整个文件 ----
+  // 取值时要把 YAML 单引号里的转义还原（'' → '），否则带撇号的文案读回会变成两个撇号
+  function stripQuote(s) {
+    return String(s == null ? '' : s).trim().replace(/^['"]|['"]$/g, '').replace(/''/g, "'")
+  }
+
+  function yamlTopValue(text, key) {
+    var m = new RegExp('^' + key + ':[ \\t]*(.*)$', 'm').exec(text)
+    return m ? stripQuote(m[1]) : ''
+  }
+
+  function yamlSetTop(text, key, value) {
+    var line = key + ": '" + String(value).replace(/'/g, "''") + "'"
+    var re = new RegExp('^' + key + ':[ \\t]*.*$', 'm')
+    return re.test(text) ? text.replace(re, line) : text.replace(/\s*$/, '\n') + line + '\n'
+  }
+
+  // 取一个顶层块（key: 到下一个同级或更浅缩进的行为止）的行号范围
+  function yamlBlockRange(lines, key, indent) {
+    var re = new RegExp('^' + indent + key + ':')
+    var start = -1
+    for (var i = 0; i < lines.length; i++) if (re.test(lines[i])) { start = i; break }
+    if (start < 0) return null
+    var end = lines.length
+    for (var j = start + 1; j < lines.length; j++) {
+      if (!lines[j].trim()) continue
+      var m = /^(\s*)\S/.exec(lines[j])
+      if (m[1].length <= indent.length) { end = j; break }
+    }
+    return { start: start, end: end }
+  }
+
+  function themeAuthorDesc(text) {
+    var lines = text.split('\n')
+    var b = yamlBlockRange(lines, 'card_author', '  ')
+    if (!b) return { value: '', line: -1 }
+    for (var i = b.start; i < b.end; i++) {
+      var m = /^(\s*)description:[ \t]*(.*)$/.exec(lines[i])
+      if (m) return { value: stripQuote(m[2]), line: i, indent: m[1] }
+    }
+    return { value: '', line: -1, insertAt: b.start + 1 }
+  }
+
+  function themeSetAuthorDesc(text, value) {
+    var lines = text.split('\n')
+    var info = themeAuthorDesc(text)
+    var line = (info.indent || '    ') + "description: " + value
+    if (info.line >= 0) lines[info.line] = line
+    else if (info.insertAt != null) lines.splice(info.insertAt, 0, line)
+    return lines.join('\n')
+  }
+
+  function themeSubtitleLines(text) {
+    var lines = text.split('\n')
+    var b = yamlBlockRange(lines, 'subtitle', '')
+    if (!b) return []
+    var out = []
+    var inSub = false
+    for (var i = b.start; i < b.end; i++) {
+      if (/^  sub:[ \t]*$/.test(lines[i])) { inSub = true; continue }
+      if (!inSub) continue
+      var m = /^\s{4}-[ \t]?(.*)$/.exec(lines[i])
+      if (m) out.push(stripQuote(m[1]))
+      else if (lines[i].trim()) break
+    }
+    return out
+  }
+
+  function themeSetSubtitleLines(text, arr) {
+    var lines = text.split('\n')
+    var b = yamlBlockRange(lines, 'subtitle', '')
+    if (!b) return text
+    var subIdx = -1
+    for (var i = b.start; i < b.end; i++) if (/^  sub:/.test(lines[i])) { subIdx = i; break }
+    var items = arr.map(function (s) { return '    - ' + s })
+    if (subIdx < 0) {
+      // 没有 sub: 就在 subtitle 块末尾补一个
+      var pos = b.end
+      // 回退掉块尾的空行，插在最后一个非空行之后
+      while (pos - 1 > b.start && !lines[pos - 1].trim()) pos--
+      ;[].splice.apply(lines, [pos, 0].concat(['  sub:'], items))
+    } else {
+      var j = subIdx + 1
+      while (j < lines.length && /^\s{4}-[ \t]?/.test(lines[j])) j++
+      ;[].splice.apply(lines, [subIdx + 1, j - (subIdx + 1)].concat(items))
+    }
+    return lines.join('\n')
+  }
+
+  function loadCopyTab() {
+    var ab = aboutBody()
+    if (ab) ab.value = '读取中…'
+    markAboutDirty(false, '读取中…')
+    Promise.all([ghGetFile(ABOUT_FILE), ghGetFile(SITE_CFG_FILE), ghGetFile(THEME_CFG_FILE)]).then(function (r) {
+      var about = r[0], site = r[1], theme = r[2]
+      // 关于页：front-matter 原样留着（保存时再拼回去），只把正文放进编辑器
+      if (about && about.text != null) {
+        var m = /^---\r?\n[\s\S]*?\r?\n---\r?\n?/.exec(about.text)
+        state.aboutFront = m ? m[0].replace(/\r\n/g, '\n') : '---\ntitle: 关于\n---\n'
+        if (ab) ab.value = (m ? about.text.slice(m[0].length) : about.text).replace(/^\n+/, '').replace(/\s+$/, '') + '\n'
+        state.aboutSha = about.sha
+      } else if (ab) {
+        ab.value = ''
+      }
+      // 站点文案
+      if (site && site.text != null) {
+        var st = $('#copy-subtitle'); if (st) st.value = yamlTopValue(site.text, 'subtitle')
+        var sd = $('#copy-description'); if (sd) sd.value = yamlTopValue(site.text, 'description')
+        state.siteCfgSha = site.sha
+      }
+      // 主题文案
+      if (theme && theme.text != null) {
+        var tl = $('#copy-subtitle-lines'); if (tl) tl.value = themeSubtitleLines(theme.text).join('\n')
+        var ad = $('#copy-author-desc'); if (ad) ad.value = themeAuthorDesc(theme.text).value
+        state.themeCfgSha = theme.sha
+      }
+      markAboutDirty(false, '与仓库一致')
+      aboutStats()
+      var h = historyFor(aboutEditor())
+      if (h) h.reset()
+    }).catch(function (e) {
+      markAboutDirty(false, '读取失败')
+      toast('站点文案读取失败：' + e.message, 'err')
+    })
+  }
+
+  function saveAbout() {
+    var body = aboutBody().value.replace(/\s*$/, '') + '\n'
+    var front = (state.aboutFront || '---\ntitle: 关于\n---\n').replace(/\r\n/g, '\n').replace(/\s*$/, '\n')
+    var text = front + '\n' + body
+    ghGetFile(ABOUT_FILE).then(function (f) {
+      return ghPutFile(ABOUT_FILE, text, 'admin: 更新关于页', f ? f.sha : state.aboutSha)
+    }).then(function () {
+      markAboutDirty(false, '已提交，等构建')
+      toast('关于页已提交，站点重新构建后生效', 'ok')
+    }).catch(function (e) { toast('关于页保存失败：' + e.message, 'err') })
+  }
+
+  function saveSiteCopy() {
+    var sub = $('#copy-subtitle') ? $('#copy-subtitle').value.trim() : ''
+    var desc = $('#copy-description') ? $('#copy-description').value.trim() : ''
+    ghGetFile(SITE_CFG_FILE).then(function (f) {
+      var text = f ? f.text : ''
+      text = yamlSetTop(text, 'subtitle', sub)
+      text = yamlSetTop(text, 'description', desc)
+      return ghPutFile(SITE_CFG_FILE, text, 'admin: 更新站点副标题与简介', f ? f.sha : state.siteCfgSha)
+    }).then(function () {
+      toast('站点文案已提交，重新构建后生效', 'ok')
+    }).catch(function (e) { toast('站点文案保存失败：' + e.message, 'err') })
+  }
+
+  function saveThemeCopy() {
+    var lines = ($('#copy-subtitle-lines') ? $('#copy-subtitle-lines').value : '')
+      .split('\n').map(function (s) { return s.trim() }).filter(function (s) { return !!s })
+    var authorDesc = $('#copy-author-desc') ? $('#copy-author-desc').value.trim() : ''
+    ghGetFile(THEME_CFG_FILE).then(function (f) {
+      var text = f ? f.text : ''
+      text = themeSetSubtitleLines(text, lines)
+      text = themeSetAuthorDesc(text, authorDesc)
+      return ghPutFile(THEME_CFG_FILE, text, 'admin: 更新首页标语与作者卡片简介', f ? f.sha : state.themeCfgSha)
+    }).then(function () {
+      toast('主题文案已提交，重新构建后生效', 'ok')
+    }).catch(function (e) { toast('主题文案保存失败：' + e.message, 'err') })
+  }
+
   // ==================== 标签 / 分类 ====================
   function renderTaxonomy() {
     var m = state.meta
@@ -1824,6 +2050,7 @@
     $$('.admin-pane').forEach(function (p) { p.classList.toggle('is-active', p.id === 'tab-' + name) })
     if (name === 'posts') showListView()
     if (name === 'announce') loadAnnouncement()
+    if (name === 'copy') loadCopyTab()
   }
 
   // ==================== 启动 ====================
@@ -1856,6 +2083,10 @@
     $('#btn-delete-post').addEventListener('click', deletePost)
     $('#btn-save-announce').addEventListener('click', saveAnnouncement)
     $('#btn-reload-announce').addEventListener('click', loadAnnouncement)
+    $('#btn-save-about').addEventListener('click', saveAbout)
+    $('#btn-reload-copy').addEventListener('click', loadCopyTab)
+    $('#btn-save-site').addEventListener('click', saveSiteCopy)
+    $('#btn-save-theme').addEventListener('click', saveThemeCopy)
     $('#btn-save-gh').addEventListener('click', saveGhConfig)
     $('#btn-test-gh').addEventListener('click', testConnection)
     $('#btn-clear-gh').addEventListener('click', clearCredentials)
