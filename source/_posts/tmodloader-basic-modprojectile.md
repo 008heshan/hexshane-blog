@@ -59,7 +59,7 @@ The most important part of a Projectile is the `SetDefaults` method. `SetDefault
 A commons mistake is setting `Projectile.damage` in `SetDefaults`, this does not work, as the damage value a projectile has is always overwritten by the value passed into `Projectile.NewProjectile` when the projectile is spawned. Usually the item or the npc spawning the item will determine the damage.
 
 ## DrawOffsetX, DrawOriginOffsetY, DrawOriginOffsetX
-These are `ModProjectile` fields related to properly centering a hitbox to a sprite. Read [Drawing and Collision](#drawing-and-collision) for more info.
+These are `ModProjectile` fields related to properly centering a hitbox to a sprite. Read [Drawing and Collision](#Drawing-and-Collision) for more info.
 
 # Other Hooks/Methods
 The [ModProjectile documentation](https://docs.tmodloader.net/docs/stable/class_mod_projectile.html) lists many other hooks/methods you will want to use to make your projectile unique. For example, if you'd like to apply a debuff when the projectile hits an enemy, you would use `OnHitNPC`. To do something when the projectile hits a tile, use `OnTileCollide`. See the documentation and usages in ExampleMod to see how to properly use them.
@@ -69,13 +69,13 @@ The AI of a projectile is the most important aspect of a projectile, it controls
 
 # Using Vanilla AI
 We can use vanilla AI to prototype our projectiles. Let's make a boomerang. Using the same `aiStyle` as the vanilla projectiles that move like a boomerang, we can make a boomerang. You can look up boomerang projectiles in [Vanilla Projectile Field Values](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Projectile-Field-Values) and you will discover that boomerangs all use `aiStyle` of 3:    
-![](https://i.imgur.com/RSaxV6T.png)    
+![各种回旋镖类弹幕的 aiStyle 取值（均为 3）](/img/posts/tmodloader-basic-modprojectile/RSaxV6T.png)    
 
 We can now use `Projectile.aiStyle = 3;` in our code. (You can change 3 to `ProjAIStyleID.Boomerang` to make the code more readable.) To make this boomerang even easier, we can use `Projectile.CloneDefaults(ProjectileID.EnchantedBoomerang)`, which will copy all the other defaults as well. Doing this, you will get a projectile that almost behaves the same way as the vanilla projectile:    
-![](https://i.imgur.com/CL2MwaF.png)     
+![CloneDefaults(EnchantedBoomerang) 之后的回旋镖（没有尘土效果）](/img/posts/tmodloader-basic-modprojectile/CL2MwaF.png)     
 
 You'll notice that the dust aren't being spawned. We can fix this by using `AIType`. `AIType` is used to further narrow down `Projectile.aiStyle`. Each `aiStyle` is shared between many different projectiles. If we want to use a specific behavior of a particular type of projectile, we need to set `AIType`. Here is how our copy of EnchantedBoomerang looks after assigning `AIType` as well:    
-![](https://i.imgur.com/39KqXhc.png)    
+![再补上 AIType 之后的回旋镖（尘土效果恢复）](/img/posts/tmodloader-basic-modprojectile/39KqXhc.png)    
 
 Here is the resulting code.
 ```cs
@@ -152,7 +152,7 @@ Projectile.rotation = Projectile.velocity.ToRotation(); // projectile faces spri
 ```
 
 ### spriteDirection
-If your sprite is upside-down when shot to the left, you'll want to set this: `Projectile.spriteDirection = Projectile.direction;` See [Drawing and Collision](#drawing-and-collision) for an explanation and example.
+If your sprite is upside-down when shot to the left, you'll want to set this: `Projectile.spriteDirection = Projectile.direction;` See [Drawing and Collision](#Drawing-and-Collision) for an explanation and example.
 
 ## Dust
 Spawn dust in AI for a visual effect. Randomizing placement, `DustID`, and frequency is visually pleasing. Here is the Enchanted boomerang dust spawn (aiStyle 3, AIType ProjectileID.EnchantedBoomerang):    
@@ -309,7 +309,7 @@ With the above examples, you can craft the tile collision behavior you want. If 
 Sometimes the default drawing behavior is not what we want. We can override `PreDraw` or `PostDraw` to manually draw a projectile to customize it further.
 
 ## Afterimage Trail
-An "afterimage trail" is when a projectile draws a faded copy of itself trailing behind it. (See also the [Dust Trail section](#dust-trail).) We can implement an afterimage trail by telling the game to remember previous projectile positions and then manually drawing the projectile at those positions. The following code is relevant code from [ExampleBullet.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleBullet.cs):
+An "afterimage trail" is when a projectile draws a faded copy of itself trailing behind it. (See also the [Dust Trail section](#Dust-Trail).) We can implement an afterimage trail by telling the game to remember previous projectile positions and then manually drawing the projectile at those positions. The following code is relevant code from [ExampleBullet.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleBullet.cs):
 
 ```cs
 public override void SetStaticDefaults() {
@@ -380,7 +380,7 @@ You may find yourself noticing that your projectile is hitting walls when it sho
 
 ## Vertical Sprite Example
 Lets work through this example as we explore collision and drawing issues and work to solve them. Here is the sprite, it is 48x70 pixels:    
-![](https://i.imgur.com/y4OcJAv.png)    
+![竖直方向的弹幕精灵（48x70）](/img/posts/tmodloader-basic-modprojectile/y4OcJAv.png)    
 The important parts of this `ModProjectile` are as follows:    
 ```cs
 // SetDefatults
@@ -396,7 +396,7 @@ Here we see the hitbox, the yellow square, doesn't match up with the tip of our 
 https://github.com/tModLoader/tModLoader/assets/4522492/8efa67d9-5565-4076-b0af-5e1688dfde84
 
 The math for what vanilla code is doing is a little confusing, but basically we need to set `DrawOffsetX` and `DrawOriginOffsetY` to values that offset the drawing of our sprite in an attempt to properly place the sprite over the hitbox. If you are attempting this, either use [Modders Toolkit](https://steamcommunity.com/sharedfiles/filedetails/?id=2573569299) to change the offset values in-game or use [Edit and Continue](https://github.com/tModLoader/tModLoader/wiki/Why-Use-an-IDE#edit-and-continue) to adjust the values in-game. Another approach is to just measure it out on the sprite itself in your graphics program:    
-![](https://i.imgur.com/m5DxkBm.png)   
+![在绘图软件里量出 DrawOffsetX / DrawOriginOffsetY](/img/posts/tmodloader-basic-modprojectile/m5DxkBm.png)   
 Here we see testing various values with Modders Toolkit. Make sure to replicate these values in your `SetDefaults` code:     
 
 https://github.com/tModLoader/tModLoader/assets/4522492/a21ae4df-e79f-4878-84ff-d8e30dd59583
@@ -413,13 +413,13 @@ As you saw, we added `DrawOriginOffsetY = -16;` to position the hitbox lower on 
 You might've noticed that the sprite is upside down when fired to the left. Remember that in our `AI`, we have this line of code: `Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.ToRadians(90f);`. If we rotate our sprite to the left, then it is upside-down. We can fix this with `spriteDirection`. `spriteDirection` will flip the drawing of the sprite horizontally. To implement this, simply add `Projectile.spriteDirection = Projectile.direction;` to the `AI` code after the `Projectile.rotation = ...` line. 
 
 No fix:     
-![](https://i.imgur.com/sKUq94z.png)    
+![向左发射时精灵上下颠倒（未修复）](/img/posts/tmodloader-basic-modprojectile/sKUq94z.png)    
 Fixed:     
-![](https://i.imgur.com/w3ALhDX.png)    
+![设置 spriteDirection 之后恢复正常](/img/posts/tmodloader-basic-modprojectile/w3ALhDX.png)    
 
 ## Horizontal Sprite Example
 Things change a little if your sprite is oriented horizontally. Here is our new horizontal sprite, which is now 70x48 and oriented horizontally, pointing to the right instead of up as before:    
-![](https://i.imgur.com/etzbzs0.png)
+![水平方向的弹幕精灵（70x48）](/img/posts/tmodloader-basic-modprojectile/etzbzs0.png)
 
 Once again, we can see that the hitbox doesn't line up:    
 
@@ -438,12 +438,12 @@ DrawOriginOffsetY = Negative Y pixel position of the top left corner of the inte
 DrawOriginOffsetX = X pixel position of center of hitbox minus Texture Width divided by 2 
 ```
 Here is a diagram:    
-![](https://i.imgur.com/zQfxXM3.png)     
+![DrawOffsetX / DrawOriginOffsetY / DrawOriginOffsetX 的换算示意](/img/posts/tmodloader-basic-modprojectile/zQfxXM3.png)     
 If you don't like fighting against the vanilla projectile rendering code, you can always draw the projectile yourself as seen in [ExampleAdvancedAnimatedProjectile](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleAdvancedAnimatedProjectile.cs#L101)
 
 ### Fixing upside-down sprite problem again
 With the vertical sprite, using `Projectile.spriteDirection` works because it controls a horizontal flip of the projectile sprite. Using a horizontal sprite, a horizontal flip makes the sprite move facing backwards:    
-![](https://i.imgur.com/vfKrRzZ.png)    
+![水平精灵翻转后变成朝向后方](/img/posts/tmodloader-basic-modprojectile/vfKrRzZ.png)    
 To fix this, we need to adjust the offsets dynamically and conditionally add 180 degrees or Pi to the rotation. Here is the code:
 ```cs
 // Set both direction and spriteDirection to 1 or -1 (right and left respectively)
@@ -466,7 +466,7 @@ else
 	DrawOriginOffsetX = -31; // Math works out that this is negative of the other value.
 }
 ```
-![](https://i.imgur.com/FKfhtQ0.png)    
+![按朝向动态调整偏移量后的最终效果](/img/posts/tmodloader-basic-modprojectile/FKfhtQ0.png)    
 
 Hopefully these answers can help you solve your projectile hitbox and drawing issues.
 

@@ -6,6 +6,8 @@
       · 离屏 canvas 预渲染：一层模糊辉光 + 一层清晰点阵，逐帧只做两次 drawImage
       · 呼吸缩放 + 沿曲线流动的亮点 + 指针视差
    2) .sf-code —— 大标题背后时不时"被编辑"的幽灵代码段
+      · 内容：泰拉瑞亚 / tModLoader 模组开发代码（C#），呼应站点内容方向
+      · 两处：大标题背后（较长的配方 / 弹幕 / 刷怪逻辑）+ 大标题右下角（较短的 Boss / 掉落 / 日志）
       · 打字机逐字输出，停顿后擦除换下一段，低透明度 + 轻微模糊
    3) prefers-reduced-motion 下：只渲染一帧静态 ∞，不跑动画与打字
    ============================================================ */
@@ -86,19 +88,22 @@
   codeBR.setAttribute('aria-hidden', 'true')
   hero.insertBefore(codeBR, hero.firstChild)
 
+  // 大标题背后：泰拉瑞亚 / tModLoader 代码（C#）
   var snippetsMain = [
-    'const kernel = await createKernel({\n  plugins: [model, tools, sandbox],\n  hot: true,\n})\nawait kernel.start()',
-    'function infinity(t) {\n  const s = Math.sin(t)\n  return [Math.cos(t) / (1 + s * s),\n          s * Math.cos(t) / (1 + s * s)]\n}',
-    '$ npx @deepseek-ai/dsh web\n  ➜  ready  http://127.0.0.1:53900',
-    "blog.on('publish', (post) => {\n  cdn.invalidate(post.path)\n  sitemap.rebuild()\n})",
-    'git add -A && git commit -m "post: 新文章"\ngit push   # → Cloudflare Pages'
+    'Recipe.Create(ModContent.ItemType<MySword>())\n    .AddIngredient(ItemID.FallenStar, 10)\n    .AddIngredient(ItemID.HellstoneBar, 5)\n    .AddTile(TileID.Anvils)\n    .Register();',
+    'public override void SetDefaults() {\n    Projectile.width = 14;\n    Projectile.height = 14;\n    Projectile.friendly = true;\n    Projectile.aiStyle = ProjAIStyleID.Arrow;\n}',
+    'public override void AI() {\n    Projectile.rotation = Projectile.velocity.ToRotation();\n    Lighting.AddLight(Projectile.Center, 0.6f, 0.3f, 0.2f);\n}',
+    'public override float SpawnChance(NPCSpawnInfo spawnInfo) {\n    if (Main.hardMode && spawnInfo.Player.ZoneRockLayerHeight)\n        return 0.12f;\n    return 0f;\n}',
+    'if (Main.myPlayer == Projectile.owner) {\n    Projectile.netUpdate = true;   // 多人同步\n}',
+    '$ dotnet build MyMod.csproj\n  ➜  built  MyMod.tmod\n  ➜  reloaded  tModLoader   ●'
   ]
 
+  // 大标题右下角：同样产自泰拉瑞亚模组开发，行宽更窄所以片段更短
   var snippetsBR = [
-    '$ npm run build\n  ➜  generated 81 files in 1.9s\n  ➜  deployed  hexshane.top',
-    'interface Post {\n  title: string\n  tags: string[]\n  sticky?: number\n}',
-    '[dsh] plugin loaded  ui.terminal\n[dsh] plugin loaded  tools.shell\n[dsh] ready  ●',
-    'export const INFINITY = (t: number) => [\n  Math.cos(t) / (1 + Math.sin(t) ** 2),\n  (Math.sin(t) * Math.cos(t)) / (1 + Math.sin(t) ** 2),\n]'
+    'NPC.SpawnOnPlayer(player.whoAmI,\n    NPCID.KingSlime);',
+    'public override void OnKill() {\n    Item.NewItem(NPC.GetSource_Loot(),\n        NPC.Hitbox, ItemID.Gel, 5);\n}',
+    'player.AddBuff(BuffID.ObsidianSkin,\n    60 * 60);',
+    '[tML] loading   MyMod.tmod\n[tML] 123 recipes registered  ●'
   ]
 
   var typistMain = makeTypist(codeEl, snippetsMain, { speed: 26, hold: 2200 })

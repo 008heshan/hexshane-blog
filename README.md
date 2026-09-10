@@ -42,6 +42,7 @@
 │  └─ translate-posts.js         # 构建期翻译（需配置 deepl_api_key，默认不启用）
 ├─ source/
 │  ├─ _posts/                    # 文章（Markdown）
+│  ├─ img/posts/<文章名>/        # 文章插图（已本地化，不再外链 imgur）
 │  ├─ _data/announcement.yml     # 侧边栏公告
 │  ├─ about/index.md             # 关于页（含版权声明）
 │  └─ custom/                    # 自定义样式/脚本/字体/光标等静态资源
@@ -116,7 +117,7 @@ git add -A && git commit -m "post: 文章标题" && git push
 | 底色 | 冷黑渐变（`#0a141d → #03070b`）+ 克制的钢青辉光 + 64px 淡网格 | `sci-fi.css` |
 | 星链网络 | 卫星节点缓慢漂移、距离阈值内自动连线、指针附近点亮链路 | `source/custom/effects/starlink.js` |
 | 粒子无限符号 ∞ | 双纽线方形点阵 halftone（清晰 + 软化 + 辉光三层 + 颗粒噪声），呼吸缩放 + 沿曲线流动亮点 + 指针视差 | `source/custom/effects/hero-fx.js` |
-| 幽灵代码 | 两处独立打字循环：大标题背后、大标题右下角 | `source/custom/effects/hero-fx.js` |
+| 幽灵代码 | 两处独立打字循环：大标题背后（泰拉瑞亚 / tModLoader C# 代码片段）、大标题右下角（更短的 Boss / 掉落 / 加载日志） | `source/custom/effects/hero-fx.js` |
 
 **配色（冷峻）**：近黑冷底 `#03060a`；强调色钢青 `#9dc0d4`，亮态 `#cbe2ef`，辅助石墨蓝 `#5b7285`；
 正文冷白 `#d9e4ec`，次要文字冷灰 `#7c8a95`。全部去掉了高饱和霓虹与紫色，辉光强度也压到最低。
@@ -139,7 +140,33 @@ git add -A && git commit -m "post: 文章标题" && git push
   （1,1,2）覆盖它
 - **浅色模式已关闭**：主题 `darkmode.button: false`，导航栏不再有明暗切换按钮
 - 头像已固定为圆形且禁用任何旋转（`transform/animation: none`）
-- 面板为克制的深色玻璃（1px 淡边 + 柔和投影），不使用 HUD 角标等装饰
+- **面板材质 = 真·磨砂玻璃（v16）**：只铺一层**中性白膜**（`rgba(255,255,255,.035)`，无任何
+  色相），磨砂感 100% 由 `backdrop-filter: blur(18px)` 实时模糊元素**背后真实内容**承担；
+  描边/光晕也改成中性白（不再发蓝）。改法：`sci-fi.css` 令牌区
+  `--sf-glass / --sf-glass-2 / --sf-glass-blur / --sf-line`（想更透就调小 alpha），
+  `theme-glass.css` 的 dark 卡片 / `#page` / 移动端分支同步中性化。
+  同一材质也用在代码块（`code-highlight.css`）、引用块、行内代码、标签胶囊、分页按钮上
+  - 例外：`#page` / `#post` / `#archive` 这类**长文容器不开** `backdrop-filter`——
+    背后就是页面底色，模糊看不出来，但每帧重采样极贵（`theme-glass.css` 里有实测记录），
+    它们只铺中性薄膜
+  - 提示：`prefers-reduced-motion` 与快速滚动降级仍然生效；`theme-reveal.css`
+    在主题切换瞬间会临时关掉卡片 backdrop-filter
+- 代码块只留**一层**卡片皮（`sci-fi.css` 第 7 节）：原来 figure / `.codeblock` / 两个内层 `pre`
+  会各画一次边框，且行内 `code` 的胶囊底漏到块级 `code` 上（块级 `code` 是 inline 盒子，
+  于是一行代码一个框）。现在内层一律透明无边框，行内样式用 `:not(pre) > code` 限定
+- 分享条里 X（推特）图标品牌色是纯黑，深色底上看不见，已改紫色 `#8b5cf6`
+- **站内锚点大小写容错**：文章里的站内锚点大多是从 tModLoader 官方 Wiki 搬来的，
+  GitHub Wiki 的锚点全是小写（`#drawing-and-collision`），而本站 Hexo 生成的标题 id
+  **保留大小写**（`Drawing-and-Collision`）。URL 片段大小写敏感，精确匹配不上时浏览器
+  既不跳转也不报错 —— 表现就是"这个超链接点了没反应"。两层处理：
+  1. 正文里写成实际 id（`tmodloader-basic-modprojectile.md` 的
+     `#Drawing-and-Collision` ×2、`#Dust-Trail`）
+  2. `source/custom/effects/anchor-fallback.js`：精确 id 不存在时做一次归一化
+     （小写 + 非字母数字转 `-`）再匹配，覆盖大小写差异、`/`、`,`、空格、中文标题；
+     命中后用 `scrollIntoView` 滚动，因此仍遵守 `toc.css` 的 `scroll-margin-top`
+     （落点在固定导航下方 8px）。TOC 链接走主题 `btf.scrollToDest`，互不干扰
+- 文章底部「文章作者」链接走主题 `post_copyright.author_href` → B 站主页
+  <https://space.bilibili.com/448793040>
 - 尊重 `prefers-reduced-motion`：星链只画一帧静态图，粒子 ∞ 静态渲染，幽灵代码不打字
 - 标签页隐藏时两个 canvas 都会暂停；节点数按视口面积自适应（38~110）
 
@@ -161,4 +188,15 @@ git add -A && git commit -m "post: 文章标题" && git push
 
 - 未启用 `hexo-generator-feed` / `hexo-generator-sitemap`，站点没有 `atom.xml`、`sitemap.xml`。
   需要时可加插件并在 `_config.yml` 中补配置。
+- 文章插图**已本地化**：原先 12 张引用 `i.imgur.com`（境内不可达，页面全是破图），
+  现已下载到 `source/img/posts/<文章名>/` 并改成 `/img/posts/...` 引用，不再依赖外网。
+  文件名保留了原始 imgur ID，方便回溯：
+
+  | 文章 | 图片（imgur ID） |
+  | --- | --- |
+  | `tmodloader-basic-modprojectile` | `RSaxV6T` 回旋镖 aiStyle 查表 · `CL2MwaF` CloneDefaults 效果 · `39KqXhc` 补 AIType 后 · `y4OcJAv` 竖直精灵 48x70 · `m5DxkBm` 量偏移 · `sKUq94z` 上下颠倒未修复 · `w3ALhDX` spriteDirection 修复 · `etzbzs0` 水平精灵 70x48 · `zQfxXM3` 偏移换算示意 · `vfKrRzZ` 水平翻转朝后 · `FKfhtQ0` 最终效果 |
+  | `tmodloader-basic-npc-spawning` | `9rIgSMt` 世界高度分区示意 |
+
+  复原办法（本机直连 imgur 不通时）：用 `https://cors.eu.org/https://i.imgur.com/<id>.png`
+  可以取到原始字节；`image.thum.io` 只能截 imgur 的网页版，图会被页面裁掉，不要用。
 - `www.hexshane.top` 目前未签发证书/未绑定，如需使用请在 Cloudflare Pages 里再添加一次自定义域。

@@ -27,10 +27,17 @@
   /* 冷峻配色：近黑冷底 + 钢青强调 + 石墨蓝辅助，去掉一切高饱和霓虹 */
   --sf-bg-0: #03060a;
   --sf-bg-1: #070d14;
-  --sf-panel: rgba(10, 16, 23, .72);
-  --sf-panel-2: rgba(6, 10, 16, .88);
-  --sf-line: rgba(150, 182, 202, .1);
-  --sf-line-strong: rgba(150, 182, 202, .22);
+  /* ---- 真·磨砂玻璃材质 ----
+     只有一层【中性白膜】（无任何色相）：背景越接近 0，越"通透"；
+     磨砂感全部交给 backdrop-filter 实时模糊元素背后的真实内容。
+     想再透一点就把 .035 调到 .02；想更结实就调到 .06。 */
+  --sf-glass: rgba(255, 255, 255, .035);
+  --sf-glass-2: rgba(255, 255, 255, .055);
+  --sf-glass-blur: 18px;
+  --sf-panel: var(--sf-glass);
+  --sf-panel-2: var(--sf-glass-2);
+  --sf-line: rgba(255, 255, 255, .10);
+  --sf-line-strong: rgba(255, 255, 255, .18);
   --sf-ice: #9dc0d4;
   --sf-ice-2: #cbe2ef;
   --sf-slate: #5b7285;
@@ -57,8 +64,8 @@ html {
   --hr-border: rgba(150, 182, 202, .16);
   --hr-before-color: var(--sf-ice);
   --blockquote-color: #9fadb8;
-  --blockquote-bg: rgba(157, 192, 212, .05);
-  --search-bg: rgba(6, 11, 17, .95);
+  --blockquote-bg: rgba(255, 255, 255, .04);
+  --search-bg: rgba(255, 255, 255, .05);
   --search-input-color: var(--sf-text);
   --search-a-color: var(--sf-text);
   --toc-link-color: var(--sf-muted);
@@ -408,27 +415,48 @@ html body #page-header #scroll-down .scroll-down-effects {
 }
 
 /* ---------------------------------------------------------------
-   5. 面板：克制的深色玻璃（无角标、无霓虹描边）
+   5. 面板：真·磨砂玻璃（中性白膜 + 实时背景模糊，不自带颜色）
+   ---------------------------------------------------------------
+   旧版是 rgba(10,16,23,.72) 的深色蒙层 —— 那是"带颜色的半透明板"，
+   不是玻璃。现在：
+   · 背景只剩一层中性白膜（--sf-glass，无任何色相），透光率极高
+   · 磨砂感 100% 由 backdrop-filter 实时模糊背后内容承担
+   · 描边改为中性白（--sf-line），不再发蓝
    --------------------------------------------------------------- */
 html body .card-widget,
 html body #recent-posts .recent-post-item,
-html body #page,
-html body #archive,
-html body #post,
 html body .relatedPosts-list a.pagination-related,
-html body .post-copyright,
-html body .search-dialog {
-  background: var(--sf-panel) !important;
+html body .post-copyright {
+  background: var(--sf-glass) !important;
   border: 1px solid var(--sf-line) !important;
   box-shadow: 0 24px 60px -38px rgba(0, 0, 0, .95) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
-  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--sf-glass-blur));
+  backdrop-filter: blur(var(--sf-glass-blur));
   transition: border-color .22s ease, box-shadow .22s ease;
+}
+
+/* 长文容器（#page / #archive / #post）：背后就是页面底色，做实时模糊既看不出来
+   又极贵（theme-glass.css 踩过这个坑），所以只铺中性薄膜，不开 backdrop-filter */
+html body #page,
+html body #archive,
+html body #post {
+  background: var(--sf-glass) !important;
+  border: 1px solid var(--sf-line) !important;
+  box-shadow: 0 24px 60px -38px rgba(0, 0, 0, .95) !important;
+}
+
+/* 检索弹窗是浮层，给稍厚一点的白膜 + 模糊，保证文字仍然清楚 */
+html body .search-dialog {
+  background: var(--sf-glass-2) !important;
+  border: 1px solid var(--sf-line) !important;
+  box-shadow: 0 24px 60px -38px rgba(0, 0, 0, .95) !important;
+  -webkit-backdrop-filter: blur(var(--sf-glass-blur));
+  backdrop-filter: blur(var(--sf-glass-blur));
 }
 
 html body .card-widget:hover,
 html body #recent-posts .recent-post-item:hover {
-  border-color: rgba(150, 182, 202, .24) !important;
+  border-color: var(--sf-line-strong) !important;
   box-shadow: 0 28px 70px -34px rgba(0, 0, 0, 1) !important;
 }
 
@@ -513,10 +541,12 @@ html body #post #article-container a:hover {
 }
 
 html body #post #article-container blockquote {
-  background: rgba(157, 192, 212, .05) !important;
+  background: rgba(255, 255, 255, .04) !important;
   border-left: 3px solid rgba(157, 192, 212, .6) !important;
   border-radius: 0 6px 6px 0;
   color: #a9c0d6 !important;
+  -webkit-backdrop-filter: blur(var(--sf-glass-blur));
+  backdrop-filter: blur(var(--sf-glass-blur));
 }
 
 html body #post #article-container hr {
@@ -526,20 +556,25 @@ html body #post #article-container hr {
 }
 
 html body #post #article-container table th {
-  background: rgba(150, 182, 202, .08) !important;
+  background: rgba(255, 255, 255, .06) !important;
   color: #e6eef4 !important;
   font-family: var(--sf-mono) !important;
 }
 
 html body #post #article-container table td,
 html body #post #article-container table th {
-  border-color: rgba(150, 182, 202, .14) !important;
+  border-color: rgba(255, 255, 255, .12) !important;
 }
 
-html body #post #article-container code:not([class*='language-']) {
-  background: rgba(120, 158, 184, .12) !important;
-  color: #a9cfe0 !important;
-  border: 1px solid rgba(120, 158, 184, .2);
+/* 行内代码胶囊底：只作用于「父级不是 pre」的行内 code。
+   原来用 code:not([class*='language-']) 会把代码块里那个没有 class 的块级
+   <code> 一起命中 —— 而它是 display:inline，于是每一行代码都被画上一个
+   贴着文字的小方框（用户反馈的"代码带框"就是它）。
+   底色同样改成中性白膜：只是"稍微亮一点的玻璃"，不染色。 */
+html body #post #article-container :not(pre) > code {
+  background: rgba(255, 255, 255, .07) !important;
+  color: #dbe6ee !important;
+  border: 1px solid rgba(255, 255, 255, .12);
   border-radius: 4px;
   font-family: var(--sf-mono) !important;
   padding: 1px 5px;
@@ -547,19 +582,36 @@ html body #post #article-container code:not([class*='language-']) {
 
 /* ---------------------------------------------------------------
    7. 代码块
+   ---------------------------------------------------------------
+   只给最外层 figure 留一层卡片皮。
+   原来这条选择器同时命中 figure.shiki / .codeblock / figure.highlight / pre，
+   一个代码块被叠了 4~5 层描边（figure + .codeblock + gutter pre + shiki pre），
+   内层一律透明、无边框、无投影。
    --------------------------------------------------------------- */
 html body #post #article-container figure.shiki,
-html body #post #article-container .codeblock,
-html body #post #article-container figure.highlight,
-html body #post #article-container pre {
-  background: #050b14 !important;
-  border: 1px solid rgba(150, 182, 202, .14) !important;
+html body #post #article-container figure.highlight {
+  background: rgba(255, 255, 255, .05) !important;
+  border: 1px solid var(--sf-line) !important;
   box-shadow: 0 18px 44px -30px rgba(0, 0, 0, 1) !important;
+  -webkit-backdrop-filter: blur(var(--sf-glass-blur));
+  backdrop-filter: blur(var(--sf-glass-blur));
+}
+
+html body #post #article-container figure.shiki .codeblock,
+html body #post #article-container figure.highlight .codeblock,
+html body #post #article-container figure.shiki pre,
+html body #post #article-container figure.highlight pre,
+html body #post #article-container figure.shiki code,
+html body #post #article-container figure.highlight code {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
 
 html body #post #article-container .codeblock .gutter {
-  background: rgba(3, 8, 15, .95) !important;
-  border-right: 1px solid rgba(150, 182, 202, .1) !important;
+  background: rgba(255, 255, 255, .03) !important;
+  border-right: 1px solid rgba(255, 255, 255, .08) !important;
   color: rgba(140, 200, 240, .4) !important;
   font-family: var(--sf-mono) !important;
 }
@@ -623,7 +675,7 @@ html body #aside-content .card-widget .item-headline span {
 
 html body #aside-content .card-category-list-item:hover,
 html body #aside-content .card-archive-list-link:hover {
-  background: rgba(150, 182, 202, .06) !important;
+  background: rgba(255, 255, 255, .05) !important;
   color: var(--sf-ice-2) !important;
 }
 
@@ -664,9 +716,9 @@ html body .btn,
 html body #card-info-btn,
 html body #pagination .page-number,
 html body #pagination .extend {
-  background: rgba(12, 24, 40, .9) !important;
+  background: rgba(255, 255, 255, .06) !important;
   color: var(--sf-ice-2) !important;
-  border: 1px solid rgba(150, 182, 202, .2) !important;
+  border: 1px solid var(--sf-line) !important;
   transition: all .18s ease;
 }
 
@@ -686,10 +738,22 @@ html body #pagination .page-number.current {
 }
 
 html body #post .tag_share .post-meta__tags {
-  background: rgba(120, 158, 184, .1) !important;
-  border: 1px solid rgba(120, 158, 184, .22) !important;
+  background: rgba(255, 255, 255, .06) !important;
+  border: 1px solid var(--sf-line) !important;
   color: var(--sf-ice-2) !important;
   font-family: var(--sf-mono) !important;
+}
+
+/* 分享条：X（推特）的品牌色是纯黑，深色底上几乎看不见 → 改紫色 */
+html body .social-share .social-share-icon.icon-x {
+  color: #8b5cf6 !important;
+  border-color: #8b5cf6 !important;
+}
+
+html body .social-share .social-share-icon.icon-x:hover {
+  background: #7c3aed !important;
+  border-color: #7c3aed !important;
+  color: #fff !important;
 }
 
 html body .post-copyright {

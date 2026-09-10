@@ -91,7 +91,7 @@ if(spawnInfo.Player.GetModPlayer<ExamplePlayer>().ZoneExample) // Mod Biome
 
 ## Heights
 When worlds are generated, a few values are saved with the world to specify various heights. Main.worldSurface is a few tiles below spawn, and Main.rockLayer is below that where rock becomes more prevalent than dirt. Main.maxTilesY is the max value for Y in the world, the lowest point. We can use these values and math to drive our spawn conditions. We can also use predefined Zones as seen in the image below rather than messing with math.    
-![](https://i.imgur.com/9rIgSMt.png)
+![世界高度分区（左：数值算法 / 右：预定义 Zone）](/img/posts/tmodloader-basic-npc-spawning/9rIgSMt.png)
 
 On the right side of the image we see the Zones that are predefined for us, and on the left we see the math that drives those zones. For example, the following are equivalent:    
 ```cs
