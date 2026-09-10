@@ -485,6 +485,7 @@
     banner.style.display = 'none'
     markDirty(true)
     syncEditorUI()
+    var hr = historyFor(postBodyEl()); if (hr) hr.reset()
     toast('已恢复本地草稿', 'ok')
   }
 
@@ -711,6 +712,127 @@
     return el && el.closest ? el.closest('.editor-body') : null
   }
 
+  /* ==================== 撤回 / 重做 ====================
+     为什么不能靠浏览器原生 undo：工具栏插入、Tab 缩进、列表续行、插图这些
+     都是脚本直接改 textarea.value —— 原生撤销栈会被这一下清空，
+     于是用户在编辑器里按 Ctrl+Z 要么没反应、要么一次回到很久以前。
+     这里自己维护快照栈：
+     · 连续打字按 350ms 合并成一步（不会一个字符一步）
+     · 脚本改动（工具栏/缩进/插图）立即压一步
+     · 上限 200 步，避免内存无限增长
+     ============================================================ */
+  var HIST = new WeakMap()
+
+  function historyFor(body) {
+    if (!body) return null
+    var h = HIST.get(body)
+    if (h) return h
+    var ta = body.querySelector('textarea')
+    if (!ta) return null
+    h = {
+      ta: ta,
+      stack: [],
+      idx: -1,
+      applying: false,
+      timer: 0,
+      onChange: null
+    }
+    HIST.set(body, h)
+
+    h.snap = function () {
+      return { v: ta.value, s: ta.selectionStart, e: ta.selectionEnd }
+    }
+    h.sync = function () {
+      var undoBtn = body.querySelector('[data-act="undo"]')
+      var redoBtn = body.querySelector('[data-act="redo"]')
+      if (undoBtn) undoBtn.disabled = h.idx <= 0
+      if (redoBtn) redoBtn.disabled = h.idx >= h.stack.length - 1
+    }
+    h.push = function (force) {
+      if (h.applying) return
+      var cur = h.snap()
+      if (!force && h.idx >= 0 && h.stack[h.idx].v === cur.v) return
+      h.stack = h.stack.slice(0, h.idx + 1)
+      h.stack.push(cur)
+      if (h.stack.length > 200) h.stack.shift()
+      h.idx = h.stack.length - 1
+      h.sync()
+    }
+    h.pushSoon = function () {
+      clearTimeout(h.timer)
+      h.timer = setTimeout(function () { h.push(false) }, 350)
+    }
+    h.apply = function (s) {
+      h.applying = true
+      ta.value = s.v
+      ta.focus()
+      try { ta.setSelectionRange(s.s, s.e) } catch (e) {}
+      h.applying = false
+      if (h.onChange) h.onChange()
+      h.sync()
+    }
+    h.undo = function () {
+      h.push(false)                       // 先把"当前"记下来，避免丢掉正在编辑的内容
+      if (h.idx > 0) { h.idx--; h.apply(h.stack[h.idx]) }
+      h.sync()
+    }
+    h.redo = function () {
+      if (h.idx < h.stack.length - 1) { h.idx++; h.apply(h.stack[h.idx]) }
+      h.sync()
+    }
+    h.reset = function () {               // 打开另一篇文章时重置
+      clearTimeout(h.timer)
+      h.stack = [h.snap()]
+      h.idx = 0
+      h.sync()
+    }
+    ta.addEventListener('input', function () { h.pushSoon() })
+    h.stack = [h.snap()]
+    h.idx = 0
+    h.sync()
+    return h
+  }
+
+  function histPushNow(body) {
+    var h = HIST.get(body)
+    if (h) h.push(true)
+  }
+
+  // 工具栏 / 快捷键走后门：脚本改完内容立刻压一步
+  function markEdited(ta) {
+    var body = ta && ta.closest ? ta.closest('.editor-body') : null
+    if (body) histPushNow(body)
+  }
+
+  // 写文章编辑器的容器（historyFor 用）
+  function postBodyEl() { return document.querySelector('#editor-body') }
+
+  // 当前"活跃"的编辑器（公告页开着就是公告，否则是写文章）
+  function activeEditorBody() {
+    var pane = $('#tab-announce')
+    if (pane && pane.classList.contains('is-active') && $('#announce-editor')) return $('#announce-editor')
+    var view = $('#post-editor-view')
+    if (view && view.style.display !== 'none' && $('#editor-body')) return $('#editor-body')
+    return null
+  }
+
+  function initHistoryKeys() {
+    document.addEventListener('keydown', function (e) {
+      if (!(e.ctrlKey || e.metaKey) || e.altKey) return
+      var k = (e.key || '').toLowerCase()
+      var isUndo = k === 'z' && !e.shiftKey
+      var isRedo = (k === 'z' && e.shiftKey) || k === 'y'
+      if (!isUndo && !isRedo) return
+      var body = activeEditorBody()
+      if (!body) return
+      var h = historyFor(body)
+      if (!h) return
+      e.preventDefault()
+      if (isUndo) h.undo()
+      else h.redo()
+    })
+  }
+
   // 编辑器内容变化后的统一收尾
   function afterEdit() {
     markDirty(true)
@@ -801,6 +923,7 @@
     ta.value = out
     ta.focus()
     ta.setSelectionRange(selStart, selEnd)
+    markEdited(ta)
     onChange()
   }
 
@@ -889,6 +1012,7 @@
     ta.value = val.slice(0, start) + ins + val.slice(end)
     ta.focus()
     ta.setSelectionRange(start + ins.length, start + ins.length)
+    if (body) histPushNow(body)
     if (body && body.getAttribute('data-editor') === 'announce') announceAfterEdit()
     else afterEdit()
   }
@@ -982,6 +1106,8 @@
     var end = ta.selectionEnd
     var done = onChange || afterEdit
     var mk = function (kind) { insertMarkdown(kind, ta, done) }
+    // 脚本改动（缩进/续行/包裹）也要进撤销栈
+    var finish = function () { markEdited(ta); done() }
 
     if ((e.ctrlKey || e.metaKey) && !e.altKey) {
       var k = (e.key || '').toLowerCase()
@@ -1012,7 +1138,7 @@
         ta.value = val.slice(0, ls2) + shifted + val.slice(end)
         ta.setSelectionRange(ls2, ls2 + shifted.length)
       }
-      done()
+      finish()
       return
     }
 
@@ -1032,7 +1158,7 @@
           ta.value = val.slice(0, start) + ins + val.slice(end)
           ta.setSelectionRange(start + ins.length, start + ins.length)
         }
-        done()
+        finish()
         return
       }
     }
@@ -1046,7 +1172,7 @@
         var rep = e.key + selected + pair
         ta.value = val.slice(0, start) + rep + val.slice(end)
         ta.setSelectionRange(start + 1, start + 1 + selected.length)
-        done()
+        finish()
       }
     }
   }
@@ -1061,6 +1187,20 @@
     $('#ed-body').addEventListener('input', afterEdit)
     $('#ed-body').addEventListener('keydown', function (e) { onEditorKeydown(e, postBody, afterEdit) })
     bindImageDrop(postBody)
+    var postHist = historyFor(postBody)
+    if (postHist) postHist.onChange = afterEdit
+
+    // 撤回 / 重做按钮（两个编辑器共用一套按钮，按所在 .editor-body 派发）
+    $$('.editor-tool[data-act]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var body = editorOf(b)
+        var h = body ? historyFor(body) : null
+        if (!h) return
+        if (b.getAttribute('data-act') === 'undo') h.undo()
+        else h.redo()
+      })
+    })
+    initHistoryKeys()
 
     // 工具栏 / 模式切换：按所在 .editor-body 派发（写文章 & 公告共用一套按钮）
     $$('.editor-tool').forEach(function (b) {
@@ -1180,6 +1320,8 @@
     ta.addEventListener('input', announceAfterEdit)
     ta.addEventListener('keydown', function (e) { onEditorKeydown(e, body, announceAfterEdit) })
     bindImageDrop(body)
+    var h = historyFor(body)
+    if (h) h.onChange = announceAfterEdit
     setEditorMode(body.__mode || 'edit', body)
     announceStats()
 
@@ -1384,6 +1526,7 @@
     setEditorMode('edit')
     syncEditorUI()
     checkDraft()
+    var hn = historyFor(postBodyEl()); if (hn) hn.reset()
     $('#ed-title').focus()
   }
 
@@ -1411,6 +1554,7 @@
       markDirty(false)
       syncEditorUI()
       checkDraft()
+      var hh = historyFor(postBodyEl()); if (hh) hh.reset()
     }).catch(function (e) {
       $('#editor-file').textContent = fullPath + ' · 读取失败'
       toast('读取失败：' + e.message, 'err')
@@ -1506,11 +1650,16 @@
       markAnnounceDirty(false, '与仓库一致')
       announceStats()
       checkAnnounceDraft()
+      // 程序化写入的内容也要成为撤销栈的"起点"，否则第一次撤回会退回空白
+      var ha = historyFor(announceEditor())
+      if (ha) ha.reset()
     }).catch(function (e) {
       $('#announce-body').value = (state.meta && state.meta.announcement) || ''
       markAnnounceDirty(false, '读取失败，用的是本地缓存')
       announceStats()
       checkAnnounceDraft()
+      var hb = historyFor(announceEditor())
+      if (hb) hb.reset()
       toast('公告读取失败（已用本地缓存）：' + e.message, 'err')
     })
   }

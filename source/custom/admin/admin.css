@@ -820,6 +820,17 @@ body.admin-body {
   background-color: rgba(255, 255, 255, .045);
 }
 
+/* 撤回 / 重做：不可用时明显变淡（disabled 属性由 JS 维护） */
+.editor-tool[disabled] {
+  opacity: .32;
+  cursor: default;
+}
+
+.editor-tool[disabled]:hover {
+  background: transparent;
+  color: var(--adm-dim);
+}
+
 /* ---------- 正文区 ---------- */
 .editor-body { display: flex; flex-direction: column; }
 

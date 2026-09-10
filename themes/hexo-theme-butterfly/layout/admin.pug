@@ -127,6 +127,11 @@ html(lang='zh-CN' data-theme='dark')
                   .editor-body.mode-edit#editor-body
                     .editor-bar
                       .editor-tools
+                        button.editor-tool(type='button' data-act='undo' title='撤回（Ctrl+Z）')
+                          i.fas.fa-rotate-left
+                        button.editor-tool(type='button' data-act='redo' title='重做（Ctrl+Shift+Z / Ctrl+Y）')
+                          i.fas.fa-rotate-right
+                        span.editor-tools-sep
                         button.editor-tool(type='button' data-md='bold' title='加粗（Ctrl+B）')
                           i.fas.fa-bold
                         button.editor-tool(type='button' data-md='italic' title='斜体（Ctrl+I）')
@@ -191,6 +196,11 @@ html(lang='zh-CN' data-theme='dark')
             .editor-body.mode-edit#announce-editor(data-editor='announce')
               .editor-bar
                 .editor-tools
+                  button.editor-tool(type='button' data-act='undo' title='撤回（Ctrl+Z）')
+                    i.fas.fa-rotate-left
+                  button.editor-tool(type='button' data-act='redo' title='重做（Ctrl+Shift+Z / Ctrl+Y）')
+                    i.fas.fa-rotate-right
+                  span.editor-tools-sep
                   button.editor-tool(type='button' data-md='bold' title='加粗（Ctrl+B）')
                     i.fas.fa-bold
                   button.editor-tool(type='button' data-md='italic' title='斜体（Ctrl+I）')

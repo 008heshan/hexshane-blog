@@ -70,6 +70,34 @@
     measure()
     window.addEventListener('resize', measure)
 
+    /* ---- 几何变化时重新测量（修「导航栏缩小后光效位置不对」）----
+       nav-glass.js 会让导航栏在滚动后【居中收窄到 980px】，也就是
+       left / right / width 全都在变（0.4s 过渡，逐帧变化）。
+       而这里原本只在 resize 时测一次 rect 并缓存 —— 收窄之后缓存的还是
+       展开时的宽矩形，于是：
+         · clamp() 把光心夹在「旧边界」上 → 光斑偏到一侧、甚至跑到导航栏外
+         · targetAlphaAt() 用旧边界算距离 → 鼠标明明在导航栏上却不亮，
+           或者在离导航栏很远的地方反而点亮
+       现在三重保险跟着几何走：
+         ResizeObserver（过渡期间逐帧回调，最准）
+         + scroll（rAF 节流，一帧最多测一次）
+         + transitionend / resize */
+    if (window.ResizeObserver) {
+      try {
+        new ResizeObserver(function () { measure() }).observe(nav)
+      } catch (e) {}
+    }
+    nav.addEventListener('transitionend', measure)
+    var measureRaf = null
+    function measureSoon() {
+      if (measureRaf !== null) return
+      measureRaf = requestAnimationFrame(function () {
+        measureRaf = null
+        measure()
+      })
+    }
+    window.addEventListener('scroll', measureSoon, { passive: true })
+
     function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v) }
 
     // 把亮度写到光斑与边缘环 opacity（带 lastA 去重，全部直写 style）
