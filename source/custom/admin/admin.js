@@ -712,6 +712,27 @@
     return el && el.closest ? el.closest('.editor-body') : null
   }
 
+  /* ==================== 改值后别让文本域"跳到底部" ====================
+     踩过的坑：直接给 textarea.value 赋值时，Chromium 会把光标丢到文末、并把**内部滚动
+     位置一起甩到底部**；紧接着的 setSelectionRange 只挪光标、不会把滚动带回来 ——
+     于是长文里点一次工具栏按钮，编辑器就"跳到最底部"（光标明明还在上面）。
+     所以所有改值的地方统一走这个包装：记住滚动位置 → 改值 → 放光标 → 还原滚动；
+     只有当光标确实被挪出可视区（例如撤回跨了很多行）才把它带回视区中间。
+     ============================================================ */
+  function setValueSelection(ta, value, s, e) {
+    if (!ta) return
+    var top = ta.scrollTop
+    ta.value = value
+    try { ta.setSelectionRange(s, e) } catch (err) {}
+    ta.scrollTop = top
+    var lh = parseFloat(window.getComputedStyle(ta).lineHeight) || 20
+    var caretY = (value.slice(0, s).split('\n').length - 1) * lh
+    var view = ta.clientHeight || 0
+    if (caretY < ta.scrollTop || caretY > ta.scrollTop + view - lh * 1.5) {
+      ta.scrollTop = Math.max(0, Math.round(caretY - view / 2))
+    }
+  }
+
   /* ==================== 撤回 / 重做 ====================
      为什么不能靠浏览器原生 undo：工具栏插入、Tab 缩进、列表续行、插图这些
      都是脚本直接改 textarea.value —— 原生撤销栈会被这一下清空，
@@ -764,9 +785,8 @@
     }
     h.apply = function (s) {
       h.applying = true
-      ta.value = s.v
       ta.focus()
-      try { ta.setSelectionRange(s.s, s.e) } catch (e) {}
+      setValueSelection(ta, s.v, s.s, s.e)
       h.applying = false
       if (h.onChange) h.onChange()
       h.sync()
@@ -920,9 +940,8 @@
     }
 
     if (out === null) return
-    ta.value = out
     ta.focus()
-    ta.setSelectionRange(selStart, selEnd)
+    setValueSelection(ta, out, selStart, selEnd)
     markEdited(ta)
     onChange()
   }
@@ -1010,9 +1029,8 @@
     var pre = (start > 0 && val[start - 1] !== '\n') ? '\n\n' : ''
     var post = (end < val.length && val[end] !== '\n') ? '\n\n' : ''
     var ins = pre + text + post
-    ta.value = val.slice(0, start) + ins + val.slice(end)
     ta.focus()
-    ta.setSelectionRange(start + ins.length, start + ins.length)
+    setValueSelection(ta, val.slice(0, start) + ins + val.slice(end), start + ins.length, start + ins.length)
     if (body) histPushNow(body)
     if (body && body.getAttribute('data-editor') === 'announce') announceAfterEdit()
     else afterEdit()
@@ -1123,12 +1141,10 @@
         if (e.shiftKey) {
           var ls = val.lastIndexOf('\n', start - 1) + 1
           if (val.slice(ls, ls + 2) === '  ') {
-            ta.value = val.slice(0, ls) + val.slice(ls + 2)
-            ta.setSelectionRange(Math.max(ls, start - 2), Math.max(ls, start - 2))
+            setValueSelection(ta, val.slice(0, ls) + val.slice(ls + 2), Math.max(ls, start - 2), Math.max(ls, start - 2))
           }
         } else {
-          ta.value = val.slice(0, start) + '  ' + val.slice(end)
-          ta.setSelectionRange(start + 2, start + 2)
+          setValueSelection(ta, val.slice(0, start) + '  ' + val.slice(end), start + 2, start + 2)
         }
       } else {
         var ls2 = val.lastIndexOf('\n', start - 1) + 1
@@ -1136,8 +1152,7 @@
         var shifted = block.split('\n').map(function (l) {
           return e.shiftKey ? l.replace(/^ {1,2}/, '') : '  ' + l
         }).join('\n')
-        ta.value = val.slice(0, ls2) + shifted + val.slice(end)
-        ta.setSelectionRange(ls2, ls2 + shifted.length)
+        setValueSelection(ta, val.slice(0, ls2) + shifted + val.slice(end), ls2, ls2 + shifted.length)
       }
       finish()
       return
@@ -1151,13 +1166,11 @@
         e.preventDefault()
         if (!m[3].trim()) {
           // 空项回车 → 结束列表/引用，去掉标记
-          ta.value = val.slice(0, lsE) + val.slice(start)
-          ta.setSelectionRange(lsE, lsE)
+          setValueSelection(ta, val.slice(0, lsE) + val.slice(start), lsE, lsE)
         } else {
           var marker = /^\d+\.$/.test(m[2]) ? (parseInt(m[2], 10) + 1) + '.' : m[2]
           var ins = '\n' + m[1] + marker + ' '
-          ta.value = val.slice(0, start) + ins + val.slice(end)
-          ta.setSelectionRange(start + ins.length, start + ins.length)
+          setValueSelection(ta, val.slice(0, start) + ins + val.slice(end), start + ins.length, start + ins.length)
         }
         finish()
         return
@@ -1171,8 +1184,7 @@
         e.preventDefault()
         var selected = val.slice(start, end)
         var rep = e.key + selected + pair
-        ta.value = val.slice(0, start) + rep + val.slice(end)
-        ta.setSelectionRange(start + 1, start + 1 + selected.length)
+        setValueSelection(ta, val.slice(0, start) + rep + val.slice(end), start + 1, start + 1 + selected.length)
         finish()
       }
     }
@@ -1354,7 +1366,7 @@
         var banner = $('#announce-draft')
         var raw = banner && banner.__draft
         if (!raw) return
-        ta.value = raw.body || ''
+        setValueSelection(ta, raw.body || '', 0, 0)
         banner.style.display = 'none'
         markAnnounceDirty(true)
         announceStats()
@@ -1374,7 +1386,7 @@
     if (clear) {
       clear.addEventListener('click', function () {
         if (!confirm('清空公告输入框？（不会立即提交，点保存才生效）')) return
-        ta.value = ''
+        setValueSelection(ta, '', 0, 0)
         announceAfterEdit()
         ta.focus()
       })
