@@ -221,9 +221,31 @@
       if (res.status === 404) return null
       if (!res.ok) {
         return res.json().catch(function () { return {} }).then(function (d) {
-          var msg = (d && d.message) || ('HTTP ' + res.status)
+          var apiMsg = (d && d.message) || ('HTTP ' + res.status)
+          var remaining = res.headers.get('x-ratelimit-remaining')
+          var reset = res.headers.get('x-ratelimit-reset')
+          var msg = apiMsg
           if (res.status === 401) msg = 'Token 无效或已过期'
-          if (res.status === 403) msg = 'Token 权限不足或触发限流（需 Contents: Read and write）'
+          if (res.status === 403) {
+            /* 403 有两个完全不同的原因，必须分开说，否则只能靠猜：
+               ① GitHub 限流（message 里带 rate limit，或剩余次数为 0）
+               ② Token 没有写权限（Contents 只读 / 经典 token 没勾 repo / 仓库不在授权范围）
+               顺带把 GitHub 原文 message 带上，方便直接判断。 */
+            var rateLimited = /rate limit/i.test(apiMsg) || remaining === '0'
+            if (rateLimited) {
+              var when = ''
+              if (reset) {
+                var mins = Math.ceil((Number(reset) * 1000 - Date.now()) / 60000)
+                if (isFinite(mins) && mins > 0) when = '，约 ' + mins + ' 分钟后恢复'
+              }
+              msg = 'GitHub 接口限流' + when + '（剩余额度 ' + (remaining === null ? '未知' : remaining) + '）'
+            } else {
+              msg = 'Token 权限不足 —— 需要对该仓库的 Contents 写权限。' +
+                '细粒度 Token 请勾 “Contents: Read and write”，经典 Token 请勾 “repo”，' +
+                '并确认仓库 ' + state.gh.owner + '/' + state.gh.name + ' 在 Token 的授权范围内。' +
+                '（GitHub 原文：' + apiMsg + '）'
+            }
+          }
           if (res.status === 409) msg = '文件已变化（sha 冲突），请刷新后重试'
           throw new Error(msg)
         })
