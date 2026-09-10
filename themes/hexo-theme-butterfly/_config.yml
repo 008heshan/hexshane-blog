@@ -1092,7 +1092,7 @@ inject:
     - <link rel="stylesheet" href="/custom/nav/nav-core.css?v=20260911a">
     - <link rel="stylesheet" href="/custom/nav/nav-search.css?v=20260911a">
         # --- effects 背景/玻璃/光效 ---
-    - <link rel="stylesheet" href="/custom/effects/theme-glass.css?v=20260911a">
+    - <link rel="stylesheet" href="/custom/effects/theme-glass.css?v=20260911b">
     - <link rel="stylesheet" href="/custom/code/code-highlight.css?v=20260911a">
     - <link rel="stylesheet" href="/custom/effects/force-glow.css?v=20260911a">
     # --- widgets 卡片/挂件/页脚 ---
@@ -1122,7 +1122,7 @@ inject:
     # --- nav 顶部导航栏 + 检索 ---
     # 管理页密钥哈希需在 nav-search.js 之前加载（检索栏输入密钥进 /admin/）
     - <script src="/custom/admin/admin-key.js?v=20260911a"></script>
-    - <script src="/custom/nav/nav-core.js?v=20260911a"></script>
+    - <script src="/custom/nav/nav-core.js?v=20260911b"></script>
     - <script src="/custom/nav/nav-search.js?v=20260911a"></script>
         # --- effects 背景/玻璃/光效 ---
     - <script src="/custom/effects/glass-bg.js?v=20260911a"></script>

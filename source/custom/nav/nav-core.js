@@ -398,12 +398,24 @@
     { href: '/archives/', label: '归档', selector: '.card-archive-list-link', titleSel: '.card-archive-list-date' }
   ]
 
+  /* 比对菜单项与目标路径：不能直接全等 —— 站点部署在子路径时（镜像站
+     https://008heshan.github.io/hexshane-blog/），DOM 里的 href 会带 /hexshane-blog
+     前缀，全等比较必然失配，结果是**导航下拉整块不出现**。
+     这里改成"路径结尾相同即为同一项"，主站与镜像站都能命中。 */
+  function samePath(href, target) {
+    if (!href || !target) return false
+    var path = String(href).split('#')[0].split('?')[0]
+    if (path === target) return true
+    if (path.charAt(path.length - 1) !== '/' && target.charAt(target.length - 1) === '/') path += '/'
+    return path.slice(-target.length) === target
+  }
+
   menus.forEach(function (item) {
     var link = item.querySelector('a.site-page')
     if (!link) return
     var href = link.getAttribute('href')
     var conf = null
-    config.forEach(function (c) { if (c.href === href) conf = c })
+    config.forEach(function (c) { if (samePath(href, c.href)) conf = c })
     if (!conf) return
 
     item.addEventListener('mouseenter', function (e) {

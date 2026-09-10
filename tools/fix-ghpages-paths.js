@@ -36,7 +36,13 @@ function readRootArg() {
 
 const ROOT = '/' + String(readRootArg()).replace(/^\/+|\/+$/g, '') + '/'   // 形如 /hexshane-blog/
 const PREFIX = ROOT.replace(/\/$/, '')                                     // 形如 /hexshane-blog
-const NEEDLE = '/custom/'
+/* 需要补前缀的绝对路径。除了自研资源目录 /custom/，还有三处是 JS 里的**字面量**，
+   它们同样以 / 开头、同样在子路径下 404（Hexo 的 url_for 管不到字符串里的路径）：
+     · /search.json   —— 站内检索索引（nav-search.js）
+     · /translations/ —— 预翻译 JSON（translate-btn.js）
+     · /admin/        —— 后台页面与 posts.json / meta.json（nav-search.js 跳转、admin.js 拉取）
+   注意只匹配"以引号/括号/空白开头的整段路径"，避免误伤 /custom/ 之外的普通文本。 */
+const NEEDLES = ['/custom/', '/search.json', '/translations/', '/admin/']
 const TARGET_EXT = new Set(['.html', '.css', '.js', '.json', '.xml'])
 
 function walk(dir, out) {
@@ -50,12 +56,15 @@ function walk(dir, out) {
 
 function fixText(text) {
   let hits = 0
-  // 已经是 /hexshane-blog/custom/… 的不要重复加前缀
-  const re = new RegExp('(^|[^\\w/])' + NEEDLE.replace(/\//g, '\\/'), 'g')
-  const out = text.replace(re, (match, before) => {
-    hits++
-    return before + PREFIX + NEEDLE
-  })
+  let out = text
+  for (const needle of NEEDLES) {
+    // 已经是 /hexshane-blog/… 的不要重复加前缀
+    const re = new RegExp('(^|[^\\w/])' + needle.replace(/[/.]/g, '\\$&'), 'g')
+    out = out.replace(re, (match, before) => {
+      hits++
+      return before + PREFIX + needle
+    })
+  }
   return { out, hits }
 }
 
@@ -69,7 +78,7 @@ function main() {
   let totalHits = 0
   for (const file of files) {
     const src = fs.readFileSync(file, 'utf8')
-    if (!src.includes(NEEDLE)) continue
+    if (!NEEDLES.some((n) => src.includes(n))) continue
     const { out, hits } = fixText(src)
     if (hits > 0 && out !== src) {
       fs.writeFileSync(file, out, 'utf8')
@@ -77,25 +86,27 @@ function main() {
       totalHits += hits
     }
   }
-  console.log(`[ghpages] 已修正 ${changedFiles} 个文件、${totalHits} 处 "${NEEDLE}" → "${PREFIX}${NEEDLE}"`)
+  console.log(`[ghpages] 已修正 ${changedFiles} 个文件、${totalHits} 处绝对路径 → 统一加 "${PREFIX}" 前缀`)
 
-  // 自检：产物里不应再出现未加前缀的 /custom/ 绝对引用
+  // 自检：产物里不应再出现未加前缀的绝对引用（四条规则全查）
   const leftovers = []
   for (const file of files) {
     const src = fs.readFileSync(file, 'utf8')
-    const re = new RegExp('(^|[^\\w/])' + NEEDLE.replace(/\//g, '\\/'), 'g')
-    const m = src.match(re)
-    if (m) leftovers.push(path.relative(PUBLIC_DIR, file) + ' ×' + m.length)
+    for (const needle of NEEDLES) {
+      const re = new RegExp('(^|[^\\w/])' + needle.replace(/[/.]/g, '\\$&'), 'g')
+      const m = src.match(re)
+      if (m) leftovers.push(path.relative(PUBLIC_DIR, file) + ' ×' + m.length + ' (' + needle + ')')
+    }
   }
   if (leftovers.length) {
     console.error('[ghpages] 仍有未修正的引用：\n  ' + leftovers.slice(0, 10).join('\n  '))
     process.exit(1)
   }
-  console.log('[ghpages] 自检通过：产物中已无未加前缀的 /custom/ 引用')
+  console.log('[ghpages] 自检通过：产物中已无未加前缀的绝对引用（' + NEEDLES.join(' / ') + '）')
 }
 
 // ⚠️ 必须只在"被 node 直接调用"时执行：
 // Hexo 会把 scripts/ 下的所有文件当插件加载，若无脑跑 main()，普通构建
 // （hexo generate）也会执行到它 —— 产物还没生成就报错并中断构建。
 if (require.main === module) main()
-else module.exports = { fixText, PREFIX, NEEDLE }
+else module.exports = { fixText, PREFIX, NEEDLES }

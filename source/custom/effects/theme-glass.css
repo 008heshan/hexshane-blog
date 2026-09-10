@@ -32,19 +32,9 @@
 .bg-liquid {
   position: absolute;
   inset: -40%;
-  background-image:
-    /* 四角主光斑: 冷蓝/雾紫/青绿/暖橘, 色相与 alpha 拉大增强对比 */
-    radial-gradient(1300px 1050px at 12% 14%, rgba(95, 130, 220, .62), transparent 70%),
-    radial-gradient(1400px 1080px at 88% 18%, rgba(155, 100, 220, .58), transparent 70%),
-    radial-gradient(1500px 1150px at 78% 84%, rgba(60, 200, 190, .52), transparent 72%),
-    radial-gradient(1350px 1000px at 14% 88%, rgba(248, 168, 120, .46), transparent 72%),
-    /* 中心雾青柔光(打破纯冷蓝紫, 拉冷暖中间色) */
-    radial-gradient(980px 760px at 50% 46%, rgba(190, 200, 230, .38), transparent 74%),
-    /* 中心高光与暗角叠加: 中央径向略亮、边缘径向渐暗(vignette) */
-    radial-gradient(1100px 800px at 50% 40%, rgba(255, 255, 255, .10), transparent 60%),
-    radial-gradient(900px 700px at 50% 55%, transparent 30%, rgba(20, 30, 60, .18) 80%, transparent 100%),
-    /* 冷雾蓝底(基础色降曝光 + 弱饱和, 避免奶亮刺眼) */
-    linear-gradient(160deg, #a8b4c8 0%, #8597b8 45%, #98a8c8 100%);
+  /* v22: 原来这里铺了七层彩色光斑 + 冷雾蓝底，但已被 sci-fi.css 的
+     `.bg-liquid { background: … !important }` 在所有视口完全覆盖 —— 删掉，
+     免得以后改材质时误以为它们还在生效（真实渐变见 sci-fi.css 的 .bg-liquid）。 */
   /* [性能] 静态光斑：不做漂移动画。此前 transform 逐帧移动会让
      16 个卡片 + 全屏 hero 的 backdrop-filter 每帧重新模糊采样
      (切标签页/唤醒卡顿主因)，改为静态后玻璃只需光栅化一次并可缓存。 */
@@ -135,15 +125,9 @@ html.tab-hidden *::after {
   z-index: 1;
 }
 
-/* ---------- body 兜底 ---------- */
-body {
-  /* light：冷雾灰蓝兜底，避免 .glass-bg 被覆盖/未注入时露出
-     高亮奶蓝刺眼 */
-  background-color: #b0bbcf;
-}
-html[data-theme='dark'] body {
-  background-color: #0f1116;
-}
+/* v22: 原来这里给 body 铺了一层兜底底色（#b0bbcf / #0f1116），但 sci-fi.css 的
+   html body { background-color: var(--sf-bg-0) !important } 已经无条件兜住，两者不可能同时生效 —— 删掉。 */
+
 
 /* ---------- 全局页面滚动条（浏览器主内容）风格化 ----------
    与下拉面板 / 搜索结果列表同款冷雾蓝玻璃质感：
