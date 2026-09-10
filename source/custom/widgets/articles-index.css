@@ -17,17 +17,17 @@
   padding: 26px 28px 20px;
   border-radius: 12px;
   border: 1px solid var(--sf-glass-line, rgba(255, 255, 255, .12));
-  background-color: var(--sf-glass, rgba(255, 255, 255, .07));
-  background-image: var(--sf-glass-sheen, linear-gradient(180deg, rgba(255, 255, 255, .10), rgba(255, 255, 255, .02) 38%, rgba(255, 255, 255, .045)));
-  /* 与全站卡片同一套材质：中性白膜 + 顶部高光 + 实时背景模糊。
+  background-color: var(--sf-glass, rgba(255, 255, 255, .055));
+  background-image: var(--sf-glass-sheen, linear-gradient(180deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .012) 38%, rgba(255, 255, 255, .012)));
+  /* 与全站卡片同一套材质（卡片与文章面板都铺"白膜 + 顶部高光"）：
      少了 backdrop-filter 会变成一块"平板"；少了 background-image，
-     在 theme-glass.css 的 `background:` 简写之后又会被洗掉高光。 */
-  -webkit-backdrop-filter: blur(var(--sf-glass-blur, 24px)) saturate(110%);
-  backdrop-filter: blur(var(--sf-glass-blur, 24px)) saturate(110%);
+     在 theme-glass.css 的 `background:` 简写之后又会被洗掉顶部高光。 */
+  -webkit-backdrop-filter: blur(var(--sf-glass-blur, 20px));
+  backdrop-filter: blur(var(--sf-glass-blur, 20px));
   box-shadow:
     0 24px 60px -38px rgba(0, 0, 0, .95),
-    inset 0 1px 0 rgba(255, 255, 255, .22),
-    inset 0 -1px 0 rgba(255, 255, 255, .05);
+    inset 0 1px 0 rgba(255, 255, 255, .16),
+    inset 0 -1px 0 rgba(255, 255, 255, .04);
   overflow: hidden;
 }
 
