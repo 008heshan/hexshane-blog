@@ -122,6 +122,16 @@ git add -A && git commit -m "post: 文章标题" && git push
   - 公告图片 → `source/img/announce/`，插入 `<img src="/img/announce/…">`
   - 同名文件会自动改名（`x.png` → `x-2.png`），不会覆盖仓库里已有的图
 
+### 公告怎么渲染
+
+侧栏公告写进 `source/_data/announcement.yml` 的 `content`，模板里用 Hexo 的
+`markdown()`（底层 `hexo-renderer-marked`）渲染，所以：
+
+- **Markdown 会真的生效**：工具栏写出来的 `**加粗**`、`- 列表`、`[链接](…)`、`` `代码` `` 等
+- **HTML 原样保留**：marked 放行内联 / 块级 HTML，老的 `<p>` / `<b>` / `<ul>` 公告不受影响
+- **两者可以混用**（HTML 区块照旧，Markdown 部分正常转成标签）
+- 编辑器里的预览是「HTML 原样 + Markdown 转换」的近似渲染，最终效果以构建后的侧栏为准
+
 ## 视觉主题：深空科幻皮肤
 
 皮肤文件 `source/custom/theme/sci-fi.css`（在 `inject.head` 里**最后**引入，

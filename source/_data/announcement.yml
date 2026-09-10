@@ -1,4 +1,8 @@
 # 公告内容（由管理页 /admin/ 的「公告」标签页读写）
 # 优先级：本文件 > 主题 _config.yml 的 aside.card_announcement.content
+# 渲染方式：站点用 Hexo 的 markdown()（marked）渲染本字段 ——
+#   Markdown（**加粗**、- 列表、[链接](…)、`代码`…）会真的生效，
+#   内联/块级 HTML（<p> <b> <a> <ul>…）原样放行，两者可混用。
+# 悬停展开全文由 announce-hover.js 负责。
 content: |
   **即将更新Tmod全中译指南**

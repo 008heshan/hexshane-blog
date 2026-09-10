@@ -222,7 +222,7 @@ html(lang='zh-CN' data-theme='dark')
                   button.editor-mode(type='button' data-mode='split') 分栏
                   button.editor-mode(type='button' data-mode='preview') 预览
               .editor-panes
-                textarea#announce-body.admin-textarea(rows='12' spellcheck='false' placeholder='写侧栏公告：Markdown 或直接写 HTML 标签都行（站点按 HTML 渲染）')
+                textarea#announce-body.admin-textarea(rows='12' spellcheck='false' placeholder='写侧栏公告：Markdown（**加粗**、- 列表、[链接](https://…)）或 HTML 标签都行，可以混用')
                 .editor-preview#announce-preview
               input#announce-image-file(type='file' accept='image/*' multiple hidden)
               .editor-foot
@@ -234,7 +234,7 @@ html(lang='zh-CN' data-theme='dark')
                 span 保存公告
               button#btn-reload-announce.admin-btn(type='button') 重新拉取
               button#btn-clear-announce.admin-btn(type='button') 清空
-            .admin-hint 保存后写入 <code>source/_data/announcement.yml</code>，站点重新构建（推送后由 Cloudflare Pages 自动构建）即可生效。图片会自动上传到 <code>source/img/announce/</code> 并以 <code>/img/announce/…</code> 引用。
+            .admin-hint 保存后写入 <code>source/_data/announcement.yml</code>。站点用 <b>Markdown</b> 渲染这段内容（底层 marked）：工具栏写的 <code>**加粗**</code>、<code>- 列表</code>、<code>[链接](…)</code> 都会生效，<b>HTML 标签原样保留</b>，两种写法可混用；预览为近似效果，最终以构建后的侧栏为准。图片会自动上传到 <code>source/img/announce/</code> 并以 <code>/img/announce/…</code> 引用。
 
         //- ---------- 标签 / 分类 ----------
         section#tab-taxonomy.admin-pane
@@ -300,4 +300,4 @@ html(lang='zh-CN' data-theme='dark')
     script(src=url_for('/custom/cursor/site-cursor.js'))
     script(src=url_for('/custom/admin/admin-key.js'))
     script(src=url_for('/custom/admin/admin-space.js'))
-    script(src=url_for('/custom/admin/admin.js') + '?v=20260910i')
+    script(src=url_for('/custom/admin/admin.js') + '?v=20260910j')

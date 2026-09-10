@@ -652,19 +652,54 @@
     if (mode !== 'edit') updatePreviewFor(body)
   }
 
-  // 预览：写文章走 Markdown 渲染；公告按站点实际渲染方式（HTML）直出
+  // 公告预览：站点侧走 Hexo 的 markdown()（底层 marked）——HTML 原样放行 + Markdown 转换。
+  // 这里做一个够用的近似：按「HTML 块 / Markdown 块」切开分别处理，让预览不再骗人。
+  function mixedToHtml(src) {
+    var lines = String(src || '').replace(/\r\n?/g, '\n').split('\n')
+    var out = []
+    var md = []
+    var html = []
+    var depth = 0
+    var BLOCK = '(p|div|ul|ol|li|blockquote|table|thead|tbody|tr|td|th|h[1-6]|section|figure|details|summary)'
+    var RE_OPEN = new RegExp('<' + BLOCK + '\\b[^>]*>', 'gi')
+    var RE_CLOSE = new RegExp('</' + BLOCK + '>', 'gi')
+    function delta(line) {
+      return (line.match(RE_OPEN) || []).length - (line.match(RE_CLOSE) || []).length
+    }
+    function flushMd() { if (md.length) { out.push(mdToHtml(md.join('\n'))); md = [] } }
+    function flushHtml() { if (html.length) { out.push(html.join('\n')); html = [] } }
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i]
+      var t = line.trim()
+      if (depth > 0) {
+        html.push(line)
+        depth += delta(line)
+        if (depth <= 0) { depth = 0; flushHtml() }
+        continue
+      }
+      if (/^<[a-z!/]/i.test(t)) {          // 以 HTML 标签开头 → 整段当 HTML 块
+        flushMd()
+        depth = delta(line)
+        html.push(line)
+        if (depth <= 0) { depth = 0; flushHtml() }
+        continue
+      }
+      md.push(line)
+    }
+    flushMd()
+    flushHtml()
+    return out.join('\n')
+  }
+
+  // 预览：写文章走 Markdown 渲染；公告走「HTML 原样 + Markdown 转换」的混合渲染
   function updatePreviewFor(body) {
     if (!body) return
     var ta = body.querySelector('textarea')
     var host = body.querySelector('.editor-preview')
     if (!ta || !host) return
-    if (body.getAttribute('data-editor') === 'announce') {
-      var src = ta.value.trim()
-      // 看起来像纯文本（没有标签）时也顺手用 Markdown 渲染，两边都不吃亏
-      host.innerHTML = /<[a-z][\s\S]*>/i.test(src) ? src : mdToHtml(ta.value)
-    } else {
-      host.innerHTML = mdToHtml(ta.value)
-    }
+    host.innerHTML = body.getAttribute('data-editor') === 'announce'
+      ? mixedToHtml(ta.value)
+      : mdToHtml(ta.value)
   }
 
   function schedulePreviewFor(body) {

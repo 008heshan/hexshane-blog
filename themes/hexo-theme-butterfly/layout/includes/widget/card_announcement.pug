@@ -1,7 +1,15 @@
 if theme.aside.card_announcement.enable
   //- 公告内容优先读 source/_data/announcement.yml（管理页 /admin/ 可写），
   //- 没有该文件时回落到主题 _config.yml，保持兼容
-  - const announcementContent = (site.data.announcement && site.data.announcement.content) || theme.aside.card_announcement.content
+  //-
+  //- v18：内容统一交给 Hexo 的 markdown() helper 渲染（底层是 hexo-renderer-marked）。
+  //- 原因：后台公告编辑器的工具栏写出来的是 Markdown（**加粗**、- 列表、[链接](…)），
+  //- 而之前这里是 `!= 原文` 直接输出 HTML —— 那些 Markdown 语法在站点上不会生效，
+  //- 预览里却能看到效果，等于"预览骗人"。
+  //- marked 会**原样放行内联/块级 HTML**，所以以前写的 HTML 公告完全不受影响，
+  //- 两种写法还能混用（HTML 区块照旧，Markdown 部分正常转成标签）。
+  - const announcementRaw = (site.data.announcement && site.data.announcement.content) || theme.aside.card_announcement.content
+  - const announcementContent = announcementRaw ? markdown(announcementRaw) : ''
   .card-widget.card-announcement
     .item-headline
       i.fas.fa-bullhorn.fa-shake
