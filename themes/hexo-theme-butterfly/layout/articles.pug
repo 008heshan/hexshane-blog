@@ -8,7 +8,11 @@ block content
   include ./includes/mixins/indexPostUI.pug
   - const cats = site.categories.sort('length', -1).toArray()
   - const tags = site.tags.sort('length', -1).toArray()
-  #articles-index
+  //- class="nc" 是关键：主题有 `.layout > div:first-child:not(.nc) { background: var(--card-bg) }`
+  //- （深色模式下 --card-bg 就是 #121212），首页的 #recent-posts 正是靠 nc 躲开这条规则。
+  //- 少了 nc，这一层会被刷上整块黑板 —— 玻璃卡片背后变成纯黑，blur 等于白做，
+  //- 视觉上就是作者说的"大黑底"。
+  #articles-index.nc
     .articles-hero
       .articles-hero__head
         h1.articles-hero__title= '全部 ' + site.posts.length + ' 篇'

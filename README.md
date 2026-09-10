@@ -200,7 +200,12 @@ git add -A && git commit -m "post: 文章标题" && git push
     `artIndex`，结果污染了首页卡片 —— 已改掉，现在首页/归档 0 徽章）- **列表页摘要不再千篇一律**：`index_post_content.method: 2`（优先 `description`，没有才截正文）。
   本站文章都是"整理自官方 Wiki"的搬运稿，正文第一段永远是同一句来源说明 —— 用默认的
   method 3 会让首页与 `/articles/` 的每张卡片摘要长得一模一样。现在 27 篇都写了
-  `description`（一句话中文摘要），卡片摘要与 `<meta name="description">` 都用它- **站内锚点大小写容错**：文章锚点多是从 tModLoader 官方 Wiki 搬来的，Wiki 锚点全小写
+  `description`（一句话中文摘要），卡片摘要与 `<meta name="description">` 都用它- **自定义包裹层要带 `nc` 类（踩过的坑）**：主题有
+  `.layout > div:first-child:not(.nc) { background: var(--card-bg) }`（深色模式 = `#121212`）。
+  自己写的页面包裹层（如 `/articles/` 的 `#articles-index`）如果正好是 `.layout` 的第一个 div
+  又没带 `nc`，整列会被刷上一块黑板 —— 玻璃卡片背后变成纯色，blur 无纹理可采样，面板就"发黑、
+  不像玻璃"。首页的 `#recent-posts` 正是靠 `nc`（no-card）躲开它。排查办法：用 CDP 的
+  `CSS.getMatchedStylesForNode` 问某个元素命中了哪条规则，或扫"大面积 + 深色背景"的元素。- **站内锚点大小写容错**：文章锚点多是从 tModLoader 官方 Wiki 搬来的，Wiki 锚点全小写
   （`#drawing-and-collision`），而本站 Hexo 生成的标题 id 保留大小写（`Drawing-and-Collision`），
   URL 片段大小写敏感 —— 匹配不上时浏览器既不跳转也不报错。处理：正文写实际 id，
   另加 `source/custom/effects/anchor-fallback.js` 做归一化兜底（覆盖大小写、`/`、`,`、空格、中文），
