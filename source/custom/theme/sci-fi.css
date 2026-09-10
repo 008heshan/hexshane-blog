@@ -920,13 +920,18 @@ html body .search-dialog .local-search__hit-item a:hover {
    注意：长文容器（#post / #page / #archive）只补材质、不开 backdrop-filter ——
    它们背后就是页面底色，实时模糊既看不出来又极贵。
    =============================================================== */
-html body #recent-posts .recent-post-item,
-html body .card-widget,
-html body .post-copyright,
-html body .relatedPosts-list a.pagination-related,
-html body #post,
-html body #page,
-html body #archive {
+/* 特异性必须到 html[data-theme] body X 这一档：theme-glass.css 里的
+   html[data-theme='dark'] .card-widget（0,2,1）用的是 background **简写**，
+   简写会重置 background-image —— 之前收口块用 html body X（0,1,2）压不住它，
+   于是侧栏卡片与 #page 的顶部高光被洗掉（实测 background-image: none）。 */
+html[data-theme] body #recent-posts .recent-post-item,
+html[data-theme] body #aside-content .card-widget,
+html[data-theme] body .card-widget,
+html[data-theme] body .post-copyright,
+html[data-theme] body .relatedPosts-list a.pagination-related,
+html[data-theme] body #post,
+html[data-theme] body #page:not(.nc),
+html[data-theme] body #archive:not(.nc) {
   background-color: var(--sf-glass) !important;
   background-image: var(--sf-glass-sheen) !important;
   border-color: var(--sf-glass-line) !important;
@@ -936,10 +941,11 @@ html body #archive {
     inset 0 -1px 0 rgba(255, 255, 255, .04) !important;
 }
 
-html body #recent-posts .recent-post-item,
-html body .card-widget,
-html body .post-copyright,
-html body .relatedPosts-list a.pagination-related {
+html[data-theme] body #recent-posts .recent-post-item,
+html[data-theme] body #aside-content .card-widget,
+html[data-theme] body .card-widget,
+html[data-theme] body .post-copyright,
+html[data-theme] body .relatedPosts-list a.pagination-related {
   -webkit-backdrop-filter: blur(var(--sf-glass-blur));
   backdrop-filter: blur(var(--sf-glass-blur));
 }
@@ -947,13 +953,14 @@ html body .relatedPosts-list a.pagination-related {
 /* 硬件加速不可用 / GPU 进程回退时 Chromium 会静默丢掉 backdrop-filter，
    这时把白膜加厚一点，至少保证"这是一块玻璃"看得出来 */
 @supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
-  html body #recent-posts .recent-post-item,
-  html body .card-widget,
-  html body .post-copyright,
-  html body .relatedPosts-list a.pagination-related,
-  html body #post,
-  html body #page,
-  html body #archive {
+  html[data-theme] body #recent-posts .recent-post-item,
+  html[data-theme] body #aside-content .card-widget,
+  html[data-theme] body .card-widget,
+  html[data-theme] body .post-copyright,
+  html[data-theme] body .relatedPosts-list a.pagination-related,
+  html[data-theme] body #post,
+  html[data-theme] body #page:not(.nc),
+  html[data-theme] body #archive:not(.nc) {
     background-color: rgba(255, 255, 255, .08) !important;
   }
 }
