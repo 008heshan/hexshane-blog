@@ -34,17 +34,20 @@
      · --sf-glass-blur 实时背景模糊半径，负责"磨砂"
      blur 在硬件加速不可用时会被浏览器静默丢掉，所以高光和白膜必须
      自己就能撑起质感（详见第 5 节注释）。 */
-  --sf-glass: rgba(255, 255, 255, .055);
-  --sf-glass-2: rgba(255, 255, 255, .075);
+  /* v20：白膜从 .055 提到 .07、描边 .12→.16、模糊 20→24px，并让顶部高光变明显。
+     原因：背后是近乎纯色的深色渐变，模糊"有但看不出来"——玻璃要想读得出来，
+     必须靠白膜 + 高光 + 亮边自己撑起"这是一块玻璃"的观感，blur 只负责磨砂。 */
+  --sf-glass: rgba(255, 255, 255, .07);
+  --sf-glass-2: rgba(255, 255, 255, .09);
   --sf-glass-sheen: linear-gradient(
     180deg,
-    rgba(255, 255, 255, .07) 0%,
-    rgba(255, 255, 255, .012) 38%,
-    rgba(255, 255, 255, .012) 100%
+    rgba(255, 255, 255, .10) 0%,
+    rgba(255, 255, 255, .02) 38%,
+    rgba(255, 255, 255, .045) 100%
   );
-  --sf-glass-line: rgba(255, 255, 255, .12);
-  --sf-glass-line-strong: rgba(255, 255, 255, .2);
-  --sf-glass-blur: 20px;
+  --sf-glass-line: rgba(255, 255, 255, .16);
+  --sf-glass-line-strong: rgba(255, 255, 255, .24);
+  --sf-glass-blur: 24px;
   --sf-panel: var(--sf-glass);
   --sf-panel-2: var(--sf-glass-2);
   --sf-line: var(--sf-glass-line);
@@ -118,8 +121,8 @@ html body {
   pointer-events: none;
   z-index: 1;
   background-image:
-    linear-gradient(rgba(150, 182, 202, .04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(150, 182, 202, .04) 1px, transparent 1px);
+    linear-gradient(rgba(150, 182, 202, .06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(150, 182, 202, .06) 1px, transparent 1px);
   background-size: 64px 64px, 64px 64px;
   -webkit-mask-image: radial-gradient(ellipse 86% 78% at 50% 40%, #000 0%, rgba(0, 0, 0, .4) 72%, transparent 100%);
   mask-image: radial-gradient(ellipse 86% 78% at 50% 40%, #000 0%, rgba(0, 0, 0, .4) 72%, transparent 100%);
@@ -441,13 +444,15 @@ html body .card-widget,
 html body #recent-posts .recent-post-item,
 html body .relatedPosts-list a.pagination-related,
 html body .post-copyright {
-  background: var(--sf-glass) !important;
+  background-color: var(--sf-glass) !important;
+  background-image: var(--sf-glass-sheen) !important;
   border: 1px solid var(--sf-glass-line) !important;
   box-shadow:
     0 24px 60px -38px rgba(0, 0, 0, .95),
-    inset 0 1px 0 rgba(255, 255, 255, .10) !important;
-  -webkit-backdrop-filter: blur(var(--sf-glass-blur));
-  backdrop-filter: blur(var(--sf-glass-blur));
+    inset 0 1px 0 rgba(255, 255, 255, .22),
+    inset 0 -1px 0 rgba(255, 255, 255, .05) !important;
+  -webkit-backdrop-filter: blur(var(--sf-glass-blur)) saturate(110%);
+  backdrop-filter: blur(var(--sf-glass-blur)) saturate(110%);
   transition: border-color .22s ease, box-shadow .22s ease;
 }
 
@@ -899,4 +904,52 @@ html body .search-dialog .local-search__hit-item a:hover {
 @media (prefers-reduced-motion: reduce) {
   .sf-code { opacity: .2; }
   html body * { transition-duration: .01ms !important; }
+}
+
+/* ===============================================================
+   v20 玻璃材质收口（必须放在文件最后）
+   ---------------------------------------------------------------
+   theme-glass.css 里多处用 `background: var(--sf-glass) !important`
+   这种**简写**给卡片/文章面板铺膜 —— 简写会把 background-image 重置掉，
+   于是上面那层"顶部高光"在这些元素上会被洗掉（玻璃就只剩一块平膜）。
+   这里用同等级选择器 + 更高优先级统一补回：白膜 + 顶部高光 + 亮边 + 玻璃厚度。
+   注意：长文容器（#post / #page / #archive）只补材质、不开 backdrop-filter ——
+   它们背后就是页面底色，实时模糊既看不出来又极贵。
+   =============================================================== */
+html body #recent-posts .recent-post-item,
+html body .card-widget,
+html body .post-copyright,
+html body .relatedPosts-list a.pagination-related,
+html body #post,
+html body #page,
+html body #archive {
+  background-color: var(--sf-glass) !important;
+  background-image: var(--sf-glass-sheen) !important;
+  border-color: var(--sf-glass-line) !important;
+  box-shadow:
+    0 24px 60px -38px rgba(0, 0, 0, .95),
+    inset 0 1px 0 rgba(255, 255, 255, .22),
+    inset 0 -1px 0 rgba(255, 255, 255, .05) !important;
+}
+
+html body #recent-posts .recent-post-item,
+html body .card-widget,
+html body .post-copyright,
+html body .relatedPosts-list a.pagination-related {
+  -webkit-backdrop-filter: blur(var(--sf-glass-blur)) saturate(110%);
+  backdrop-filter: blur(var(--sf-glass-blur)) saturate(110%);
+}
+
+/* 硬件加速不可用 / GPU 进程回退时 Chromium 会静默丢掉 backdrop-filter，
+   这时把白膜加厚一点，至少保证"这是一块玻璃"看得出来 */
+@supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
+  html body #recent-posts .recent-post-item,
+  html body .card-widget,
+  html body .post-copyright,
+  html body .relatedPosts-list a.pagination-related,
+  html body #post,
+  html body #page,
+  html body #archive {
+    background-color: rgba(255, 255, 255, .095) !important;
+  }
 }
