@@ -16,7 +16,7 @@ categories:
 
 # Condition 类
 
-`Condition` 说白了是一个 [record](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/record)，里面只装两样东西：一个是 `LocalizedText` 类型的 `Description`（描述），一个是 [`Func<bool>`](https://learn.microsoft.com/en-us/dotnet/api/system.func-1?view=net-6.0) 类型的 `Predicate`（判定）。名字本身就说明了它是干嘛的 —— 描述给玩家看，判定给游戏算。
+`Condition` 说白了是一个 [record](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/record)，里面只装两样东西：一个是 `LocalizedText` 类型的 `Description`（描述），一个是 [`Func<bool>`](https://learn.microsoft.com/en-us/dotnet/api/system.func-1?view=net-6.0) 类型的 `Predicate`（判定）。一个负责给玩家看，一个负责给游戏算。
 
 这个类在 `Terraria` 命名空间下。
 
@@ -32,7 +32,7 @@ categories:
 
 ## Predicate
 
-判定是一段 `Func<bool>`，它决定这个 Condition 什么时候成立，取出来用 `Condition.TheCondition.Predicate`。只要你想要一个普通的 `bool`，加 `.IsMet()` 更省事 —— 比如 `Condition.TimeDay.IsMet()` 返回的就是"现在是不是白天"。
+判定是一段 `Func<bool>`，它决定这个 Condition 什么时候成立，取出来用 `Condition.TheCondition.Predicate`。要是你只想要一个普通的 `bool`，加 `.IsMet()` 更省事 —— 比如 `Condition.TimeDay.IsMet()` 返回的就是"现在是不是白天"。
 
 # 预定义 Condition
 
