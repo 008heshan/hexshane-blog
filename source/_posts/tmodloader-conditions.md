@@ -105,7 +105,7 @@ Condition BestiaryFilledPercent(int percent) => new Condition(Language.GetText("
 
 描述写成键名，是为了以后加多语言时不用动 Condition 那部分代码。本地化文件大概长这样，更细的规矩见[本地化指南](https://github.com/tModLoader/tModLoader/wiki/Localization)：
 
-```jisonlex
+```text
 Mods: {
 	YourModHere: {
 		Conditions: {
