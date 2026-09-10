@@ -18,6 +18,10 @@
   border-radius: 12px;
   border: 1px solid var(--sf-glass-line, rgba(255, 255, 255, .12));
   background: var(--sf-glass, rgba(255, 255, 255, .055));
+  /* 与全站卡片同一套材质：中性白膜 + 实时背景模糊。
+     少了这两行，页头就变成一块"平板"，跟旁边的玻璃卡片不是一种东西。 */
+  -webkit-backdrop-filter: blur(var(--sf-glass-blur, 20px));
+  backdrop-filter: blur(var(--sf-glass-blur, 20px));
   box-shadow:
     0 24px 60px -38px rgba(0, 0, 0, .95),
     inset 0 1px 0 rgba(255, 255, 255, .10);
