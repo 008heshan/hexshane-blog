@@ -220,25 +220,25 @@ git add -A && git commit -m "post: 文章标题" && git push
 | 6 | [Geometry](https://github.com/tModLoader/tModLoader/wiki/Geometry) | `tmodloader-geometry.md` | 🚧 已译 · 6 张图待补（代理限流） |
 | 7 | [Basic-glowmask-guide](https://github.com/tModLoader/tModLoader/wiki/Basic-glowmask-guide) | `tmodloader-basic-glowmask-guide.md` | ✅ 已译（2 张图待补） |
 | 8 | [IEntitySource](https://github.com/tModLoader/tModLoader/wiki/IEntitySource) | `tmodloader-ientitysource.md` | ✅ 已译（无图） |
-| 9 | [Localization](https://github.com/tModLoader/tModLoader/wiki/Localization) | `tmodloader-localization.md` | 🚧 进行中 |
+| 9 | [Localization](https://github.com/tModLoader/tModLoader/wiki/Localization) | `tmodloader-localization.md` | ✅ 已译（8429 汉字 · 35 代码块 · 3 图已本地化） |
 | 10 | [Logging](https://github.com/tModLoader/tModLoader/wiki/Logging) | `tmodloader-logging.md` | ✅ 已译（图已本地化 ×2） |
 | 11 | [Basic-Minion-Guide](https://github.com/tModLoader/tModLoader/wiki/Basic-Minion-Guide) | `tmodloader-basic-minion-guide.md` | ✅ 已译（无图） |
 | 12 | [Basic-JSON-&-ModConfigs](https://github.com/tModLoader/tModLoader/wiki/Basic-JSON-%26-ModConfigs) | `tmodloader-basic-json-modconfigs.md` | ✅ 已译（无图） |
 | 13 | [Basic-Dust](https://github.com/tModLoader/tModLoader/wiki/Basic-Dust) | — | ⬜ 待搬 |
-| 14 | [Basic-Item](https://github.com/tModLoader/tModLoader/wiki/Basic-Item) | — | ⬜ 待搬 |
-| 15 | [Basic-Projectile](https://github.com/tModLoader/tModLoader/wiki/Basic-Projectile) | `tmodloader-basic-modprojectile.md` | 🚧 原文已搬、待重译 |
-| 16 | [ModPlayer](https://github.com/tModLoader/tModLoader/wiki/ModPlayer) | — | ⬜ 待搬 |
-| 17 | [Basic-Recipes](https://github.com/tModLoader/tModLoader/wiki/Basic-Recipes) | `tmodloader-basic-recipe.md` | 🚧 原文已搬、待重译 |
+| 14 | [Basic-Item](https://github.com/tModLoader/tModLoader/wiki/Basic-Item) | `tmodloader-basic-item.md` | ✅ 已译（无图；原文本身很短） |
+| 15 | [Basic-Projectile](https://github.com/tModLoader/tModLoader/wiki/Basic-Projectile) | `tmodloader-basic-modprojectile.md` | ✅ 已重译（22 代码块字节一致） |
+| 16 | [ModPlayer](https://github.com/tModLoader/tModLoader/wiki/ModPlayer) | `tmodloader-modplayer.md` | ✅ 已译（无图） |
+| 17 | [Basic-Recipes](https://github.com/tModLoader/tModLoader/wiki/Basic-Recipes) | `tmodloader-basic-recipe.md` | ✅ 已重译（20 代码块字节一致） |
 | 18 | [Basic-Tile](https://github.com/tModLoader/tModLoader/wiki/Basic-Tile) | — | ⬜ 待搬 |
 | 19 | [Basic-Tile-Entity](https://github.com/tModLoader/tModLoader/wiki/Basic-Tile-Entity) | — | ⬜ 待搬 |
 | 20 | [Basic-Netcode](https://github.com/tModLoader/tModLoader/wiki/Basic-Netcode) | — | ⬜ 待搬 |
 | 21 | [Basic-NPC-Drops-and-Loot-1.4](https://github.com/tModLoader/tModLoader/wiki/Basic-NPC-Drops-and-Loot-1.4) | — | ⬜ 待搬 |
 | 22 | [Basic-NPC-Spawning](https://github.com/tModLoader/tModLoader/wiki/Basic-NPC-Spawning) | `tmodloader-basic-npc-spawning.md` | ✅ 已重译（21 个代码块逐字保留） |
 | 23 | [Basic-Sounds](https://github.com/tModLoader/tModLoader/wiki/Basic-Sounds) | — | ⬜ 待搬 |
-| 24 | [Time-and-Timers](https://github.com/tModLoader/tModLoader/wiki/Time-and-Timers) | — | ⬜ 待搬 |
-| 25 | [Basic-UI-Element](https://github.com/tModLoader/tModLoader/wiki/Basic-UI-Element) | — | ⬜ 待搬 |
+| 24 | [Time-and-Timers](https://github.com/tModLoader/tModLoader/wiki/Time-and-Timers) | `tmodloader-time-and-timers.md` | ✅ 已译 |
+| 25 | [Basic-UI-Element](https://github.com/tModLoader/tModLoader/wiki/Basic-UI-Element) | `tmodloader-basic-ui-element.md` | ✅ 已译 |
 | 26 | [Wall](https://github.com/tModLoader/tModLoader/wiki/Wall) | — | ⬜ 待搬 |
-| 27 | [Conditions](https://github.com/tModLoader/tModLoader/wiki/Conditions) | — | ⬜ 待搬 |
+| 27 | [Conditions](https://github.com/tModLoader/tModLoader/wiki/Conditions) | `tmodloader-conditions.md` | ✅ 已译 |
 
 > 抓取提示：`raw.githubusercontent.com/wiki/tModLoader/tModLoader/<页面名>.md` 直接就是 Wiki 原稿
 > （本机直连时通时不通，多试几次或走代理）；原稿里的 imgur 图可用 `https://cors.eu.org/<原图地址>` 取回本地（会限流）。
