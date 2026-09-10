@@ -152,7 +152,8 @@ index_top_img_height: 66vh
 
 # The subtitle on homepage
 subtitle:
-  enable: false
+  # 2026-09-10：开启首页打字机小标语（作者要的"人性化小简介"就放在这儿）
+  enable: true
   # Typewriter Effect
   effect: true
   # Customize typed.js
@@ -168,6 +169,10 @@ subtitle:
   source: false
   # If you close the typewriter effect, the subtitle will only show the first line of sub
   sub:
+    - 写点代码，也写点生活
+    - 折腾泰拉瑞亚模组中 🧩
+    - 把踩过的坑，都记在这里
+    - 欢迎来玩，随便逛逛 ✨
 
 # Article layout on the homepage
 # 1: Cover on the left, info on the right
@@ -296,7 +301,7 @@ aside:
     category: true
   card_author:
     enable: true
-    description:
+    description: 写点代码，也写点生活 ✨
     button:
       enable: false
       icon: fab fa-github

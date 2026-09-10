@@ -5,4 +5,6 @@
 #   内联/块级 HTML（<p> <b> <a> <ul>…）原样放行，两者可混用。
 # 悬停展开全文由 announce-hover.js 负责。
 content: |
-  **即将更新Tmod全中译指南**
+  **Tmod 全中译指南已上线** 🎉
+
+  tModLoader 官方 Wiki 的 Easy guides 全 27 篇，按原顺序翻完了 —— [点这里从头看](/articles/)

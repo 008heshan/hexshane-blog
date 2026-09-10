@@ -1,8 +1,18 @@
 # 纪元 · hexshane.top
 
-个人技术博客的完整源码。由 [Hexo](https://hexo.io/) + [Butterfly](https://butterfly.js.org/) 构建，
+> 善姐的个人博客 —— 写点代码，也写点生活。
+>
+> 主线上是 **tModLoader 模组开发**（官方 Wiki 的 Easy guides 全 27 篇中文精翻已上线），
+> 另外还有 Web 前端与性能折腾、工具与踩坑记录，偶尔夹一点生活杂谈。
+> 写得不算快，但每一篇都想让人一遍看懂 👋
+
+站点地址：<https://hexshane.top>　·　文章列表：<https://hexshane.top/articles/>
+
+---
+
+技术上的事：本站由 [Hexo](https://hexo.io/) + [Butterfly](https://butterfly.js.org/) 构建，
 主题源码直接放在仓库里（`themes/hexo-theme-butterfly`，不走 npm），
-主站部署在 **Cloudflare Pages**，自定义域名 <https://hexshane.top>。
+主站部署在 **Cloudflare Pages**。
 
 | 部署目标 | 地址 | 说明 |
 | --- | --- | --- |
@@ -23,10 +33,11 @@
 | 字段 | 值 |
 | --- | --- |
 | 站点标题 | 纪元 |
-| 副标题 | 分享技巧与经验 |
-| 作者 | HexShane |
+| 副标题 | 写点代码，也写点生活 |
+| 作者 | HexShane（读者都喊 **善姐**） |
 | 头像 | `/img/hexshane.jpg` |
 | 内容方向 | Terraria / tModLoader 模组开发、Hexo、前端与性能优化 |
+| 首页打字机标语 | 写点代码，也写点生活 / 折腾泰拉瑞亚模组中 🧩 / 把踩过的坑，都记在这里 / 欢迎来玩，随便逛逛 ✨ |
 | 哔哩哔哩 | <https://space.bilibili.com/448793040> |
 | 抖音 | <https://www.douyin.com/user/MS4wLjABAAAAVagbpZnsrACyaBI9a3H_FS4x3muOxK-DSPu4ddC7kz4> |
 | 仓库 | <https://github.com/008heshan/hexshane-blog> |
