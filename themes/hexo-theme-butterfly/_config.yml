@@ -301,7 +301,7 @@ aside:
     category: true
   card_author:
     enable: true
-    description: !?强强?!
+    description: ！？强强？！
     button:
       enable: false
       icon: fab fa-github
