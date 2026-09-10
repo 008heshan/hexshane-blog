@@ -91,6 +91,40 @@
   border-color: var(--sf-glass-line-strong, rgba(255, 255, 255, .2)) !important;
 }
 
+/* ---------------------------------------------------------------
+   移动端抽屉里的那一行
+   ---------------------------------------------------------------
+   结构由 author-dock.js 插到「文章 / 标签 / 分类」三个统计块的正下方
+   （#sidebar-menus > .site-data 之后）。抽屉只在移动端出现，所以这里
+   不用写媒体查询；三个图标一行居中，样式比桌面那条更轻：
+   淡描边圆角方块 + 中性图标色，hover/active 时才上品牌色。
+   --------------------------------------------------------------- */
+#sidebar #sidebar-menus .author-dock-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 4px 0 16px;
+  padding: 0 20px;
+}
+
+#sidebar #sidebar-menus .author-dock-inline .author-dock__item {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--sf-glass-line, rgba(255, 255, 255, .12));
+  background-color: rgba(255, 255, 255, .04);
+  font-size: 17px;
+  color: var(--sf-muted, #7c8a95);
+}
+
+#sidebar #sidebar-menus .author-dock-inline .author-dock__item:hover,
+#sidebar #sidebar-menus .author-dock-inline .author-dock__item:active {
+  background-color: rgba(255, 255, 255, .09);
+  transform: none;               /* 触屏上不做位移，只有颜色反馈 */
+}
+
 /* 小屏 / 触屏：不滑出，直接作为一行图标常显在卡片下方（可见即可点） */
 @media (max-width: 900px), (hover: none) {
   .author-dock {

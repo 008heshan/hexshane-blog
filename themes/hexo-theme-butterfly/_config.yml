@@ -1112,7 +1112,7 @@ inject:
     # 带版本号：hexo/静态托管对自定义资源无 cache-control，不加版本号浏览器会长期跑旧 JS
     - <link rel="stylesheet" href="/custom/widgets/translate-btn.css?v=20260911a">
     # --- widgets 作者卡片右侧滑出社媒条 ---
-    - <link rel="stylesheet" href="/custom/widgets/author-dock.css?v=20260911a">
+    - <link rel="stylesheet" href="/custom/widgets/author-dock.css?v=20260911b">
     # --- widgets /articles/ 列表页：页头 + 分类筛选 + 卡片强调（只在 #articles-index 内生效） ---
     - <link rel="stylesheet" href="/custom/widgets/articles-index.css?v=20260911a">
     # --- 科幻/科技/极客皮肤（必须放在最后，覆盖上面所有自定义样式） ---
@@ -1139,7 +1139,7 @@ inject:
     # --- widgets 卡片/挂件/页脚 ---
     - <script src="/custom/widgets/announce-hover.js?v=20260911a"></script>
     # 作者卡片右侧滑出社媒条（抖音 / B站 / GitHub 仓库）
-    - <script src="/custom/widgets/author-dock.js?v=20260911a"></script>
+    - <script src="/custom/widgets/author-dock.js?v=20260911b"></script>
     # 单人卡片：已停用 visit-card 双人切换
     # - <script src="/custom/widgets/visit-card.js"></script>
     - <script src="/custom/widgets/footer-reveal.js?v=20260911a"></script>

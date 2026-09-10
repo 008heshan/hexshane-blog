@@ -35,7 +35,41 @@
     }
   ]
 
+  function makeItem(l) {
+    var a = document.createElement('a')
+    a.className = 'author-dock__item'
+    a.href = l.url
+    a.target = '_blank'
+    a.rel = 'noopener'
+    a.title = l.name
+    a.setAttribute('aria-label', l.name)
+    a.setAttribute('data-site', l.site)
+    var i = document.createElement('i')
+    i.className = l.icon
+    i.setAttribute('aria-hidden', 'true')
+    a.appendChild(i)
+    return a
+  }
+
+  /* 移动端抽屉里的那一行：插在「文章 / 标签 / 分类」三个统计块的正下方
+     （#sidebar-menus > .site-data 之后、菜单之前）。抽屉只在移动端出现，
+     所以这里不需要媒体查询；桌面那条滑出条仍是主角。 */
+  function buildDrawerRow() {
+    var siteData = document.querySelector('#sidebar-menus .site-data')
+    if (!siteData) return
+    if (document.querySelector('#sidebar-menus .author-dock-inline')) return
+    var row = document.createElement('div')
+    row.className = 'author-dock-inline'
+    row.id = 'author-dock-inline'
+    row.setAttribute('role', 'navigation')
+    row.setAttribute('aria-label', '我的社媒链接')
+    LINKS.forEach(function (l) { row.appendChild(makeItem(l)) })
+    siteData.insertAdjacentElement('afterend', row)
+  }
+
   function build() {
+    buildDrawerRow()
+
     var card = document.querySelector('#aside-content .card-info')
     if (!card) return
     var host = card.parentElement
@@ -47,21 +81,7 @@
     dock.setAttribute('role', 'navigation')
     dock.setAttribute('aria-label', '我的社媒链接')
 
-    LINKS.forEach(function (l) {
-      var a = document.createElement('a')
-      a.className = 'author-dock__item'
-      a.href = l.url
-      a.target = '_blank'
-      a.rel = 'noopener'
-      a.title = l.name
-      a.setAttribute('aria-label', l.name)
-      a.setAttribute('data-site', l.site)
-      var i = document.createElement('i')
-      i.className = l.icon
-      i.setAttribute('aria-hidden', 'true')
-      a.appendChild(i)
-      dock.appendChild(a)
-    })
+    LINKS.forEach(function (l) { dock.appendChild(makeItem(l)) })
 
     host.appendChild(dock)
     card.classList.add('dock-ready')
