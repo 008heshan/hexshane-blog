@@ -1,6 +1,6 @@
 ---
 title: Basic Logging Guide
-date: 2026-09-02 20:00:00
+date: 2026-09-01 20:00:00
 tags:
   - tModLoader
   - Terraria
