@@ -1,0 +1,7 @@
+# 站点地图与爬虫规则
+# 管理后台不参与索引：页面本身已带 noindex，这里再加一道
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /admin/posts.json
+Disallow: /admin/meta.json

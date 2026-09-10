@@ -7,3 +7,6 @@ db.json
 source/custom/cursor/win11-cursor/
 _multiconfig.yml
 .shots/
+
+# 运维私记：含后台入口与凭证配置细节，不入库
+NOTES-private.md
