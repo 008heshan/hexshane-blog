@@ -34,21 +34,24 @@
      · --sf-glass-blur 实时背景模糊半径，负责"磨砂"
      blur 在硬件加速不可用时会被浏览器静默丢掉，所以高光和白膜必须
      自己就能撑起质感（详见第 5 节注释）。 */
-  /* v21：数值还原为 b61877d（69ac3ec"改平"之前）的原始材质 —— 也就是作者说的
-     "原先那个玻璃效果"：白膜 .055 + 顶部渐变高光 .07→.012→.012 + blur 20px。
-     当天 69ac3ec 为了"首页卡片与文章面板通透度一致"把顶部高光删了，玻璃就没反光了；
-     现在高光回来了，而且是**卡片与文章面板一起**铺（一致性仍然保证）。 */
-  --sf-glass: rgba(255, 255, 255, .055);
-  --sf-glass-2: rgba(255, 255, 255, .075);
+  /* v22：往"通透"再走一档。v21 还原了原先那套（白膜 .055 + 高光 .07→.012 + blur 20），
+     但作者反馈"不够通透"—— 原因有三：白膜本身偏厚、高光铺满上部 38% 变成一层灰纱、
+     blur 20px 把背后纹理糊成了奶白。改法：
+       · 白膜 .055 → .03（面板中段的有效不透明度从 ~6.7% 降到 ~3.6%）
+       · 高光只留"顶部一条细边"（12% 高度就衰减到底），不再是一大片灰纱
+       · blur 20px → 12px：糊得少，背后的星链与网格能看清，才叫"通透"
+       · 描边与内高光保留 —— 玻璃之所以像玻璃靠的是这条亮边，不是靠不透明度 */
+  --sf-glass: rgba(255, 255, 255, .03);
+  --sf-glass-2: rgba(255, 255, 255, .045);
   --sf-glass-sheen: linear-gradient(
     180deg,
-    rgba(255, 255, 255, .07) 0%,
-    rgba(255, 255, 255, .012) 38%,
-    rgba(255, 255, 255, .012) 100%
+    rgba(255, 255, 255, .055) 0%,
+    rgba(255, 255, 255, .006) 12%,
+    rgba(255, 255, 255, .006) 100%
   );
-  --sf-glass-line: rgba(255, 255, 255, .12);
-  --sf-glass-line-strong: rgba(255, 255, 255, .2);
-  --sf-glass-blur: 20px;
+  --sf-glass-line: rgba(255, 255, 255, .13);
+  --sf-glass-line-strong: rgba(255, 255, 255, .22);
+  --sf-glass-blur: 12px;
   --sf-panel: var(--sf-glass);
   --sf-panel-2: var(--sf-glass-2);
   --sf-line: var(--sf-glass-line);
@@ -486,7 +489,7 @@ html body .search-dialog {
   html body .relatedPosts-list a.pagination-related,
   html body .post-copyright,
   html body .search-dialog {
-    background-color: rgba(255, 255, 255, .09) !important;
+    background-color: rgba(255, 255, 255, .05) !important;
     border-color: rgba(255, 255, 255, .16) !important;
   }
 }
