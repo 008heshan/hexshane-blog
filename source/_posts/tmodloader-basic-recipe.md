@@ -12,7 +12,7 @@ categories:
 
 配方有三个地方可以写：`ModItem.AddRecipes`、`GlobalItem.AddRecipes` 和 `ModSystem.AddRecipes`。放哪儿看你自己的整理习惯，不过 `ModItem.CreateRecipe` 并不是在哪儿都能直接用，用不了的地方就换成 `Recipe.Create`。
 
-一个配方由三部分组成：材料（Ingredients，合成时被消耗掉的物品）、合成站（Tiles，你得站在旁边的那些物块）和产物（Results，合成出来的物品）。
+一个配方由三部分组成：材料（Ingredients，合成时被消耗掉的物品）、制作站（Tiles，你得站在旁边的那些物块）和产物（Results，合成出来的物品）。
 
 只要某个物品被至少一个配方当作材料用过，游戏就会自动给它加上“Material”（材料）提示，不用你手动加。
 
@@ -84,9 +84,9 @@ recipe.AddIngredient(Mod, "ExampleItem");
 recipe.AddIngredient(this, 5);
 ```
 
-## 指定合成站
+## 指定制作站
 
-接着指定合成站，写法跟加物品一样。[TileID 在这里查](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Tile-IDs)。
+接着指定制作站，写法跟加物品一样。[TileID 在这里查](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Tile-IDs)。
 
 想让它徒手就能合成的话，这一步直接跳过。
 
@@ -106,7 +106,7 @@ recipe.AddTile(Mod, "ExampleWorkbench");
 recipe.Register();
 ```
 
-## 原版与模组材料、合成站的写法区别
+## 原版与模组材料、制作站的写法区别
 
 小结一下：原版物品和物块用 `TileID`、`ItemID` 类，模组内容用 `ModContent.TileType`、`ModContent.ItemType` 方法：
 
@@ -158,7 +158,7 @@ Recipe.Create(ItemID.AlphabetStatueA)
 
 # 条件
 
-除了材料和合成站，配方还能带条件。每一个条件都满足，配方才做得出来。
+除了材料和制作站，配方还能带条件。每一个条件都满足，配方才做得出来。
 
 ## 水、蜂蜜、岩浆、微光
 
@@ -203,7 +203,7 @@ recipe = Recipe.Create(ItemID.AlphabetStatueB);
 
 # 让原版物块“升级”
 
-顺带提一个需求：你可能希望自己的 `ModTile` 也能被当成工作台、铁砧之类的合成站。做法是在 `ModTile.SetStaticDefaults` 里加上这一行：
+顺带提一个需求：你可能希望自己的 `ModTile` 也能被当成工作台、铁砧之类的制作站。做法是在 `ModTile.SetStaticDefaults` 里加上这一行：
 
 ```cs
 AdjTiles = [TileID.WorkBenches];
@@ -293,7 +293,7 @@ namespace ExampleMod.Content
 
 `AddRecipes` 只能在 `Mod`、`ModSystem` 或 `ModItem` 里重写，别的类不行。
 
-### 游戏里显示的合成站或材料和我的配方代码对不上
+### 游戏里显示的制作站或材料和我的配方代码对不上
 
 多半是把 `ItemID` 传进了 `AddTile`，或者把 `TileID` 传进了 `AddIngredient`。用错了 ID 类，等于引用到了另一个 ID。
 

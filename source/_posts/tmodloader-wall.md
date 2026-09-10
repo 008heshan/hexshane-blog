@@ -10,11 +10,11 @@ categories:
 
 > 本文内容整理自 tModLoader 官方 Wiki（Terraria 模组开发指南），原文：[Wall Guide](https://github.com/tModLoader/tModLoader/wiki/Wall)。
 
-# 什么是墙壁？
+# 什么是墙？
 
-墙壁（wall）本身没什么绕弯的地方，做一面墙基本就是照着现成的模式走一遍。跟物块（tile）一样，一面墙由两部分组成：负责把它放下去的 `ModItem`，以及墙本体的 `ModWall`。
+墙（wall）本身没什么绕弯的地方，做一面墙基本就是照着现成的模式走一遍。跟物块（tile）一样，一面墙由两部分组成：负责把它放下去的 `ModItem`，以及墙本体的 `ModWall`。
 
-## 墙壁与物品的配对
+## 墙与物品的配对
 
 `Item.createWall` 设成某个 `ModWall` 的 `WallType`，这件物品放下时就会生成那面墙；反过来，`ModWall` 通常也要指回对应的 `ModItem`。如果放置用的物品和这面墙该掉落的物品是同一件，这套配对是自动完成的，不用你操心；否则得在 `ModWall.SetStaticDefaults` 里写一句 `RegisterItemDrop(ModContent.ItemType<ItemName>());`，手动把掉落物指定上。
 
@@ -25,7 +25,7 @@ ExampleMod 里的 `ExampleWall` 就是最基础的例子，一共 4 个文件：
 - [ExampleMod/Content/Walls/ExampleWall.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Walls/ExampleWall.cs) —— `ModWall` 类本体
 - [ExampleMod/Content/Walls/ExampleWall.png](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Walls/ExampleWall.png) —— 这面墙的贴图
 - [ExampleMod/Content/Items/Placeable/ExampleWall.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Items/Placeable/ExampleWall.cs) —— 负责放置 `ExampleWall` 的 `ModItem` 类
-  - 注意：`ModWall.SetStaticDefaults` 里的 `Item.DefaultToPlacableWall(ModContent.WallType<Walls.ExampleWall>());` 会自动设好 `Item.createWall`，以及墙壁物品共有的其它属性。
+  - 注意：`ModWall.SetStaticDefaults` 里的 `Item.DefaultToPlacableWall(ModContent.WallType<Walls.ExampleWall>());` 会自动设好 `Item.createWall`，以及墙物品共有的其它属性。
 - [ExampleMod/Content/Items/Placeable/ExampleWall.png](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Items/Placeable/ExampleWall.png) —— `ExampleWall` 这件 `ModItem` 的贴图
 
 `ExampleWallUnsafe` 同样是基础例子，不过只有 2 个文件：`ModWall` 类和它的贴图。它没有能放置自己的物品，所以用 `RegisterItemDrop` 注册掉落物。
@@ -36,7 +36,7 @@ ExampleMod 里的 `ExampleWall` 就是最基础的例子，一共 4 个文件：
 
 # 贴图
 
-墙壁贴图被切成了若干分区，用来应付“周围哪些邻居是同一种墙”的各种方位。每个方位都有 3 个可选样式；中心方位是个例外，它有 15 个 —— 也就是 5 个分区各 3 个样式，多出来的这些变化是为了打散重复图案。这些分区叫 `style`，分区里的每个样式叫 `WallFrameNumber`。`ExampleWall` 是照着 `Gemspark` 墙做的，因为它足够好懂。想要更细的例子，去翻[现成的墙壁贴图](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Prerequisites#vanilla-texture-file-reference)。
+墙贴图被切成了若干分区，用来应付“周围哪些邻居是同一种墙”的各种方位。每个方位都有 3 个可选样式；中心方位是个例外，它有 15 个 —— 也就是 5 个分区各 3 个样式，多出来的这些变化是为了打散重复图案。这些分区叫 `style`，分区里的每个样式叫 `WallFrameNumber`。`ExampleWall` 是照着 `Gemspark` 墙做的，因为它足够好懂。想要更细的例子，去翻[现成的墙贴图](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Prerequisites#vanilla-texture-file-reference)。
 
 ![ExampleWall 的完整贴图：按方位切成的多个 style 分区，每个分区里排着若干个 WallFrameNumber 样式](/img/posts/tmodloader-wall/ExampleWall.png)
 
@@ -48,13 +48,13 @@ ExampleMod 里的 `ExampleWall` 就是最基础的例子，一共 4 个文件：
 
 ![同一批贴图在 wallLargeFrames 取 1（Phlebas）与取 2（Lazure）时铺出的固定图案](/img/posts/tmodloader-wall/193192050-91e6502d-8f39-4c28-8221-297562ca0f51.png)
 
-## 动画墙壁
+## 动画墙
 
-墙壁做成动画时，这套模板会在贴图里重复好几遍。注意：只有不用 `Main.wallLargeFrames` 的墙支持这么做。
+墙做成动画时，这套模板会在贴图里重复好几遍。注意：只有不用 `Main.wallLargeFrames` 的墙支持这么做。
 
-![动画墙壁的贴图：同一套模板重复排列了多份](/img/posts/tmodloader-wall/191140761-06536d43-3b87-4ffc-b036-d3b9cf1739f0.png)
+![动画墙的贴图：同一套模板重复排列了多份](/img/posts/tmodloader-wall/191140761-06536d43-3b87-4ffc-b036-d3b9cf1739f0.png)
 
-# 墙壁属性
+# 墙属性
 
 在 `ModWall.SetStaticDefaults` 里能填不少数据，它们会影响这面墙的行为。
 
@@ -78,7 +78,7 @@ ExampleMod 里的 `ExampleWall` 就是最基础的例子，一共 4 个文件：
 
 赋成某个已知的 `WallID`，就能跟风格相近的墙拼在一起。比如墙的不安全版本里可以写 `Main.wallBlend[Type] = ModContent.WallType<MyWallSafe>();`。反过来就别在安全版本上再写一遍 —— 两面墙里只设其中一边。
 
-# 让墙壁动起来
+# 让墙动起来
 
 前面说过，动画墙的贴图里有好几份模板。动起来的节奏和图案，交给 `ModWall.AnimateWall` 这个钩子决定。
 
@@ -105,7 +105,7 @@ public override void AnimateWall(ref byte frame, ref byte frameCounter) {
 
 # 安全墙与不安全墙
 
-Terraria 里很多墙都有安全和不安全两套。安全版就是玩家挖掉不安全版之后拿到手、能自己放下的那种；不安全版基本只出现在世界生成阶段，玩家放不了，但会参与 NPC 生成（NPC spawning）的计算。把两者拆开，玩家挖墙回去做装饰时，就不用担心在自己家里刷出某些敌怪。只要你的模组里有逻辑会参考墙壁类型来刷 NPC，这个套路就值得照抄。
+Terraria 里很多墙都有安全和不安全两套。安全版就是玩家挖掉不安全版之后拿到手、能自己放下的那种；不安全版基本只出现在世界生成阶段，玩家放不了，但会参与 NPC 生成（NPC spawning）的计算。把两者拆开，玩家挖墙回去做装饰时，就不用担心在自己家里刷出某些敌怪。只要你的模组里有逻辑会参考墙类型来刷 NPC，这个套路就值得照抄。
 
 # 自定义拼接
 

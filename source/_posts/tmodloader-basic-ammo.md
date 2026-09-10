@@ -34,7 +34,7 @@ categories:
 
 # 怎么用原版物品拼出一个新的弹药类别？
 
-用一个 `GlobalItem` 类，在 `SetDefaults` 里设置 `Item.ammo`，再在 `PickAmmo` 里把 `type` 改成你自己写的新弹幕。这里有个坑：如果这件物品默认能放置墙壁或方块，原版逻辑会挡掉「Ammo」那条提示，得你自己补回去。
+用一个 `GlobalItem` 类，在 `SetDefaults` 里设置 `Item.ammo`，再在 `PickAmmo` 里把 `type` 改成你自己写的新弹幕。这里有个坑：如果这件物品默认能放置墙或物块，原版逻辑会挡掉「Ammo」那条提示，得你自己补回去。
 
 ```cs
 public class AmmoModificationsGlobalItem : GlobalItem

@@ -53,7 +53,7 @@ namespace ModNamespaceHere
 
 # SetDefaults
 
-`SetDefaults` 是弹幕最重要的方法，弹幕的各项数值都在这里定下来：判定框的宽高、是友方还是敌方、用哪套 AI，等等。`SetDefaults` 里常设的这些值分别是什么意思，见 [Projectile Class Documentation](https://github.com/tModLoader/tModLoader/wiki/Projectile-Class-Documentation)；原版弹幕实际填了什么值，查 [Vanilla Projectile Field Values](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Projectile-Field-Values)。[ExampleMod.Content.Projectiles](https://github.com/tModLoader/tModLoader/tree/stable/ExampleMod/Content/Projectiles) 里有大量现成例子。
+`SetDefaults` 是弹幕最重要的方法，弹幕的各项数值都在这里定下来：碰撞箱的宽高、是友方还是敌方、用哪套 AI，等等。`SetDefaults` 里常设的这些值分别是什么意思，见 [Projectile Class Documentation](https://github.com/tModLoader/tModLoader/wiki/Projectile-Class-Documentation)；原版弹幕实际填了什么值，查 [Vanilla Projectile Field Values](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Projectile-Field-Values)。[ExampleMod.Content.Projectiles](https://github.com/tModLoader/tModLoader/tree/stable/ExampleMod/Content/Projectiles) 里有大量现成例子。
 
 ## Projectile.damage
 
@@ -61,11 +61,11 @@ namespace ModNamespaceHere
 
 ## DrawOffsetX, DrawOriginOffsetY, DrawOriginOffsetX
 
-这三个是 `ModProjectile` 的字段，用来把判定框和贴图对齐。细节见 [Drawing and Collision](#Drawing-and-Collision)。
+这三个是 `ModProjectile` 的字段，用来把碰撞箱和贴图对齐。细节见 [Drawing and Collision](#Drawing-and-Collision)。
 
 # 其他 Hooks/Methods
 
-[ModProjectile 文档](https://docs.tmodloader.net/docs/stable/class_mod_projectile.html)里还列了一大堆钩子，用它们才能把弹幕做出自己的味道。比如想让弹幕打中敌人时挂个 debuff，用 `OnHitNPC`；想在弹幕撞到方块时做点什么，用 `OnTileCollide`。具体怎么用，翻文档和 ExampleMod 里的实际用例。
+[ModProjectile 文档](https://docs.tmodloader.net/docs/stable/class_mod_projectile.html)里还列了一大堆钩子，用它们才能把弹幕做出自己的味道。比如想让弹幕打中敌人时挂个 减益，用 `OnHitNPC`；想在弹幕撞到物块时做点什么，用 `OnTileCollide`。具体怎么用，翻文档和 ExampleMod 里的实际用例。
 
 # AI 是什么
 
@@ -77,10 +77,10 @@ AI 决定弹幕生成之后怎么动、怎么表现，可以说是一个弹幕�
 ![各种回旋镖类弹幕的 aiStyle 取值（均为 3）](/img/posts/tmodloader-basic-modprojectile/RSaxV6T.png)    
 
 于是代码里写 `Projectile.aiStyle = 3;` 就行（把 3 换成 `ProjAIStyleID.Boomerang` 可读性更好）。想再省点事，可以直接 `Projectile.CloneDefaults(ProjectileID.EnchantedBoomerang)`，一行把其余默认值也拷过来，得到的弹幕表现几乎和原版一样：
-![CloneDefaults(EnchantedBoomerang) 之后的回旋镖（没有尘土效果）](/img/posts/tmodloader-basic-modprojectile/CL2MwaF.png)     
+![CloneDefaults(EnchantedBoomerang) 之后的回旋镖（没有粒子效果）](/img/posts/tmodloader-basic-modprojectile/CL2MwaF.png)     
 
-但你会发现尘土没出来。补上 `AIType` 就能修好。`AIType` 的作用是在 `aiStyle` 的基础上再细化一层：同一个 `aiStyle` 被很多弹幕共用，想用其中某一种弹幕的具体行为，就得靠 `AIType` 指定。把 `AIType` 也补上之后，我们的附魔回旋镖副本长这样：
-![再补上 AIType 之后的回旋镖（尘土效果恢复）](/img/posts/tmodloader-basic-modprojectile/39KqXhc.png)    
+但你会发现粒子没出来。补上 `AIType` 就能修好。`AIType` 的作用是在 `aiStyle` 的基础上再细化一层：同一个 `aiStyle` 被很多弹幕共用，想用其中某一种弹幕的具体行为，就得靠 `AIType` 指定。把 `AIType` 也补上之后，我们的附魔回旋镖副本长这样：
+![再补上 AIType 之后的回旋镖（粒子效果恢复）](/img/posts/tmodloader-basic-modprojectile/39KqXhc.png)    
 
 最终的代码：
 
@@ -92,7 +92,7 @@ public override void SetDefaults()
 	AIType= ProjectileID.EnchantedBoomerang;
 }
 ```
-尘土是好看了，可只要你想改尘土颜色，或者动任何一点细节，`aiStyle` 加 `AIType` 就不够用了。这种时候得去翻 [Vanilla Code Adaption](https://github.com/tModLoader/tModLoader/wiki/Advanced-Vanilla-Code-Adaption) 指南改原版代码，或者接着往下看，自己从零写 AI。记住，`projectile.aiStyle` 配 `AIType` 只是**做原型用的工具**，模组里稍微有点意思的弹幕，基本都得自己写 AI 或者改原版代码。
+粒子是好看了，可只要你想改粒子颜色，或者动任何一点细节，`aiStyle` 加 `AIType` 就不够用了。这种时候得去翻 [Vanilla Code Adaption](https://github.com/tModLoader/tModLoader/wiki/Advanced-Vanilla-Code-Adaption) 指南改原版代码，或者接着往下看，自己从零写 AI。记住，`projectile.aiStyle` 配 `AIType` 只是**做原型用的工具**，模组里稍微有点意思的弹幕，基本都得自己写 AI 或者改原版代码。
 
 # 自定义 AI
 
@@ -165,9 +165,9 @@ Projectile.rotation = Projectile.velocity.ToRotation(); // projectile faces spri
 ### spriteDirection
 向左发射时贴图上下颠倒？加这一行：`Projectile.spriteDirection = Projectile.direction;`。原理和示例见 [Drawing and Collision](#Drawing-and-Collision)。
 
-## 尘土
+## 粒子
 
-想要视觉效果就往 AI 里撒 Dust。位置、`DustID`、生成频率都随机化一下，看起来会舒服很多。下面是附魔回旋镖的尘土代码（aiStyle 3，AIType 为 ProjectileID.EnchantedBoomerang）：
+想要视觉效果就往 AI 里撒 Dust。位置、`DustID`、生成频率都随机化一下，看起来会舒服很多。下面是附魔回旋镖的粒子代码（aiStyle 3，AIType 为 ProjectileID.EnchantedBoomerang）：
 ```cs
 if (Main.rand.NextBool(5)) // only spawn 20% of the time
 {
@@ -188,12 +188,12 @@ if (Main.rand.NextBool(5)) // only spawn 20% of the time
 	Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, choice, Projectile.velocity.X * 0.25f, Projectile.velocity.Y * 0.25f, 150, default(Color), 0.7f);
 }
 ```
-### 尘土拖尾
-每次 AI 更新生成一颗尘土，就是一条拖尾。
+### 粒子拖尾
+每次 AI 更新生成一颗粒子，就是一条拖尾。
 
 ## 光照
 
-"光照"这个词各人理解不一样，分几种情况：想加粒子就看上面尘土那一节；想让贴图不受黑暗影响，用 `ModProjectile.GetAlpha`；想让弹幕本身发白光，在 `SetDefaults` 里设 `Projectile.light = 1f;`（0 到 1 之间的任意值都行）；最后，如果你要的是带颜色的光、而且能照亮周围方块的那种（不是靠撒尘土），就在 `AI` 方法里用 `Lighting.AddLight`：
+"光照"这个词各人理解不一样，分几种情况：想加粒子就看上面粒子那一节；想让贴图不受黑暗影响，用 `ModProjectile.GetAlpha`；想让弹幕本身发白光，在 `SetDefaults` 里设 `Projectile.light = 1f;`（0 到 1 之间的任意值都行）；最后，如果你要的是带颜色的光、而且能照亮周围物块的那种（不是靠撒粒子），就在 `AI` 方法里用 `Lighting.AddLight`：
 ```cs
 Lighting.AddLight(Projectile.Center, 0.9f, 0.1f, 0.3f); // R G B values from 0 to 1f. This is the red from the Crimson Heart pet
 ```
@@ -237,11 +237,11 @@ if (OptionallySomeCondition && Projectile.owner == Main.myPlayer)
 
 跟随鼠标的做法是在 `AI` 里读 `Main.MouseWorld`，再把 `Projectile.velocity` 调整到朝鼠标的方向。这段代码只能对弹幕的拥有者执行，也就是外面套一层 `if(Main.myPlayer == projectile.owner)`。不做这个判断就会失步——每个客户端都拿自己本地的鼠标去影响这颗弹幕。别的客户端根本不知道弹幕拥有者的鼠标在哪，所以速度的变化和位置的改变都得靠 `Projectile.netUpdate` 同步过去。[MagicMissile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Old/Projectiles/MagicMissile.cs) 目前还没适配新版 tModLoader，但它展示了跟随鼠标弹幕需要写哪些代码。
 
-## 持握弹幕
+## 手持弹幕
 
-持握弹幕看起来就像被玩家握在手里，类似物品武器的拿法。做成弹幕之后，行为比做成物品好定制得多。最典型的例子是钻头，长矛、短剑、鞭子、连枷这类武器也常用持握弹幕实现。
+手持弹幕看起来就像被玩家握在手里，类似物品武器的拿法。做成弹幕之后，行为比做成物品好定制得多。最典型的例子是钻头，长矛、短剑、鞭子、连枷这类武器也常用手持弹幕实现。
 
-要实现持握弹幕，你得有一个"发射"它的物品。物品里要设 `Item.channel = true;`。弹幕这边则是读 `player.channel`，判断物品是否还在使用中；只要还在用，就每帧把弹幕的位置和旋转对齐到玩家的位置和物品的旋转上。[ExampleDrillProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleDrillProjectile.cs) 是持握弹幕的范例，实现所需的代码都在里面。
+要实现手持弹幕，你得有一个"发射"它的物品。物品里要设 `Item.channel = true;`。弹幕这边则是读 `player.channel`，判断物品是否还在使用中；只要还在用，就每帧把弹幕的位置和旋转对齐到玩家的位置和物品的旋转上。[ExampleDrillProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleDrillProjectile.cs) 是手持弹幕的范例，实现所需的代码都在里面。
 
 ## Player Owner
 
@@ -313,17 +313,17 @@ public override bool CanUseItem(Player player) {
 
 # 反弹与 OnTileCollide
 
-很多弹幕撞到实心方块会弹开。严格说这件事不算 `AI` 的一部分，它发生在 `OnTileCollide` 这个方法里。默认行为是：弹幕撞上方块后速度被迅速削掉，最终停下并被销毁。只要重写 `ModProjectile.OnTileCollide` 并返回 `false`，就能跳过这套逻辑、换成自己的；返回 `true` 则是在保留原版逻辑的前提下再补点东西。最常见的目标就是让弹幕反弹：有的弹幕会损失一部分速度，弹得比较真实；有的完全不掉速，换个方向继续原速飞。还有的只允许弹有限的次数，这通常是借用 `Projectile.penetrate` 来倒数。另外，重写 `ModProjectile.OnTileCollide` 之后，销毁弹幕、生成碰撞处的尘土、播放碰撞音效，这些都可能得你自己补上。
+很多弹幕撞到实心物块会弹开。严格说这件事不算 `AI` 的一部分，它发生在 `OnTileCollide` 这个方法里。默认行为是：弹幕撞上物块后速度被迅速削掉，最终停下并被销毁。只要重写 `ModProjectile.OnTileCollide` 并返回 `false`，就能跳过这套逻辑、换成自己的；返回 `true` 则是在保留原版逻辑的前提下再补点东西。最常见的目标就是让弹幕反弹：有的弹幕会损失一部分速度，弹得比较真实；有的完全不掉速，换个方向继续原速飞。还有的只允许弹有限的次数，这通常是借用 `Projectile.penetrate` 来倒数。另外，重写 `ModProjectile.OnTileCollide` 之后，销毁弹幕、生成碰撞处的粒子、播放碰撞音效，这些都可能得你自己补上。
 
 ## OnTileCollide 示例
 
-[ExampleBullet.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleBullet.cs#L37) 演示了有限次数反弹、碰撞尘土、碰撞音效，以及完全保留速度的反弹。
+[ExampleBullet.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleBullet.cs#L37) 演示了有限次数反弹、碰撞粒子、碰撞音效，以及完全保留速度的反弹。
 
 [ExampleCloneProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleCloneProjectile.cs#L51) 演示了随机播放多个碰撞音效，以及返回 `true` 保留原版碰撞逻辑；里面的 `OnKill` 还演示了爆出一小片次级弹幕。
 
 [SparklingBall.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/SparklingBall.cs#L28) 和 ExampleBullet.cs 差不多，区别是速度每帧乘 `0.75f`，所以每弹一次都会更慢。
 
-[ExampleAdvancedFlailProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleAdvancedFlailProjectile.cs#L315) 根据连枷的状态和速度，给出了更动态的尘土与反弹写法，还额外做了火花特效。连枷类武器的手感就来自这种动态表现。
+[ExampleAdvancedFlailProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleAdvancedFlailProjectile.cs#L315) 根据连枷的状态和速度，给出了更动态的粒子与反弹写法，还额外做了火花特效。连枷类武器的手感就来自这种动态表现。
 
 有了这些例子，你想要什么碰撞行为都能拼出来。如果是要克隆某个原版弹幕的行为，就去 `Projectile.HandleMovement` 里搜对应的 `ProjectileID` 编号或该弹幕的 `aiStyle` 编号，相关代码就在那儿。改编指南里的 [Shadowbeam Staff Clone](https://github.com/tModLoader/tModLoader/wiki/Advanced-Vanilla-Code-Adaption#example-item-and-projectile-shadowbeam-staff-clone) 例子演示了这个过程，也演示了如何找到那些没被 `AI` 代码覆盖到的原版代码片段。
 
@@ -333,7 +333,7 @@ public override bool CanUseItem(Player player) {
 
 ## 残影拖尾
 
-"残影拖尾"就是弹幕一路飞出淡去的复制品（也可以看看上面的 [尘土拖尾](#尘土拖尾)）。实现思路是让游戏记住弹幕之前的位置，再手动把这些位置的弹幕画出来。下面是 [ExampleBullet.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleBullet.cs) 里的相关代码：
+"残影拖尾"就是弹幕一路飞出淡去的复制品（也可以看看上面的 [粒子拖尾](#粒子拖尾)）。实现思路是让游戏记住弹幕之前的位置，再手动把这些位置的弹幕画出来。下面是 [ExampleBullet.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleBullet.cs) 里的相关代码：
 
 ```cs
 public override void SetStaticDefaults() {
@@ -385,7 +385,7 @@ https://github.com/user-attachments/assets/2307462e-b0f1-4195-a14c-b52268bd8dfc
 
 ## Glowmask
 
-只要放一个名为 `[TextureName]_Glow.png` 的文件，它就会被自动当成这颗弹幕的 Glowmask（发光遮罩）：以全亮度叠在正常贴图之上。
+只要放一个名为 `[TextureName]_Glow.png` 的文件，它就会被自动当成这颗弹幕的 Glowmask（发光贴图）：以全亮度叠在正常贴图之上。
 
 ## PreDraw/PostDraw 示例
 
@@ -403,12 +403,12 @@ https://github.com/user-attachments/assets/2307462e-b0f1-4195-a14c-b52268bd8dfc
 
 # Drawing and Collision
 
-你可能已经发现弹幕会在不该撞墙的时候撞墙，或者判定框莫名其妙。先把话说清楚：`Projectile.width` 和 `Projectile.height` 对应的是弹幕的判定框，不是贴图。这两个值几乎永远不应该不相等，判定框应该是正方形。另外，`Projectile.scale` 也不要用，原版绘制代码并没有正确处理它。绘制贴图时会尽量把贴图叠到判定框上，具体怎么叠，受 `Main.DrawProj_DrawNormalProjs` 方法里一堆数学计算影响。
+你可能已经发现弹幕会在不该撞墙的时候撞墙，或者碰撞箱莫名其妙。先把话说清楚：`Projectile.width` 和 `Projectile.height` 对应的是弹幕的碰撞箱，不是贴图。这两个值几乎永远不应该不相等，碰撞箱应该是正方形。另外，`Projectile.scale` 也不要用，原版绘制代码并没有正确处理它。绘制贴图时会尽量把贴图叠到碰撞箱上，具体怎么叠，受 `Main.DrawProj_DrawNormalProjs` 方法里一堆数学计算影响。
 
 ## 竖直方向贴图的例子
 
 跟着下面这个例子走一遍，碰撞和绘制的问题以及解决思路就清楚了。贴图是这样的，48x70 像素：
-![竖直方向的弹幕精灵（48x70）](/img/posts/tmodloader-basic-modprojectile/y4OcJAv.png)    
+![竖直方向的弹幕贴图（48x70）](/img/posts/tmodloader-basic-modprojectile/y4OcJAv.png)    
 这个 `ModProjectile` 里要紧的部分：
 ```cs
 // SetDefatults
@@ -417,45 +417,45 @@ Projectile.height = 8;
 // AI
 Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.ToRadians(90f);
 ```
-我们的目标是让贴图里的黄色部分当判定框。黄色区域是 8x8 像素，所以 `width` 和 `height` 都设成 8。那段 `Projectile.rotation` 代码把旋转设成速度方向，另外多加 90 度，因为这张贴图是朝上的，而游戏默认期望它朝右。本篇里我们会用 [Modders Toolkit](https://steamcommunity.com/sharedfiles/filedetails/?id=2573569299) 这个模组来可视化判定框，非常好用。
+我们的目标是让贴图里的黄色部分当碰撞箱。黄色区域是 8x8 像素，所以 `width` 和 `height` 都设成 8。那段 `Projectile.rotation` 代码把旋转设成速度方向，另外多加 90 度，因为这张贴图是朝上的，而游戏默认期望它朝右。本篇里我们会用 [Modders Toolkit](https://steamcommunity.com/sharedfiles/filedetails/?id=2573569299) 这个模组来可视化碰撞箱，非常好用。
 
-可以看到判定框（那个黄方块）和贴图的尖端对不上：
+可以看到碰撞箱（那个黄物块）和贴图的尖端对不上：
 
 https://github.com/tModLoader/tModLoader/assets/4522492/8efa67d9-5565-4076-b0af-5e1688dfde84
 
-原版那套数学有点绕，但说到底就是把 `DrawOffsetX` 和 `DrawOriginOffsetY` 设成合适的值，把贴图的绘制位置挪一挪，让贴图正好压在判定框上。调这两个值时，可以在游戏里用 [Modders Toolkit](https://steamcommunity.com/sharedfiles/filedetails/?id=2573569299) 直接改，也可以开 [Edit and Continue](https://github.com/tModLoader/tModLoader/wiki/Why-Use-an-IDE#edit-and-continue) 边跑边调。还有个笨办法：在绘图软件里对着贴图量：
+原版那套数学有点绕，但说到底就是把 `DrawOffsetX` 和 `DrawOriginOffsetY` 设成合适的值，把贴图的绘制位置挪一挪，让贴图正好压在碰撞箱上。调这两个值时，可以在游戏里用 [Modders Toolkit](https://steamcommunity.com/sharedfiles/filedetails/?id=2573569299) 直接改，也可以开 [Edit and Continue](https://github.com/tModLoader/tModLoader/wiki/Why-Use-an-IDE#edit-and-continue) 边跑边调。还有个笨办法：在绘图软件里对着贴图量：
 ![在绘图软件里量出 DrawOffsetX / DrawOriginOffsetY](/img/posts/tmodloader-basic-modprojectile/m5DxkBm.png)   
 这里是拿 Modders Toolkit 试各种值，试出来的结果记得写回 `SetDefaults` 里：
 
 https://github.com/tModLoader/tModLoader/assets/4522492/a21ae4df-e79f-4878-84ff-d8e30dd59583
 
-试了几轮、或者量过之后就知道，给这个 `ModProjectile.SetDefaults` 加上 `DrawOffsetX = -20;`，绘制位置和判定框就对上了。
+试了几轮、或者量过之后就知道，给这个 `ModProjectile.SetDefaults` 加上 `DrawOffsetX = -20;`，绘制位置和碰撞箱就对上了。
 
-接着让判定框落到贴图的蓝色部分。这次用 [Edit and Continue](https://github.com/tModLoader/tModLoader/wiki/Why-Use-an-IDE#edit-and-continue) 来试，下面这段录屏能看出试新值有多快：
+接着让碰撞箱落到贴图的蓝色部分。这次用 [Edit and Continue](https://github.com/tModLoader/tModLoader/wiki/Why-Use-an-IDE#edit-and-continue) 来试，下面这段录屏能看出试新值有多快：
 
 https://github.com/tModLoader/tModLoader/assets/4522492/d17b18ad-1d4b-46fb-90ee-dfa43789e484
 
-如你所见，加上 `DrawOriginOffsetY = -16;` 就让判定框在贴图上往下移了。
+如你所见，加上 `DrawOriginOffsetY = -16;` 就让碰撞箱在贴图上往下移了。
 
 ### 修掉贴图上下颠倒的问题
 
 你可能也注意到，向左发射时贴图是倒着的。回想一下 `AI` 里这行：`Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.ToRadians(90f);`。贴图一转到左边，自然就上下颠倒了。用 `spriteDirection` 能修：它会把贴图的绘制水平翻转。做法就是在 `AI` 里 `Projectile.rotation = ...` 那行之后补上 `Projectile.spriteDirection = Projectile.direction;`。
 
 没修之前：
-![向左发射时精灵上下颠倒（未修复）](/img/posts/tmodloader-basic-modprojectile/sKUq94z.png)    
+![向左发射时贴图上下颠倒（未修复）](/img/posts/tmodloader-basic-modprojectile/sKUq94z.png)    
 修好之后：
 ![设置 spriteDirection 之后恢复正常](/img/posts/tmodloader-basic-modprojectile/w3ALhDX.png)    
 
 ## 水平方向贴图的例子
 
 贴图改成横向的话，事情会有点变化。新的水平贴图是 70x48，朝右，而不是像刚才那样朝上：
-![水平方向的弹幕精灵（70x48）](/img/posts/tmodloader-basic-modprojectile/etzbzs0.png)
+![水平方向的弹幕贴图（70x48）](/img/posts/tmodloader-basic-modprojectile/etzbzs0.png)
 
-判定框还是对不齐：
+碰撞箱还是对不齐：
 
 https://github.com/tModLoader/tModLoader/assets/4522492/50312b6e-ecc8-46fe-b356-f50b9164290e
 
-和竖直例子不同，这次直接写 `Projectile.rotation = Projectile.velocity.ToRotation();`，不用再加 90 度。试了几轮之后，判定框落在尖端上的取值是这样：
+和竖直例子不同，这次直接写 `Projectile.rotation = Projectile.velocity.ToRotation();`，不用再加 90 度。试了几轮之后，碰撞箱落在尖端上的取值是这样：
 ```cs
 DrawOffsetX = -62;
 DrawOriginOffsetY = -20; 
@@ -474,7 +474,7 @@ DrawOriginOffsetX = X pixel position of center of hitbox minus Texture Width div
 ### 再修一次贴图上下颠倒的问题
 
 竖直贴图那次，用 `Projectile.spriteDirection` 就能解决，因为它控制的是贴图的水平翻转。但贴图本身就是横向的，一水平翻转，弹幕就变成朝后飞了：
-![水平精灵翻转后变成朝向后方](/img/posts/tmodloader-basic-modprojectile/vfKrRzZ.png)    
+![水平贴图翻转后变成朝向后方](/img/posts/tmodloader-basic-modprojectile/vfKrRzZ.png)    
 要修就得动态地调整偏移量，并且按朝向决定要不要给旋转加上 180 度（也就是 Pi）。代码如下：
 ```cs
 // Set both direction and spriteDirection to 1 or -1 (right and left respectively)
@@ -499,4 +499,4 @@ else
 ```
 ![按朝向动态调整偏移量后的最终效果](/img/posts/tmodloader-basic-modprojectile/FKfhtQ0.png)    
 
-希望这些内容能帮你把弹幕的判定框和绘制问题都解决掉。
+希望这些内容能帮你把弹幕的碰撞箱和绘制问题都解决掉。

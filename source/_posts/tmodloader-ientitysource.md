@@ -16,10 +16,10 @@ categories:
 
 `IEntitySource`（实体来源）和一系列 `OnSpawn` 钩子配合工作，回答同一个问题：这个 `Projectile` / `NPC` / `Item` **究竟为什么会**出现在世界里。它主要管两件事：
 
-- 只在特定情境下生成时，才去改动 `NPC` / `Projectile` 的属性 —— 比如罐子里炸出来的炸弹，或者某个 Boss 的仆从。
+- 只在特定情境下生成时，才去改动 `NPC` / `Projectile` 的属性 —— 比如罐子里炸出来的炸弹，或者某个 Boss 的召唤物。
 - 把属性或增益从来源传递给生成出来的实体（通常是 `Projectile`），例如 NPC 旗帜 id、玩家或武器的暴击率。
 
-Boss 召唤仆从就是个现成的例子：这些仆从带着辅助方法 `NPC.GetSource_FromAI()` 返回的 `IEntitySource` 生成，而该方法返回的实际类型是 `EntitySource_Parent`，其中 `Entity` 字段的类型为 `NPC`。于是，一个想把所有 Boss 仆从血量砍半的模组就能认出它们来。这类附加信息能撑起很多以前用模组根本做不出来的效果。
+Boss 召唤召唤物就是个现成的例子：这些召唤物带着辅助方法 `NPC.GetSource_FromAI()` 返回的 `IEntitySource` 生成，而该方法返回的实际类型是 `EntitySource_Parent`，其中 `Entity` 字段的类型为 `NPC`。于是，一个想把所有 Boss 召唤物血量砍半的模组就能认出它们来。这类附加信息能撑起很多以前用模组根本做不出来的效果。
 
 注意：`OnSpawn` 不能阻止实体生成，想拦下来目前只能用 `On` / `IL` 钩子；不过将来也许会补上这样一个钩子（真加了的话，返回的实体会是数组末尾那个 'dummy' 实体槽位）。
 
@@ -54,18 +54,18 @@ Example Mod 里的 `ExampleSourceDependentProjectileTweaks`、`ExampleSourceDepe
 ### 详细清单
 
 - NPC 发射弹幕：用 `NPC.GetSource_FromAI()`
-- NPC 掉落物品：走掉落池（loot）的用 `NPC.GetSource_Loot()`，其它情况用 `NPC.GetSource_DropAsItem()`。（注意：99.9% 的 NPC 物品掉落都应该改用新的掉落池系统）
-- NPC 生成另一个 NPC，比如 Boss 的仆从：用 `NPC.GetSource_FromAI()`
-- NPC 死亡时生成血雾（gore）：用 `NPC.GetSource_Death()`
+- NPC 掉落物品：走战利品（loot）的用 `NPC.GetSource_Loot()`，其它情况用 `NPC.GetSource_DropAsItem()`。（注意：99.9% 的 NPC 物品掉落都应该改用新的战利品系统）
+- NPC 生成另一个 NPC，比如 Boss 的召唤物：用 `NPC.GetSource_FromAI()`
+- NPC 死亡时生成血污（gore）：用 `NPC.GetSource_Death()`
 - 弹幕生成物品，比如箭矢回收掉落：用 `Projectile.GetSource_DropAsItem()`
-- 弹幕生成别的弹幕，比如分裂弹幕或会射击的仆从：用 `Projectile.GetSource_FromThis()`
+- 弹幕生成别的弹幕，比如分裂弹幕或会射击的召唤物：用 `Projectile.GetSource_FromThis()`
 - 手持的弹幕类武器消耗弹药发射别的弹幕：用 `player.GetSource_ItemUse_WithPotentialAmmo(player.HeldItem, usedAmmoItemId)`
-- 在 `ModBuff.Update` 里生成仆从或宠物：用 `player.GetSource_Buff(buffIndex)`
+- 在 `ModBuff.Update` 里生成召唤物或宠物：用 `player.GetSource_Buff(buffIndex)`
 - 饰品生成弹幕：用 `player.GetSource_Accessory(itemInstance)`，或者 `player.GetSource_Accessory_OnHurt(itemInstance, hurtInfo.DamageSource)`
 - 套装奖励生成弹幕：用 `player.GetSource_FromThis("SetBonus_MySetName")`
 - 在 `ModItem.UseItem` 里生成东西，以及其它没被上面覆盖到的 `ModItem` 场景：用 `player.GetSource_ItemUse(Item)`
 - 玩家在 `ModItem.Shoot` 里生成弹幕：用方法传进来的那个 `source` 参数
-- 方块掉落物品（`ModTile.KillMultiTile` 或 `GlobalTile.Drop`）：用 `WorldGen.GetItemSource_FromTileBreak(i, j)`
+- 物块掉落物品（`ModTile.KillMultiTile` 或 `GlobalTile.Drop`）：用 `WorldGen.GetItemSource_FromTileBreak(i, j)`
 - 玩家因为丢弃物品，或者从 UISlot 里取不回物品（`player.GetItem` 溢出）而生成物品：用 `new EntitySource_OverfullInventory(player)`
 
 # 从 IEntitySource 里取出信息

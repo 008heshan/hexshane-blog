@@ -334,7 +334,7 @@ ExampleMinionBoostAccessory: {
 }
 ```
 
-然后把这个值"绑"上去。假设这件饰品要让最大仆从数 +3，做法是重写 `Tooltip` 属性，对原提示调用 `WithFormatArgs` 方法，占位符就会被传进去的值填上。推荐在类里用 `static readonly int` 字段存这类数值 —— 下面例子里 `MaxMinionIncrease` 在代码和提示中各用了一次，用字段能让行为跟提示同步改动；加上 `readonly` 可以防止运行时误改（那样改对 `WithFormatArgs` 是不生效的），也能避免手滑写错导致提示和实际效果对不上。
+然后把这个值"绑"上去。假设这件饰品要让最大召唤物数 +3，做法是重写 `Tooltip` 属性，对原提示调用 `WithFormatArgs` 方法，占位符就会被传进去的值填上。推荐在类里用 `static readonly int` 字段存这类数值 —— 下面例子里 `MaxMinionIncrease` 在代码和提示中各用了一次，用字段能让行为跟提示同步改动；加上 `readonly` 可以防止运行时误改（那样改对 `WithFormatArgs` 是不生效的），也能避免手滑写错导致提示和实际效果对不上。
 
 ```cs
 public class ExampleMinionBoostAccessory : ModItem
@@ -770,7 +770,7 @@ ClassB: {
 
 ### 另一个例子
 
-[ExampleChest.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Tiles/Furniture/ExampleChest.cs) 演示了怎么用自定义键。默认情况下，tModLoader 会为每个 `ModTile` 注册一个形如 `Mods.{ModName}.Tiles.{ContentName}.MapEntry` 的翻译键，方便给图格加地图条目（地图条目决定了全屏地图上鼠标悬停到该图格时显示的文字）。但 `ExampleChest` 需要两条地图条目，这时用 `GetLocalization` 就能轻松往本地化文件里加新键：
+[ExampleChest.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Tiles/Furniture/ExampleChest.cs) 演示了怎么用自定义键。默认情况下，tModLoader 会为每个 `ModTile` 注册一个形如 `Mods.{ModName}.Tiles.{ContentName}.MapEntry` 的翻译键，方便给物块加地图条目（地图条目决定了全屏地图上鼠标悬停到该物块时显示的文字）。但 `ExampleChest` 需要两条地图条目，这时用 `GetLocalization` 就能轻松往本地化文件里加新键：
 
 ```cs
 AddMapEntry(new Color(200, 200, 200), this.GetLocalization("MapEntry0"), MapChestName);
