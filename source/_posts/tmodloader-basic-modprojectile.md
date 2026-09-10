@@ -1,26 +1,25 @@
 ---
-title: Basic ModProjectile Guide
-date: 2026-09-05 16:30:00
+title: 基础自定义弹幕指南
+date: "2026-09-05 16:30:00"
+categories:
+  - Terraria 模组开发
 tags:
   - tModLoader
   - Terraria
-categories:
-  - Terraria 模组开发
 ---
 
 > 本文内容整理自 tModLoader 官方 Wiki（Terraria 模组开发指南），原文：[Basic ModProjectile Guide](https://github.com/tModLoader/tModLoader/wiki/Basic-Projectile)。
 
 
-Before you start modding a projectile, you should be aware of the difference between items and projectiles. Items are the objects that can be stored in your inventory, whereas projectiles are the objects that are shot from weapons or enemies, for example.
+在你开始自定义弹幕之前，你应该了解物品和弹幕之间的区别。物品是可以存放在你物品栏中的对象，而弹幕则是例如由武器或敌怪发射出来的对象。
 
-# What uses Projectiles?
+# 哪些东西会使用弹幕？
 
-Many items in Terraria are functional due to projectiles, including guns and bows (the bullets and arrows respectively), lasers, bombs and other thrown items, and most magic weapons. Some other items you might not think to be projectiles include; grappling hooks, flails, spears, pets, summons, drills, and yoyos. A lot of enemies spawn projectiles as well.
+泰拉瑞亚中的许多物品之所以能发挥作用，都是因为弹幕，包括枪和弓（分别对应子弹和箭）、激光、炸弹和其他投掷物品，以及大多数魔法武器。其他一些你可能想不到也属于弹幕的物品包括：抓钩、连枷、长矛、宠物、召唤物、钻头和悠悠球。很多敌怪也会生成弹幕。
 
-# Making a Projectile
+# 制作弹幕
 
-To create a projectile in Terraria, you must first create a class that "inherits" from `ModProjectile`. To do so, make a .cs file in your mod's source directory (My Games\Terraria\tModLoader\ModSources\MyModName) and then open that file in your text editor. Paste the following into that file, replacing `NameHere` with the internal name of your item and `ModNamespaceHere` with your mod's foldername
-amespace. (A common mistake is to use apostrophes or spaces in internal names, don't do this, the computer won't understand.)
+要在泰拉瑞亚中创建一个弹幕，你必须先创建一个“继承”自 ModProjectile 的类。为此，在你的模组源代码目录:**（My Games\Terraria\tModLoader\ModSources\MyModName）**中创建一个 .cs 文件，然后在你的文本编辑器中打开该文件。将以下内容粘贴到该文件中，把 NameHere 替换为你物品的内部名称，把 ModNamespaceHere 替换为你模组的文件夹名命名空间。（一个常见错误是在内部名称中使用撇号或空格，不要这样做，电脑无法理解。）
 
 ```cs
 using Terraria;
@@ -43,41 +42,41 @@ namespace ModNamespaceHere
 			AIType = ProjectileID.WoodenArrowFriendly;
 		}
 
-		// Additional hooks/methods here.
+		// 这里写额外的钩子/方法.
 	}
 }
 ```
-Now that you have a .cs file, bring in your texture file (a .png image file that you have made) and put it in the folder with this .cs file. Make sure read [Autoload](https://github.com/tModLoader/tModLoader/wiki/Basic-Autoload) so you know how to satisfy what the computer expects for its filename and folder structure.
+现在你已经有了一个 .cs 文件，接下来把你制作好的纹理文件（一个 .png 图像文件）放到这个 .cs 文件所在的文件夹中。 你必须阅读 [自动加载 (Autoload)](https://github.com/tModLoader/tModLoader/wiki/Basic-Autoload) 这样你就知道如何满足电脑对文件名和文件夹结构的预期要求。
 
-# I can't find my Projectile
-Remember that Items and Projectiles are different. A common mistake is modders will make a projectile and not understand that they need to make something use that projectile. For example, for a throwing knife weapon, you need to make both an Item and a Projectile. Ammo items need a unique projectile associated with it as well. You don't always need both and item and a projectile, such as if the projectile is spawned by an NPC. The easiest way to test a projectile is to make an item and set `Item.shoot` to the projectile. For example, `Item.shoot = ModContent.ProjectileType<MyProjectile>();`. See ExampleMod for many examples of Projectiles spawned by Items, they are in separate folders, but they are easy to find. 
+# 我找不到我的弹幕
+记住，物品和弹幕是不同的。一个常见的错误是，模组制作者制作了一个弹幕，却不明白他们需要让某个东西使用这个弹幕。例如，对于投刀武器，你需要同时制作一个物品和一个弹幕。弹药物品也需要一个与之关联的独特弹幕。你并不总是需要同时拥有物品和弹幕，例如当弹幕是由 NPC 生成的时候。测试弹幕最简单的方法是制作一个物品，并将 Item.shoot 设置为该弹幕。例如，Item.shoot = ModContent.ProjectileType<MyProjectile>();。请参阅 ExampleMod 中许多由物品生成的弹幕示例，它们位于不同的文件夹中，但很容易找到。
 
-# SetDefaults
-The most important part of a Projectile is the `SetDefaults` method. `SetDefaults` is where you set values for the projectile, things like the hitbox width and height, if the projectile is friendly or hostile, and which AI the projectile will use. See [Projectile Class Documentation](https://github.com/tModLoader/tModLoader/wiki/Projectile-Class-Documentation) to see what values commonly set in `SetDefaults` mean. You can also view vanilla projectile values by visiting [Vanilla Projectile Field Values](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Projectile-Field-Values). Many examples of different projectiles can be found in [ExampleMod.Content.Projectiles](https://github.com/tModLoader/tModLoader/tree/stable/ExampleMod/Content/Projectiles)
+# 属性
+弹幕最重要的部分是 SetDefaults 方法。SetDefaults 是你设置弹幕各种属性的地方，比如碰撞箱的宽度和高度、弹幕是友好还是敌对，以及弹幕将使用哪种 AI。请参阅 [弹幕类文档 (Projectile Class Documentation)](https://github.com/tModLoader/tModLoader/wiki/Projectile-Class-Documentation) 了解 SetDefaults 中常见设置的值的含义。你也可以通过访问 [原版弹幕字段值 (Vanilla Projectile Field Values)](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Projectile-Field-Values) 查看原版弹幕的数值。许多不同弹幕的示例可以在 [ExampleMod.Content.Projectiles](https://github.com/tModLoader/tModLoader/tree/stable/ExampleMod/Content/Projectiles) 中找到
 
-## Projectile.damage
-A commons mistake is setting `Projectile.damage` in `SetDefaults`, this does not work, as the damage value a projectile has is always overwritten by the value passed into `Projectile.NewProjectile` when the projectile is spawned. Usually the item or the npc spawning the item will determine the damage.
+## 伤害
+一个常见错误是在 `SetDefaults` 中设置 `Projectile.damage`，这是无效的，因为弹幕生成时，其伤害值总是会被传入 `Projectile.NewProjectile` 的值覆盖。通常是由生成该弹幕的物品或 NPC 来决定伤害。
 
 ## DrawOffsetX, DrawOriginOffsetY, DrawOriginOffsetX
-These are `ModProjectile` fields related to properly centering a hitbox to a sprite. Read [Drawing and Collision](#Drawing-and-Collision) for more info.
+这些是与将碰撞箱正确居中到贴图相关的 ModProjectile 字段。更多请查阅 [绘制与碰撞](#绘制与碰撞)
 
-# Other Hooks/Methods
-The [ModProjectile documentation](https://docs.tmodloader.net/docs/stable/class_mod_projectile.html) lists many other hooks/methods you will want to use to make your projectile unique. For example, if you'd like to apply a debuff when the projectile hits an enemy, you would use `OnHitNPC`. To do something when the projectile hits a tile, use `OnTileCollide`. See the documentation and usages in ExampleMod to see how to properly use them.
+# 其他钩子/方法
+[自定义弹幕文档 (ModProjectile documentation)](https://docs.tmodloader.net/docs/stable/class_mod_projectile.html) 列出了许多其他钩子/方法，你可以用它们来让你的弹幕更具独特性。例如，如果你想在弹幕击中敌人时施加一个减益，你会使用 OnHitNPC。要在弹幕击中物块时做些什么，就使用 OnTileCollide。请参阅文档以及 ExampleMod 中的用法，了解如何正确使用它们。
 
-# What is AI
-The AI of a projectile is the most important aspect of a projectile, it controls how the projectile moves and acts after it is spawned. It is easiest for new modders to first rely on AI code already used in other vanilla projectiles by assigning `Projectile.aiStyle = #;` and `AIType = ProjectileID.NameHere;`. The number you assign to `aiStyle` must be the aiStyle number used by the projectile you are using for `AIType`. This is called mimicking a vanilla projectile. As you desire more advanced movement, you'll realize that mimicking vanilla projectile AI is very limited. We will discuss mimicking and custom AI below.
+# 什么是 AI
+弹幕的 AI 是弹幕最重要的方面，它控制弹幕生成后如何移动等行为。对于新手模组制作者来说，最简单的方法是先通过设置 Projectile.aiStyle = #; 和 AIType = ProjectileID.NameHere; 来依赖其他原版弹幕已经使用的 AI 代码。你赋给 aiStyle 的数字必须与你用于 AIType 的弹幕所使用的 aiStyle 数字一致。这称为模仿原版弹幕。当你想要更高级的移动方式时，你会意识到模仿原版弹幕 AI 非常有限。我们将在下面讨论模仿和自定义 AI。
 
-# Using Vanilla AI
-We can use vanilla AI to prototype our projectiles. Let's make a boomerang. Using the same `aiStyle` as the vanilla projectiles that move like a boomerang, we can make a boomerang. You can look up boomerang projectiles in [Vanilla Projectile Field Values](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Projectile-Field-Values) and you will discover that boomerangs all use `aiStyle` of 3:    
+# 运用原版AI
+你可以在[原版弹幕字段值 (Vanilla Projectile Field Values)](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Projectile-Field-Values)中查找回旋镖弹幕，你会发现所有回旋镖都使用 `aiStyle` 3:
 ![各种回旋镖类弹幕的 aiStyle 取值（均为 3）](/img/posts/tmodloader-basic-modprojectile/RSaxV6T.png)    
 
-We can now use `Projectile.aiStyle = 3;` in our code. (You can change 3 to `ProjAIStyleID.Boomerang` to make the code more readable.) To make this boomerang even easier, we can use `Projectile.CloneDefaults(ProjectileID.EnchantedBoomerang)`, which will copy all the other defaults as well. Doing this, you will get a projectile that almost behaves the same way as the vanilla projectile:    
-![CloneDefaults(EnchantedBoomerang) 之后的回旋镖（没有尘土效果）](/img/posts/tmodloader-basic-modprojectile/CL2MwaF.png)     
+我们现在可以在代码中使用 Projectile.aiStyle = 3;。（你可以把 3 改成 ProjAIStyleID.Boomerang，让代码更具可读性。）为了让这个回旋镖更加简便，我们可以使用 Projectile.CloneDefaults(ProjectileID.EnchantedBoomerang)，这会一并复制所有其他默认值。这样做之后，你将得到一个行为几乎与原版弹幕相同的弹幕:
+![CloneDefaults(EnchantedBoomerang) 之后的回旋镖（没有粒子效果）](/img/posts/tmodloader-basic-modprojectile/CL2MwaF.png)     
 
-You'll notice that the dust aren't being spawned. We can fix this by using `AIType`. `AIType` is used to further narrow down `Projectile.aiStyle`. Each `aiStyle` is shared between many different projectiles. If we want to use a specific behavior of a particular type of projectile, we need to set `AIType`. Here is how our copy of EnchantedBoomerang looks after assigning `AIType` as well:    
-![再补上 AIType 之后的回旋镖（尘土效果恢复）](/img/posts/tmodloader-basic-modprojectile/39KqXhc.png)    
+你会注意到粒子没有生成。我们可以通过使用 AIType 来解决这个问题。AIType 用于进一步细化 Projectile.aiStyle。每个 aiStyle 被许多不同的弹幕共享。如果我们想使用特定类型弹幕的特定行为，我们需要设置 AIType。这是我们的 EnchantedBoomerang 副本在也分配了 AIType 之后的样子：
+![再补上 AIType 之后的回旋镖（粒子效果恢复）](/img/posts/tmodloader-basic-modprojectile/39KqXhc.png)    
 
-Here is the resulting code.
+这是生成的代码。
 ```cs
 public override void SetDefaults()
 {
@@ -86,37 +85,37 @@ public override void SetDefaults()
 	AIType= ProjectileID.EnchantedBoomerang;
 }
 ```
-That dust is cool, but if you want to change the color of that dust or any other small thing, you can't rely on `aiStyle` and `AIType`. To change things, you'll need to consult the [Vanilla Code Adaption](https://github.com/tModLoader/tModLoader/wiki/Advanced-Vanilla-Code-Adaption) guide to tweak existing code or read on to learn how to do AI code from scratch. Remember, using `projectile.aiStyle` and `AIType` is a **prototyping tool**, anything remotely interesting in a mod would likely need to write their own AI code or adapt vanilla code.
+那个粒子很酷，但如果你想改变那个粒子的颜色或任何其他小细节，你就不能依赖 `aiStyle` 和 `AIType`。要做出改变，你需要查阅[原版代码改编 (Vanilla Code Adaption)](https://github.com/tModLoader/tModLoader/wiki/Advanced-Vanilla-Code-Adoption)指南来调整现有代码，或者继续往下读，学习如何从零开始编写 AI 代码。记住，使用 `projectile.aiStyle` 和 `AIType` 是一种**原型制作工具**，模组中任何稍微有点意思的东西，很可能都需要编写自己的 AI 代码或改编原版代码。
 
-# Custom AI
-This section will discuss elements you can incorporate into your AI. Remember to set `Projectile.aiStyle` back to 0 if you are using `Projectile.CloneDefaults` to copy other projectile defaults. All code for custom AI goes into the `ModProjectile.AI` method.
+# 自定义AI
+本节将讨论你可以纳入你的 AI 中的各种要素。记住，如果你使用 `Projectile.CloneDefaults` 来复制其他弹幕的默认值，请将 `Projectile.aiStyle` 重新设置为 0。所有用于自定义 AI 的代码都放入 `ModProjectile.AI` 方法中。
 
-## Timers
-Many projectiles use timers to delay actions. Typically we use `Projectile.ai[0]` or `Projectile.ai[1]` as those values are synced automatically, but we can also use class fields as well. Here we count to 30, or in other words, half a second.
+## 计时器
+许多弹幕使用计时器来延迟行动。通常我们使用 `Projectile.ai[0]` 或 `Projectile.ai[1]`，因为这些值会自动同步，但我们也可以使用类字段。这里我们数到 30，换句话说，也就是半秒。
 
 ```cs
 Projectile.ai[0] += 1f;
 if (Projectile.ai[0] >= 30f)
 {
-	// Half a second has passed. Reset timer, etc.
+	// 半秒已经过去。重置计时器，或者别的什么。
 	Projectile.ai[0] = 0f;
 	Projectile.netUpdate = true;
-	// Do something here, maybe change to a new state.
+	// 在这里做点什么，比如切换到一个新状态。
 }
 ```
 
-## Gravity
-Gravity doesn't actually exist for projectiles, every projectile that moves with gravity actually just has code in their AI. To implement gravity, simply add a small value to `Projectile.velocity.Y`:
+## 重力
+弹幕实际上并不存在重力，每个受重力影响的弹幕实际上只是在其 AI 中写上了相应的代码。要实现重力，只需给 `Projectile.velocity.Y` 加上一个很小的值：
 ```cs
-Projectile.velocity.Y = Projectile.velocity.Y + 0.1f; // 0.1f for arrow gravity, 0.4f for knife gravity
-if (Projectile.velocity.Y > 16f) // This check implements "terminal velocity". We don't want the projectile to keep getting faster and faster. Past 16f this projectile will travel through blocks, so this check is useful.
+Projectile.velocity.Y = Projectile.velocity.Y + 0.1f; // 箭的重力为 0.1f，投刀的重力为 0.4f。
+if (Projectile.velocity.Y > 16f) // 限制 Y 速度最大为 16f，防止速度过快导致碰撞检测失效、弹幕穿模。
 {
 	Projectile.velocity.Y = 16f;
 }
 ```
 
-### Delayed Gravity
-Arrows and Throwing Knife projectiles all wait several frames before being affected by gravity:   
+### 延迟重力影响
+箭和投刀弹幕都会等待若干帧后才受重力影响：
 ```cs
 Projectile.ai[0] += 1f; // Use a timer to wait 15 ticks before applying gravity.
 if (Projectile.ai[0] >= 15f)
@@ -130,37 +129,37 @@ if (Projectile.velocity.Y > 16f)
 }
 ```
 
-## Wind Resistance
-By reducing `Projectile.velocity.X` multiplicity, we can easily implement wind resistance. Combine with a timer to have this effect conditionally.
+## 风阻
+让 Projectile.velocity.X 乘以一个小于 1 的数，就能实现风阻。配合计时器，可控制触发时机。
 ```cs
-Projectile.velocity.X = Projectile.velocity.X * 0.97f; // 0.99f for rolling grenade speed reduction. Try values between 0.90f and 0.99f
+Projectile.velocity.X = Projectile.velocity.X * 0.97f; // 0.99f 用于滚动中的手榴弹减速。可尝试 0.90f 到 0.99f 之间的值。
 ```
 
-## Rotation
-### Constant Rotation
-We can increase `Projectile.rotation` in `AI` to rotate like a boomerang.
+## 旋转
+### 持续旋转
+我们可以在 `AI` 中增大 `Projectile.rotation`，让它像回旋镖一样旋转。
 ```cs
 Projectile.rotation += 0.4f * (float)Projectile.direction;
 ```
 
-### Face Forward
-Rotating in the direction of travel is often used in projectiles like arrows. If your projectile faces right, you don't need to add `MathHelper.PiOver2` (found in Microsoft.Xna.Framework). If your projectile points up, you'll need to.
+### 朝向
+让弹幕沿飞行方向旋转，常用于箭之类的弹幕。如果你的弹幕贴图朝右，就不需要加上 `MathHelper.PiOver2`（位于 Microsoft.Xna.Framework 中）。如果你的弹幕贴图朝上，就需要加上。
 ```cs
-Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2; // projectile sprite faces up
+Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2; // 弹幕贴图面朝上方
 // or
-Projectile.rotation = Projectile.velocity.ToRotation(); // projectile faces sprite right
+Projectile.rotation = Projectile.velocity.ToRotation(); // 弹幕贴图面朝右方
 ```
 
-### spriteDirection
-If your sprite is upside-down when shot to the left, you'll want to set this: `Projectile.spriteDirection = Projectile.direction;` See [Drawing and Collision](#Drawing-and-Collision) for an explanation and example.
+### 贴图方向
+如果你的贴图在向左射击时上下颠倒，就需要设置这个：`Projectile.spriteDirection = Projectile.direction;` 有关解释和示例，请参阅[绘制与碰撞](#绘制与碰撞)。
 
-## Dust
-Spawn dust in AI for a visual effect. Randomizing placement, `DustID`, and frequency is visually pleasing. Here is the Enchanted boomerang dust spawn (aiStyle 3, AIType ProjectileID.EnchantedBoomerang):    
+## 粒子
+在 AI 中生成粒子以获得视觉效果。随机化位置、`DustID` 和生成频率会让视觉效果更美观。以下是附魔回旋镖的尘埃生成（aiStyle 3，AIType ProjectileID.EnchantedBoomerang）:
 ```cs
-if (Main.rand.NextBool(5)) // only spawn 20% of the time
+if (Main.rand.NextBool(5)) // 20% 概率
 {
-	int choice = Main.rand.Next(3); // choose a random number: 0, 1, or 2
-	if (choice == 0) // use that number to select dustID: 15, 57, or 58
+	int choice = Main.rand.Next(3); // 从 0、1、2 中随机选一个数。
+	if (choice == 0) // 使用这个随机数来选择 dustID: 15, 57, or 58
 	{
 		choice = 15;
 	}
@@ -172,22 +171,22 @@ if (Main.rand.NextBool(5)) // only spawn 20% of the time
 	{
 		choice = 58;
 	}
-	// Spawn the dust
+	// 粒子生成
 	Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, choice, Projectile.velocity.X * 0.25f, Projectile.velocity.Y * 0.25f, 150, default(Color), 0.7f);
 }
 ```
-### Dust Trail
-A dust trail can be accomplished by spawning 1 dust every AI update.
+### 粒子拖尾
+每次 AI 更新时生成 1 个粒子，就能做出粒子拖尾效果。
 
-## Lighting
-Modders have many different definitions of lighting. If you want to add particles, see the Dust section. If you want the projectile texture to be un-affected by darkness, see `ModProjectile.GetAlpha`. If you want the projectile to give off white light, you can set `Projectile.light = 1f;` (or any number between 0 and 1) in `SetDefaults`. Finally, if you want to give off color light NOT from spawned dust, light that lights up nearby tiles, use Lighting.AddLight inside your `AI` method:
+## 光照
+模组制作者对光照有许多不同的定义。如果你想添加粒子，请参阅粒子部分。如果你希望弹幕贴图不受黑暗影响，请参阅 `ModProjectile.GetAlpha`。如果你希望弹幕发出白光，可以在 `SetDefaults` 中设置 `Projectile.light = 1f;`（或 0 到 1 之间的任意数值）。最后，如果你想发出彩色光，且这种光不是来自生成的粒子，而是能照亮附近物块的光，可以在你的 `AI` 方法中使用 `Lighting.AddLight`:
 ```cs
-Lighting.AddLight(Projectile.Center, 0.9f, 0.1f, 0.3f); // R G B values from 0 to 1f. This is the red from the Crimson Heart pet
+Lighting.AddLight(Projectile.Center, 0.9f, 0.1f, 0.3f); // R G B 值范围从 0 到 1f；这是猩红之心宠物的红色。
 ```
 
-## Sound
-### Repeating Sound
-The field `soundDelay` will automatically decrease each frame. Checking that it is 0 and then setting it to a value and playing a sound will result in a repeating sound. This example is from the boomerang aiStyle (3).
+## 声音
+### 重复播放声音
+字段 `soundDelay` 每帧会自动递减。检查它是否为 0，然后将其设置为某个值并播放声音，就能实现重复播放声音。这个示例来自回旋镖的 aiStyle（3）。
 ```cs
 if (Projectile.soundDelay == 0) 
 {
@@ -196,27 +195,27 @@ if (Projectile.soundDelay == 0)
 }
 ```
 
-## Splitting/Spawning Projectiles
-The Crystal Bullet and the Scourge of the Corruptor projectile (EatersBite) both spawn new projectiles when they die. We typically see spawning projectiles in `OnKill` or `OnTileCollide`, but we can do it in `AI` as well. When spawning projectiles, we need to be aware of Multiplayer Compatibility and be sure to only spawn projectiles when `Main.myPlayer == Projectile.owner` is true to prevent issues. Scaling down Projectile.damage is typical. See [Projectile.NewProjectile](https://github.com/tModLoader/tModLoader/wiki/Projectile-Class-Documentation#public-static-int-newprojectilefloat-x-float-y-float-speedx-float-speedy-int-type-int-damage-float-knockback-int-owner--255-float-ai0--0f-float-ai1--0f-) to see the parameters and usage with multiplayer in mind.
+## 分裂/生成弹幕
+水晶子弹 - (Crystal Bullet)或腐化者之戟 - (Scourge of the Corruptor)的弹幕(EatersBite)都会在消亡时生成新的弹幕。我们通常在 `OnKill` 或 `OnTileCollide` 中看到生成弹幕，但我们也可以在 `AI` 中这样做。生成弹幕时，我们需要注意多人兼容性，并确保只在 `Main.myPlayer == Projectile.owner` 为 true 时生成弹幕，以避免问题。按比例调低 `伤害 (Projectile.damage)` 是常见做法。请参阅 [Projectile.NewProjectile](https://github.com/tModLoader/tModLoader/wiki/Projectile-Class-Documentation#public-static-int-newprojectilefloat-x-float-y-float-speedx-float-speedy-int-type-int-damage-float-knockback-int-owner--255-float-ai0--0f-float-ai1--0f-) 了解参数以及考虑多人游戏时的用法。
 ```cs
-// This code spawns 3 projectiles in the opposite direction of the projectile, with random variance in velocity.
+// 这段代码会朝与原弹幕相反的方向生成 3 个弹幕，并具有随机速度。
 if (OptionallySomeCondition && Projectile.owner == Main.myPlayer) 
 {
 	for (int i = 0; i < 3; i++)
 	{
-		// Calculate new speeds for other projectiles.
-		// Rebound at 40% to 70% speed, plus a random amount between -8 and 8
+    // 计算其他弹幕的新速度。
+    // 朝反方向飞，速度为原速度的 40% 到 70%，再加 -8 到 8 之间的随机偏移。
 		float speedX = -Projectile.velocity.X * Main.rand.NextFloat(.4f, .7f) + Main.rand.NextFloat(-8f, 8f);
-		float speedY = -Projectile.velocity.Y * Main.rand.Next(40, 70) * 0.01f + Main.rand.Next(-20, 21) * 0.4f; // This is Vanilla code, a little harder to comprehend. This is just here to teach you that you can convert vanilla code to more readable code sometimes.
+		float speedY = -Projectile.velocity.Y * Main.rand.Next(40, 70) * 0.01f + Main.rand.Next(-20, 21) * 0.4f; // 这是原版代码, 写法稍难理解; 放这里是为了告诉你: 有时可以把原版代码改写成更易读的形式。
 					
-		// Spawn the Projectile.
+		// 生成弹幕。
 		Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.position.X + speedX, Projectile.position.Y + speedY, speedX, speedY, ProjectileID.CrystalShard, (int)(Projectile.damage * 0.5), 0f, Projectile.owner, 0f, 0f);
 	}
 }
 ```
 
-## Homing
-Homing projectiles work by finding a target and then adjusting velocity to point towards the target. To find a target, usually `Main.ActiveNPCs` is iterated over to find the closest enemy `NPC`. Once the target is determined, `Projectile.velocity` is adjusted to point towards the `NPC.Center` of the target. This adjustment can be gradual or immediate, depending on the desired projectile flight characteristics. More logic can be added to the homing logic to influence how accurate and abrupt the homing behaves. [ExampleHomingProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleHomingProjectile.cs) showcases a basic homing projectile. 
+## 追踪
+追踪弹幕的工作方式是：先找到一个目标，然后调整速度使其指向目标。要寻找目标，通常会遍历 `Main.ActiveNPCs`，找出距离最近的敌人 `NPC`。确定目标后，调整 `Projectile.velocity`，使其指向目标的 `NPC.Center`。这种调整可以是渐进的，也可以是立即的，具体取决于你想要的弹幕飞行特性。你还可以在追踪逻辑中加入更多判断，以影响追踪的精准度和转向的突然程度。[ExampleHomingProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleHomingProjectile.cs) 展示了一个基础的追踪弹幕。
 
 ## Follow Mouse
 To follow the mouse, we write code in `AI` to check `Main.MouseWorld` and adjust `Projectile.velocity` to move towards the mouse. This code must only run for the owner of the projectile using a check for `if(Main.myPlayer == projectile.owner)`. Failure to do this will lead to desync as the projectile is influenced by each users mouse locally. Other clients do not know the projectile owner's mouse position, so the resulting velocity and position changes are synced using `Projectile.netUpdate`. [MagicMissile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Old/Projectiles/MagicMissile.cs), despite not currently being updated to work on current tModLoader, shows the required code to properly implement a projectile that follows the mouse. 
