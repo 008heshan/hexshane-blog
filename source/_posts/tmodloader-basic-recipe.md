@@ -10,56 +10,65 @@ categories:
 
 > 本文内容整理自 tModLoader 官方 Wiki（Terraria 模组开发指南），原文：[Basic Recipe](https://github.com/tModLoader/tModLoader/wiki/Basic-Recipes)。
 
-Recipes can be added to the game in 3 places. In `ModItem.AddRecipes`, `GlobalItem.AddRecipes`, and `ModSystem.AddRecipes`. Where you add your recipes is up to your organizational preferences, but do note that the `ModItem.CreateRecipe` method cannot be used everywhere as is, use `Recipe.Create` where it is not possible. 
+配方有三个地方可以写：`ModItem.AddRecipes`、`GlobalItem.AddRecipes` 和 `ModSystem.AddRecipes`。放哪儿看你自己的整理习惯，不过 `ModItem.CreateRecipe` 并不是在哪儿都能直接用，用不了的地方就换成 `Recipe.Create`。
 
-Recipes consist of Ingredients (Items consumed to craft the result), Tiles (Tiles you need to stand by), and Results (Item created).
+一个配方由三部分组成：材料（Ingredients，合成时被消耗掉的物品）、合成站（Tiles，你得站在旁边的那些物块）和产物（Results，合成出来的物品）。
 
-The "Material" tooltip is automatically added to every item that is used in at least one recipe as an ingredient, and should not be manually added.
+只要某个物品被至少一个配方当作材料用过，游戏就会自动给它加上“Material”（材料）提示，不用你手动加。
 
-# Basic Recipe Structure
-## Required Using Statements
-First, make sure that you have the following using statements in the .cs file. These using statements will let us access recipe related functions:    
+# 配方的基本结构
+
+## 需要引用的命名空间
+
+先确认 `.cs` 文件顶部有这几个 using，配方相关的函数都在里面：
+
 ```cs
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 ```
-## Create Recipe and Assign Recipe Result
-To start a recipe we create an instance of the `Recipe` class. We do this through the `Recipe.Create` method or the `ModItem.CreateRecipe` method. When creating a recipe, we need to assign the recipe result type and result stack. The `ModItem.CreateRecipe` method assumes that the recipe results in the current `ModItem`, so only the stack size is needed. The stack size is optional and defaults to 1:
 
-In `GlobalItem` class, we type "Recipe.Create" to use the `Recipe.Create` method. Here are various examples, showing vanilla and modded ingredients as well as default stack sizes and custom stack sizes:
+## 创建配方并指定产物
+
+配方的第一步，是拿到一个 `Recipe` 类的实例，途径有两条：`Recipe.Create` 方法，或者 `ModItem.CreateRecipe` 方法。创建的时候要指定产物的类型和数量。`ModItem.CreateRecipe` 默认产物就是当前这个 `ModItem`，所以只需要给数量。数量可以不写，默认为 1：
+
+在 `GlobalItem` 类里，得用 `Recipe.Create` 方法。下面几个例子分别用了原版物品和模组物品，也演示了默认数量和自定义数量：
+
 ```cs
 Recipe recipe = Recipe.Create(ItemID.AlphabetStatueZ); 
 Recipe recipe = Recipe.Create(ItemID.AlphabetStatueZ, 5); 
 Recipe recipe = Recipe.Create(ModContent.ItemType<Content.Items.ExampleItem>());
 Recipe recipe = Recipe.Create(ModContent.ItemType<Content.Items.ExampleItem>(), 10);
 ```
-In `ModSystem` class, we also use `Recipe.Create`:
+在 `ModSystem` 类里也是用 `Recipe.Create`：
+
 ```cs
 Recipe recipe = Recipe.Create(ItemID.AlphabetStatueZ); 
 ```
-In `ModItem` class, we can use `Recipe.Create` to create a recipe that doesn't have this `ModItem` as a result:
+在 `ModItem` 类里，如果产物不是这个 `ModItem` 本身，就用 `Recipe.Create`：
+
 ```cs
 Recipe recipe = Recipe.Create(ItemID.AlphabetStatueZ); 
 // ... And we can use "CreateRecipe" directly to create a recipe that results in this ModItem. We can optionally provide a stack size:
 Recipe recipe = CreateRecipe(); 
 Recipe recipe = CreateRecipe(10); 
 ```
-## Add Recipe Ingredients
-Now, we add the ingredients. These are the items we want the recipe to be consumed when the recipe is crafted:
+## 添加材料
+
+接下来往配方里加材料 —— 也就是合成时会被消耗掉的物品：
 
 ```cs
 recipe.AddIngredient(ItemID.DirtBlock);
 recipe.AddIngredient(ItemID.Ruby);
 ```
-AddIngredient also takes an optional argument for specifying a stack size:
+`AddIngredient` 还有一个可选参数用来指定数量：
 
 ```cs
 recipe.AddIngredient(ItemID.Chain, 10);
 ```
-The previous examples added vanilla items to the recipe by referencing the ItemID class. With a capable IDE such as Visual Studio, you will find autocomplete and intellisense very useful, but you can also [look up ItemID names or values here](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Content-IDs#item-ids). 
+上面的例子都是通过 `ItemID` 类来引用原版物品的。用 Visual Studio 这类趁手的 IDE 时，自动补全和智能提示会非常省事；当然你也可以[在这里查 ItemID 的名字或数值](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Content-IDs#item-ids)。
 
-We can also add modded items added by this mod. There are several ways we can do this. Go for whatever approach you like. The 1st approach is the cleanest. All of these methods can add the stack parameter. These examples all point to the `ExampleItem` class in the `ExampleMod.Content.Items` namespace:
+要加自己模组的物品也有好几种写法，挑顺手的用就行，第一种最干净。这些写法都能再带上数量参数。下面的例子指向的都是 `ExampleMod.Content.Items` 命名空间里的 `ExampleItem` 类：
 
 ```cs
 recipe.AddIngredient<Content.Items.ExampleItem>();
@@ -69,15 +78,17 @@ recipe.AddIngredient(ModContent.GetInstance<Content.Items.ExampleItem>());
 recipe.AddIngredient(Mod, "ExampleItem");
 ```
 
-If you are in a `ModItem` class, you can also use that ModItem directly in a recipe:
+如果代码就写在 `ModItem` 类里，也可以直接把这个 ModItem 当材料用：
+
 ```cs
 recipe.AddIngredient(this, 5);
 ```
 
-## Add Crafting Stations
-Next, we can specify the crafting stations. This follows the same patterns as items. You can [look up TileIDs here](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Tile-IDs).
+## 指定合成站
 
-If you want the item to be crafted by hand, you should skip this step.
+接着指定合成站，写法跟加物品一样。[TileID 在这里查](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Tile-IDs)。
+
+想让它徒手就能合成的话，这一步直接跳过。
 
 ```cs
 recipe.AddTile(TileID.WorkBenches);
@@ -87,14 +98,17 @@ recipe.AddTile(ModContent.TileType<Content.Tiles.Furniture.ExampleWorkbench>());
 recipe.AddTile(ModContent.GetInstance<Content.Tiles.Furniture.ExampleWorkbench>());
 recipe.AddTile(Mod, "ExampleWorkbench");
 ```
-## Register Recipe
-Finally, we need to tell tModLoader that our Recipe is complete and add it to the game:
+## 注册配方
+
+最后告诉 tModLoader 这个配方已经写完了，把它加进游戏：
+
 ```cs
 recipe.Register();
 ```
 
-## Using Vanilla vs Modded Ingredients and Tiles
-As a recap, vanilla items and tiles use the `TileID` and `ItemID` classes, while modded items and items use the `ModContent.TileType` and `ModContent.ItemType` methods:
+## 原版与模组材料、合成站的写法区别
+
+小结一下：原版物品和物块用 `TileID`、`ItemID` 类，模组内容用 `ModContent.TileType`、`ModContent.ItemType` 方法：
 
 ```cs
 recipe.AddTile(TileID.WorkBenches); // Vanilla Tile
@@ -103,8 +117,9 @@ recipe.AddIngredient(ItemID.Meowmere); // Vanilla Item
 recipe.AddIngredient(ModContent.ItemType<Content.Items.ExampleItem>()); // Modded Item
 ```
 
-## Full Basic Recipe Example
-Here are a few full basic recipe example. This first example resides in a ModSystem class. The recipe takes 1 Chain and 10 Stone Blocks, it is crafted at a workbench and anvil, and the resulting item is 1 AlphabetStatueA.
+## 完整的配方示例
+
+先看两个简单的完整例子。第一个写在 `ModSystem` 类里：消耗 1 个锁链和 10 个石块，需要在工作台和铁砧旁边合成，产出 1 个 AlphabetStatueA。
 
 ```cs
 Recipe recipe = Recipe.Create(ItemID.AlphabetStatueA);
@@ -115,7 +130,7 @@ recipe.AddTile(TileID.Anvils);
 recipe.Register();
 ```
 
-This example is in a `ModItem` class. This recipe crafts 3 of the ModItem from 5 `ExampleItem`s:
+第二个写在 `ModItem` 类里：用 5 个 `ExampleItem` 合成 3 个该 ModItem。
 
 ```cs
 Recipe recipe = CreateRecipe(3);
@@ -124,7 +139,9 @@ recipe.Register();
 ```
 
 # Chain Syntax
-The code in this guide is quite wordy. Using the chaining syntax, we can reduce the verbosity of our code. This approach may be more pleasing to the modder. Only the final line has a semi-colon.
+
+前面那些代码啰嗦得很，用链式语法可以把它们串起来，看起来清爽不少，改起来也舒服。注意只有最后一行带分号。
+
 ```cs
 Recipe.Create(ItemID.AlphabetStatueA)
 	.AddIngredient(ItemID.StoneBlock, 10)
@@ -135,14 +152,17 @@ Recipe.Create(ItemID.AlphabetStatueA)
 ```
 
 
-# Recipe Groups
-Recipe Groups allow a single ingredient to be satisfied from a selection of similar items. The most common example of this is using Iron Bar or Lead Bar to craft a recipe. Recipe Groups are discussed in [Intermediate Recipes](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#recipegroups)
+# 配方组
 
-# Conditions
-In addition to ingredients and crafting stations, recipes can also have conditions. Each condition must be satisfied for the recipe to be able to be crafted.
+配方组（Recipe Group）允许一个材料位置由一组同类物品里的任意一个来满足，最常见的例子就是用铁锭或铅锭都能合成同一个配方。这部分内容在[中级配方篇](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#recipegroups)里讲。
 
-## Water, Honey, Lava, Shimmer
-Water, Honey, Lava, and Shimmer are not technically Tiles, so to make a recipe require standing next to those, use one of the following:
+# 条件
+
+除了材料和合成站，配方还能带条件。每一个条件都满足，配方才做得出来。
+
+## 水、蜂蜜、岩浆、微光
+
+水、蜂蜜、岩浆和微光严格来说不算物块，所以想让配方要求站在这些东西旁边，得用下面这几个：
 
 ```cs
 recipe.AddCondition(Condition.NearWater);
@@ -150,16 +170,19 @@ recipe.AddCondition(Condition.NearLava);
 recipe.AddCondition(Condition.NearHoney);
 recipe.AddCondition(Condition.NearShimmer);
 ```
-Note that `NearWater` is also satisfied by Sinks, so don't add the Sink tile separately.
+注意 `NearWater` 对水槽（Sink）同样成立，所以别再单独把水槽这个物块加进去。
 
-## Other Vanilla Conditions
-The [Conditions.cs](https://github.com/tModLoader/tModLoader/blob/stable/patches/tModLoader/Terraria/Condition.cs) page lists all other vanilla conditions. Use them in a similar manner.
+## 其他原版条件
 
-## Custom Condition
-Mods can also use custom conditions, those are discussed in the [Custom Conditions section of the Intermediate Recipes guide](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#custom-conditions).
+其余原版条件都列在 [Condition.cs](https://github.com/tModLoader/tModLoader/blob/stable/patches/tModLoader/Terraria/Condition.cs) 里，用法跟上面一样。
 
-# Multiple Recipes
-With multiple Recipes in the same AddRecipes, make sure not to re-declare your variable name. The following will cause errors: 
+## 自定义条件
+
+模组也可以定义自己的条件，见[中级配方篇的自定义条件一节](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#custom-conditions)。
+
+# 一个地方写多个配方
+
+在同一个 AddRecipes 里写多个配方时，注意别把变量名重复声明了。下面这样会报错：
 
 ```cs
 Recipe recipe = Recipe.Create(ItemID.AlphabetStatueA); 
@@ -167,7 +190,7 @@ Recipe recipe = Recipe.Create(ItemID.AlphabetStatueA);
 Recipe recipe = Recipe.Create(ItemID.AlphabetStatueB);
 // other code
 ```
-You can name your variables recipe1, recipe2, and so on, but a cleaner approach would be to just reuse the same variable:
+你可以把变量名起成 recipe1、recipe2 这样，但更干净的做法是干脆复用同一个变量：
 
 ```cs
 Recipe recipe = Recipe.Create(ItemID.AlphabetStatueA); 
@@ -176,18 +199,22 @@ recipe = Recipe.Create(ItemID.AlphabetStatueB);
 // other code
 ```
 
-If you are using the [Chain Syntax](#Chain-Syntax), then simply do the same approach for each recipe on subsequent lines.
+如果你用的是[链式写法](#Chain-Syntax)，那就每个配方各起一行、照同样的方式往下写即可。
 
-# Making an "upgraded" vanilla tile
-As an aside, you may want your ModTile to count as, say, a workbench or anvil. To do this, add the following to your `ModTile.SetStaticDefaults`:
+# 让原版物块“升级”
+
+顺带提一个需求：你可能希望自己的 `ModTile` 也能被当成工作台、铁砧之类的合成站。做法是在 `ModTile.SetStaticDefaults` 里加上这一行：
 
 ```cs
 AdjTiles = [TileID.WorkBenches];
 ```
 
-# Complete Examples
-Here are 2 complete examples, one showing recipes added in a `ModItem` class more suitable for recipes involving that `ModItem`, and the other showing adding recipes in a `Mod` class more suitable for recipes involving vanilla items. Technically the recipes can go in either location, but for organization purposes it is sometimes nice to have recipes in ModItem classes.
-## ModItem Example
+# 完整示例
+
+下面给两个完整例子：一个把配方写在 `ModItem` 类里，适合跟这个 `ModItem` 相关的配方；另一个写在 `ModSystem` 类里，适合围绕原版物品的配方。严格来说放哪儿都能跑，只是为了条理清楚，把配方放在 `ModItem` 类里有时更顺手。
+
+## ModItem 示例
+
 ```cs
 using Terraria;
 using Terraria.ID;
@@ -212,8 +239,10 @@ namespace ExampleMod.Content.Items.Accessories
 }
 ```
 
-## ModSystem Example
-Remember that in `ModSystem`, we must pass in the recipe result item type.
+## ModSystem 示例
+
+记住在 `ModSystem` 里必须把配方的产物物品类型传进去。
+
 ```cs
 using Terraria;
 using Terraria.ID;
@@ -242,36 +271,50 @@ namespace ExampleMod.Content
 }
 ```
 
-# Common Errors
+# 常见错误
+
 ### Error CS0117 'ItemID' (or TileID) does not contain a definition for 'MyModItem'
-You tried to use the vanilla item syntax for adding a ModItem, read this tutorial again.
+
+你用了原版物品的写法去加模组物品，回头再读一遍前面的内容。
+
 ### Error CS0103 The name 'recipe' does not exist in the current context
-You forgot to declare your first recipe as `Recipe`. Make sure the first recipe in your code starts with `Recipe recipe = ...`
+
+第一个配方忘了声明成 `Recipe`。代码里第一个配方得写成 `Recipe recipe = ...`。
+
 ### Error CS0128 A local variable named 'recipe' is already defined in this scope
-Read `Multiple Recipes` above.
-### My recipes aren't in game
-Check that your AddRecipes method has override not virtual.
+
+看上面的「一个地方写多个配方」那节。
+
+### 游戏里找不到我写的配方
+
+检查一下 `AddRecipes` 方法是不是写成了 `override` 而不是 `virtual`。
+
 ### No suitable method to override
-Make sure you are only overriding AddRecipes in Mod, ModSystem, or ModItem.
-### The crafting station or ingredient shown in game doesn't match my recipe code
-This is most likely because you mistakenly passed in an `ItemID` into `AddTile` or a `TileID` into `AddIngredient`. By using the wrong ID class, you have accidentally referred to the wrong ID.
 
-# Relevant References
-* [Vanilla ItemIDs](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Content-IDs#item-ids)
-* [Vanilla TileIDs](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Content-IDs#tile-ids)
-* [Recipe Documentation](https://docs.tmodloader.net/docs/stable/class_recipe.html)
-* [ModSystem Documentation](http://docs.tmodloader.net/docs/stable/class_mod_system.html)
-* [ModItem Documentation](http://docs.tmodloader.net/docs/stable/class_mod_item.html)
-* [GlobalItem Documentation](http://docs.tmodloader.net/docs/stable/class_global_item.html)
+`AddRecipes` 只能在 `Mod`、`ModSystem` 或 `ModItem` 里重写，别的类不行。
 
-# Not covered in Basic level
-There are other aspects of Recipes that will be covered in more advanced guides:
-* [Recipe Groups](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#recipe-groups) -- Intermediate -- Allows a single ingredient to be 1 of a large group, like how most recipes involving wood can take Boreal Wood or Pearl Wood. ("any wood")
-* [Editing Recipes](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#editing-recipes) -- Intermediate -- Edit existing recipes or disable existing recipes
-* [Ordering Recipes](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#ordering-recipes) -- Intermediate -- Customize where in the crafting list a recipe will appear.
-* [Shimmer Decrafting](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#shimmer-decrafting) -- Intermediate -- Customize which recipe is used for decrafting via the shimmer liquid.
-* [Custom Conditions](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#custom-conditions) -- Intermediate -- Allows recipes to require custom conditions met in order to be crafted.
-* [Custom Item Consumption](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#custom-item-consumption) -- Intermediate -- Allows a recipe to conditionally consume less ingredients than usual, such as what Alchemy Table does.
-* [Custom Recipe Craft Behavior](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#custom-recipe-craft-behavior) -- Intermediate -- Allows running code after a recipe is crafted.
-* [Cross-Mod Content](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#cross-mod-recipes) -- Intermediate -- Use Items or Tiles from other mods in your Recipe.
+### 游戏里显示的合成站或材料和我的配方代码对不上
 
+多半是把 `ItemID` 传进了 `AddTile`，或者把 `TileID` 传进了 `AddIngredient`。用错了 ID 类，等于引用到了另一个 ID。
+
+# 相关参考
+
+* [原版 ItemID 列表](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Content-IDs#item-ids)
+* [原版 TileID 列表](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Content-IDs#tile-ids)
+* [Recipe 文档](https://docs.tmodloader.net/docs/stable/class_recipe.html)
+* [ModSystem 文档](http://docs.tmodloader.net/docs/stable/class_mod_system.html)
+* [ModItem 文档](http://docs.tmodloader.net/docs/stable/class_mod_item.html)
+* [GlobalItem 文档](http://docs.tmodloader.net/docs/stable/class_global_item.html)
+
+# 基础篇不涉及的内容
+
+配方还有几块内容留给更进阶的指南：
+
+* [配方组 Recipe Groups](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#recipe-groups) —— 中级 —— 让一个材料位置可以由一大类物品里的任意一种满足，就像大多数用木头的配方，能收北地木也能收珍珠木（也就是“任意木材”）。
+* [编辑配方 Editing Recipes](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#editing-recipes) —— 中级 —— 修改已有配方，或者禁用已有配方。
+* [配方排序 Ordering Recipes](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#ordering-recipes) —— 中级 —— 自定义配方出现在合成列表里的位置。
+* [微光拆解 Shimmer Decrafting](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#shimmer-decrafting) —— 中级 —— 自定义微光液体拆解时使用哪一个配方。
+* [自定义条件 Custom Conditions](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#custom-conditions) —— 中级 —— 让配方必须满足自定义条件才能合成。
+* [自定义材料消耗 Custom Item Consumption](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#custom-item-consumption) —— 中级 —— 让配方有条件地少消耗一些材料，比如炼药桌的效果。
+* [自定义合成行为 Custom Recipe Craft Behavior](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#custom-recipe-craft-behavior) —— 中级 —— 在配方被合成之后执行代码。
+* [跨模组内容 Cross-Mod Content](https://github.com/tModLoader/tModLoader/wiki/Intermediate-Recipes#cross-mod-recipes) —— 中级 —— 在你的配方里使用其他模组的物品或物块。

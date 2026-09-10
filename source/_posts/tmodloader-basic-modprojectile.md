@@ -1,25 +1,24 @@
 ---
-title: 基础自定义弹幕指南
-date: "2026-09-05 16:30:00"
-categories:
-  - Terraria 模组开发
+title: Basic ModProjectile Guide
+date: 2026-09-05 16:30:00
 tags:
   - tModLoader
   - Terraria
+categories:
+  - Terraria 模组开发
 ---
 
 > 本文内容整理自 tModLoader 官方 Wiki（Terraria 模组开发指南），原文：[Basic ModProjectile Guide](https://github.com/tModLoader/tModLoader/wiki/Basic-Projectile)。
 
+动手写弹幕之前，先分清楚物品和弹幕不是一回事：物品是能放进背包里的东西，而弹幕是被武器或敌怪"打出去"的东西。
 
-在你开始自定义弹幕之前，你应该了解物品和弹幕之间的区别。物品是可以存放在你物品栏中的对象，而弹幕则是例如由武器或敌怪发射出来的对象。
+# 哪些东西用到了弹幕
 
-# 哪些东西会使用弹幕？
+Terraria 里很多东西能起作用都是靠弹幕：枪和弓打出的子弹、箭，激光，炸弹和其它投掷物，还有大多数魔法武器。另外一些你未必会往弹幕上想的：钩爪、连枷、长矛、宠物、召唤物、钻头、悠悠球。很多敌怪也会发射弹幕。
 
-泰拉瑞亚中的许多物品之所以能发挥作用，都是因为弹幕，包括枪和弓（分别对应子弹和箭）、激光、炸弹和其他投掷物品，以及大多数魔法武器。其他一些你可能想不到也属于弹幕的物品包括：抓钩、连枷、长矛、宠物、召唤物、钻头和悠悠球。很多敌怪也会生成弹幕。
+# 制作一个弹幕
 
-# 制作弹幕
-
-要在泰拉瑞亚中创建一个弹幕，你必须先创建一个“继承”自 ModProjectile 的类。为此，在你的模组源代码目录:**（My Games\Terraria\tModLoader\ModSources\MyModName）**中创建一个 .cs 文件，然后在你的文本编辑器中打开该文件。将以下内容粘贴到该文件中，把 NameHere 替换为你物品的内部名称，把 ModNamespaceHere 替换为你模组的文件夹名命名空间。（一个常见错误是在内部名称中使用撇号或空格，不要这样做，电脑无法理解。）
+要在 Terraria 里做一个弹幕，先得写一个继承自 `ModProjectile` 的类（`ModProjectile` 就是弹幕的基类，你自己的弹幕类都要继承它）。在模组的源码目录（`My Games\Terraria\tModLoader\ModSources\MyModName`）里新建一个 `.cs` 文件，用文本编辑器打开，把下面这段粘进去，其中 `NameHere` 换成你的内部名，`ModNamespaceHere` 换成模组的文件夹名/命名空间。顺带说一句常见的坑：内部名里不要出现撇号或空格，机器认不出来。
 
 ```cs
 using Terraria;
@@ -42,41 +41,49 @@ namespace ModNamespaceHere
 			AIType = ProjectileID.WoodenArrowFriendly;
 		}
 
-		// 这里写额外的钩子/方法.
+		// Additional hooks/methods here.
 	}
 }
 ```
-现在你已经有了一个 .cs 文件，接下来把你制作好的纹理文件（一个 .png 图像文件）放到这个 .cs 文件所在的文件夹中。 你必须阅读 [自动加载 (Autoload)](https://github.com/tModLoader/tModLoader/wiki/Basic-Autoload) 这样你就知道如何满足电脑对文件名和文件夹结构的预期要求。
+`.cs` 文件有了，接着把你画好的贴图（一张 `.png`）放进同一个文件夹。文件名和目录结构有什么讲究，看 [Autoload](https://github.com/tModLoader/tModLoader/wiki/Basic-Autoload)。
 
-# 我找不到我的弹幕
-记住，物品和弹幕是不同的。一个常见的错误是，模组制作者制作了一个弹幕，却不明白他们需要让某个东西使用这个弹幕。例如，对于投刀武器，你需要同时制作一个物品和一个弹幕。弹药物品也需要一个与之关联的独特弹幕。你并不总是需要同时拥有物品和弹幕，例如当弹幕是由 NPC 生成的时候。测试弹幕最简单的方法是制作一个物品，并将 Item.shoot 设置为该弹幕。例如，Item.shoot = ModContent.ProjectileType<MyProjectile>();。请参阅 ExampleMod 中许多由物品生成的弹幕示例，它们位于不同的文件夹中，但很容易找到。
+# 找不到我做的弹幕
 
-# 属性
-弹幕最重要的部分是 SetDefaults 方法。SetDefaults 是你设置弹幕各种属性的地方，比如碰撞箱的宽度和高度、弹幕是友好还是敌对，以及弹幕将使用哪种 AI。请参阅 [弹幕类文档 (Projectile Class Documentation)](https://github.com/tModLoader/tModLoader/wiki/Projectile-Class-Documentation) 了解 SetDefaults 中常见设置的值的含义。你也可以通过访问 [原版弹幕字段值 (Vanilla Projectile Field Values)](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Projectile-Field-Values) 查看原版弹幕的数值。许多不同弹幕的示例可以在 [ExampleMod.Content.Projectiles](https://github.com/tModLoader/tModLoader/tree/stable/ExampleMod/Content/Projectiles) 中找到
+物品和弹幕是两码事，这是新手最容易卡住的地方：弹幕做出来了，却没意识到还得有东西去发射它。比如一把投掷飞刀武器，物品和弹幕你都得写；弹药类物品也一样，得给它配一个专属弹幕。反过来并不总是需要两个 —— 弹幕由敌怪生成时就没有物品什么事。测弹幕最快的方式是随手写个物品，把 `Item.shoot` 指向它，例如 `Item.shoot = ModContent.ProjectileType<MyProjectile>();`。ExampleMod 里物品发射弹幕的例子很多，物品和弹幕虽然在各自的文件夹里，找起来并不难。
 
-## 伤害
-一个常见错误是在 `SetDefaults` 中设置 `Projectile.damage`，这是无效的，因为弹幕生成时，其伤害值总是会被传入 `Projectile.NewProjectile` 的值覆盖。通常是由生成该弹幕的物品或 NPC 来决定伤害。
+# SetDefaults
+
+`SetDefaults` 是弹幕最重要的方法，弹幕的各项数值都在这里定下来：判定框的宽高、是友方还是敌方、用哪套 AI，等等。`SetDefaults` 里常设的这些值分别是什么意思，见 [Projectile Class Documentation](https://github.com/tModLoader/tModLoader/wiki/Projectile-Class-Documentation)；原版弹幕实际填了什么值，查 [Vanilla Projectile Field Values](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Projectile-Field-Values)。[ExampleMod.Content.Projectiles](https://github.com/tModLoader/tModLoader/tree/stable/ExampleMod/Content/Projectiles) 里有大量现成例子。
+
+## Projectile.damage
+
+在 `SetDefaults` 里设 `Projectile.damage` 是白费力气 —— 弹幕生成时，这个值总会被 `Projectile.NewProjectile` 传进来的伤害覆盖掉。伤害通常由发射它的物品或 NPC 决定。
 
 ## DrawOffsetX, DrawOriginOffsetY, DrawOriginOffsetX
-这些是与将碰撞箱正确居中到贴图相关的 ModProjectile 字段。更多请查阅 [绘制与碰撞](#绘制与碰撞)
 
-# 其他钩子/方法
-[自定义弹幕文档 (ModProjectile documentation)](https://docs.tmodloader.net/docs/stable/class_mod_projectile.html) 列出了许多其他钩子/方法，你可以用它们来让你的弹幕更具独特性。例如，如果你想在弹幕击中敌人时施加一个减益，你会使用 OnHitNPC。要在弹幕击中物块时做些什么，就使用 OnTileCollide。请参阅文档以及 ExampleMod 中的用法，了解如何正确使用它们。
+这三个是 `ModProjectile` 的字段，用来把判定框和贴图对齐。细节见 [Drawing and Collision](#Drawing-and-Collision)。
 
-# 什么是 AI
-弹幕的 AI 是弹幕最重要的方面，它控制弹幕生成后如何移动等行为。对于新手模组制作者来说，最简单的方法是先通过设置 Projectile.aiStyle = #; 和 AIType = ProjectileID.NameHere; 来依赖其他原版弹幕已经使用的 AI 代码。你赋给 aiStyle 的数字必须与你用于 AIType 的弹幕所使用的 aiStyle 数字一致。这称为模仿原版弹幕。当你想要更高级的移动方式时，你会意识到模仿原版弹幕 AI 非常有限。我们将在下面讨论模仿和自定义 AI。
+# 其他 Hooks/Methods
 
-# 运用原版AI
-你可以在[原版弹幕字段值 (Vanilla Projectile Field Values)](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Projectile-Field-Values)中查找回旋镖弹幕，你会发现所有回旋镖都使用 `aiStyle` 3:
+[ModProjectile 文档](https://docs.tmodloader.net/docs/stable/class_mod_projectile.html)里还列了一大堆钩子，用它们才能把弹幕做出自己的味道。比如想让弹幕打中敌人时挂个 debuff，用 `OnHitNPC`；想在弹幕撞到方块时做点什么，用 `OnTileCollide`。具体怎么用，翻文档和 ExampleMod 里的实际用例。
+
+# AI 是什么
+
+AI 决定弹幕生成之后怎么动、怎么表现，可以说是一个弹幕最核心的部分。新手最省事的做法是先蹭原版：设置 `Projectile.aiStyle = #;` 和 `AIType = ProjectileID.NameHere;`，直接借用别的原版弹幕写好的 AI 代码。这里有个前提，你填给 `aiStyle` 的数字，必须是 `AIType` 那个弹幕自己在用的 `aiStyle` 编号。这就是所谓的"模仿原版弹幕"。等你想要更复杂的运动，就会发现模仿这条路很快就到头了。下面把模仿和自定义 AI 都讲一遍。
+
+# 用原版 AI
+
+拿原版 AI 快速验证想法是很好用的。做一个回旋镖试试：只要跟会飞回来的原版弹幕用同一个 `aiStyle`，回旋镖就出来了。到 [Vanilla Projectile Field Values](https://github.com/tModLoader/tModLoader/wiki/Vanilla-Projectile-Field-Values) 里查回旋镖类弹幕，会发现它们的 `aiStyle` 都是 3：
 ![各种回旋镖类弹幕的 aiStyle 取值（均为 3）](/img/posts/tmodloader-basic-modprojectile/RSaxV6T.png)    
 
-我们现在可以在代码中使用 Projectile.aiStyle = 3;。（你可以把 3 改成 ProjAIStyleID.Boomerang，让代码更具可读性。）为了让这个回旋镖更加简便，我们可以使用 Projectile.CloneDefaults(ProjectileID.EnchantedBoomerang)，这会一并复制所有其他默认值。这样做之后，你将得到一个行为几乎与原版弹幕相同的弹幕:
-![CloneDefaults(EnchantedBoomerang) 之后的回旋镖（没有粒子效果）](/img/posts/tmodloader-basic-modprojectile/CL2MwaF.png)     
+于是代码里写 `Projectile.aiStyle = 3;` 就行（把 3 换成 `ProjAIStyleID.Boomerang` 可读性更好）。想再省点事，可以直接 `Projectile.CloneDefaults(ProjectileID.EnchantedBoomerang)`，一行把其余默认值也拷过来，得到的弹幕表现几乎和原版一样：
+![CloneDefaults(EnchantedBoomerang) 之后的回旋镖（没有尘土效果）](/img/posts/tmodloader-basic-modprojectile/CL2MwaF.png)     
 
-你会注意到粒子没有生成。我们可以通过使用 AIType 来解决这个问题。AIType 用于进一步细化 Projectile.aiStyle。每个 aiStyle 被许多不同的弹幕共享。如果我们想使用特定类型弹幕的特定行为，我们需要设置 AIType。这是我们的 EnchantedBoomerang 副本在也分配了 AIType 之后的样子：
-![再补上 AIType 之后的回旋镖（粒子效果恢复）](/img/posts/tmodloader-basic-modprojectile/39KqXhc.png)    
+但你会发现尘土没出来。补上 `AIType` 就能修好。`AIType` 的作用是在 `aiStyle` 的基础上再细化一层：同一个 `aiStyle` 被很多弹幕共用，想用其中某一种弹幕的具体行为，就得靠 `AIType` 指定。把 `AIType` 也补上之后，我们的附魔回旋镖副本长这样：
+![再补上 AIType 之后的回旋镖（尘土效果恢复）](/img/posts/tmodloader-basic-modprojectile/39KqXhc.png)    
 
-这是生成的代码。
+最终的代码：
+
 ```cs
 public override void SetDefaults()
 {
@@ -85,37 +92,41 @@ public override void SetDefaults()
 	AIType= ProjectileID.EnchantedBoomerang;
 }
 ```
-那个粒子很酷，但如果你想改变那个粒子的颜色或任何其他小细节，你就不能依赖 `aiStyle` 和 `AIType`。要做出改变，你需要查阅[原版代码改编 (Vanilla Code Adaption)](https://github.com/tModLoader/tModLoader/wiki/Advanced-Vanilla-Code-Adoption)指南来调整现有代码，或者继续往下读，学习如何从零开始编写 AI 代码。记住，使用 `projectile.aiStyle` 和 `AIType` 是一种**原型制作工具**，模组中任何稍微有点意思的东西，很可能都需要编写自己的 AI 代码或改编原版代码。
+尘土是好看了，可只要你想改尘土颜色，或者动任何一点细节，`aiStyle` 加 `AIType` 就不够用了。这种时候得去翻 [Vanilla Code Adaption](https://github.com/tModLoader/tModLoader/wiki/Advanced-Vanilla-Code-Adaption) 指南改原版代码，或者接着往下看，自己从零写 AI。记住，`projectile.aiStyle` 配 `AIType` 只是**做原型用的工具**，模组里稍微有点意思的弹幕，基本都得自己写 AI 或者改原版代码。
 
-# 自定义AI
-本节将讨论你可以纳入你的 AI 中的各种要素。记住，如果你使用 `Projectile.CloneDefaults` 来复制其他弹幕的默认值，请将 `Projectile.aiStyle` 重新设置为 0。所有用于自定义 AI 的代码都放入 `ModProjectile.AI` 方法中。
+# 自定义 AI
+
+下面这些是可以塞进你自己 AI 里的东西。如果用 `Projectile.CloneDefaults` 拷过别的弹幕的默认值，记得把 `Projectile.aiStyle` 改回 0。自定义 AI 的代码全写在 `ModProjectile.AI` 方法里。
 
 ## 计时器
-许多弹幕使用计时器来延迟行动。通常我们使用 `Projectile.ai[0]` 或 `Projectile.ai[1]`，因为这些值会自动同步，但我们也可以使用类字段。这里我们数到 30，换句话说，也就是半秒。
+
+很多弹幕靠计时器来延迟动作。一般用 `Projectile.ai[0]` 或 `Projectile.ai[1]`，因为这两个值会自动同步；用类里的字段也可以。下面这段数到 30，也就是半秒：
 
 ```cs
 Projectile.ai[0] += 1f;
 if (Projectile.ai[0] >= 30f)
 {
-	// 半秒已经过去。重置计时器，或者别的什么。
+	// Half a second has passed. Reset timer, etc.
 	Projectile.ai[0] = 0f;
 	Projectile.netUpdate = true;
-	// 在这里做点什么，比如切换到一个新状态。
+	// Do something here, maybe change to a new state.
 }
 ```
 
 ## 重力
-弹幕实际上并不存在重力，每个受重力影响的弹幕实际上只是在其 AI 中写上了相应的代码。要实现重力，只需给 `Projectile.velocity.Y` 加上一个很小的值：
+
+弹幕身上其实没有"重力"这回事，所有会往下掉的弹幕都是在 AI 里自己写的代码。做法就是每帧给 `Projectile.velocity.Y` 加一个小值：
 ```cs
-Projectile.velocity.Y = Projectile.velocity.Y + 0.1f; // 箭的重力为 0.1f，投刀的重力为 0.4f。
-if (Projectile.velocity.Y > 16f) // 限制 Y 速度最大为 16f，防止速度过快导致碰撞检测失效、弹幕穿模。
+Projectile.velocity.Y = Projectile.velocity.Y + 0.1f; // 0.1f for arrow gravity, 0.4f for knife gravity
+if (Projectile.velocity.Y > 16f) // This check implements "terminal velocity". We don't want the projectile to keep getting faster and faster. Past 16f this projectile will travel through blocks, so this check is useful.
 {
 	Projectile.velocity.Y = 16f;
 }
 ```
 
-### 延迟重力影响
-箭和投刀弹幕都会等待若干帧后才受重力影响：
+### 延迟下落
+
+箭和投掷小刀这类弹幕都会先飞几帧，之后才开始受重力影响：
 ```cs
 Projectile.ai[0] += 1f; // Use a timer to wait 15 ticks before applying gravity.
 if (Projectile.ai[0] >= 15f)
@@ -129,37 +140,39 @@ if (Projectile.velocity.Y > 16f)
 }
 ```
 
-## 风阻
-让 Projectile.velocity.X 乘以一个小于 1 的数，就能实现风阻。配合计时器，可控制触发时机。
+## 空气阻力
+
+把 `Projectile.velocity.X` 每帧乘一个小数，空气阻力就有了。配上计时器还能让它只在特定条件下生效。
 ```cs
-Projectile.velocity.X = Projectile.velocity.X * 0.97f; // 0.99f 用于滚动中的手榴弹减速。可尝试 0.90f 到 0.99f 之间的值。
+Projectile.velocity.X = Projectile.velocity.X * 0.97f; // 0.99f for rolling grenade speed reduction. Try values between 0.90f and 0.99f
 ```
 
 ## 旋转
 ### 持续旋转
-我们可以在 `AI` 中增大 `Projectile.rotation`，让它像回旋镖一样旋转。
+在 `AI` 里不断累加 `Projectile.rotation`，弹幕就能像回旋镖那样转起来。
 ```cs
 Projectile.rotation += 0.4f * (float)Projectile.direction;
 ```
 
-### 朝向
-让弹幕沿飞行方向旋转，常用于箭之类的弹幕。如果你的弹幕贴图朝右，就不需要加上 `MathHelper.PiOver2`（位于 Microsoft.Xna.Framework 中）。如果你的弹幕贴图朝上，就需要加上。
+### 朝向飞行方向
+让贴图始终对着飞行方向，箭这类弹幕很常用。贴图本身朝右的话，不用加 `MathHelper.PiOver2`（这个常量在 `Microsoft.Xna.Framework` 里）；贴图朝上就必须加。
 ```cs
-Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2; // 弹幕贴图面朝上方
+Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2; // projectile sprite faces up
 // or
-Projectile.rotation = Projectile.velocity.ToRotation(); // 弹幕贴图面朝右方
+Projectile.rotation = Projectile.velocity.ToRotation(); // projectile faces sprite right
 ```
 
-### 贴图方向
-如果你的贴图在向左射击时上下颠倒，就需要设置这个：`Projectile.spriteDirection = Projectile.direction;` 有关解释和示例，请参阅[绘制与碰撞](#绘制与碰撞)。
+### spriteDirection
+向左发射时贴图上下颠倒？加这一行：`Projectile.spriteDirection = Projectile.direction;`。原理和示例见 [Drawing and Collision](#Drawing-and-Collision)。
 
-## 粒子
-在 AI 中生成粒子以获得视觉效果。随机化位置、`DustID` 和生成频率会让视觉效果更美观。以下是附魔回旋镖的尘埃生成（aiStyle 3，AIType ProjectileID.EnchantedBoomerang）:
+## 尘土
+
+想要视觉效果就往 AI 里撒 Dust。位置、`DustID`、生成频率都随机化一下，看起来会舒服很多。下面是附魔回旋镖的尘土代码（aiStyle 3，AIType 为 ProjectileID.EnchantedBoomerang）：
 ```cs
-if (Main.rand.NextBool(5)) // 20% 概率
+if (Main.rand.NextBool(5)) // only spawn 20% of the time
 {
-	int choice = Main.rand.Next(3); // 从 0、1、2 中随机选一个数。
-	if (choice == 0) // 使用这个随机数来选择 dustID: 15, 57, or 58
+	int choice = Main.rand.Next(3); // choose a random number: 0, 1, or 2
+	if (choice == 0) // use that number to select dustID: 15, 57, or 58
 	{
 		choice = 15;
 	}
@@ -171,22 +184,23 @@ if (Main.rand.NextBool(5)) // 20% 概率
 	{
 		choice = 58;
 	}
-	// 粒子生成
+	// Spawn the dust
 	Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, choice, Projectile.velocity.X * 0.25f, Projectile.velocity.Y * 0.25f, 150, default(Color), 0.7f);
 }
 ```
-### 粒子拖尾
-每次 AI 更新时生成 1 个粒子，就能做出粒子拖尾效果。
+### 尘土拖尾
+每次 AI 更新生成一颗尘土，就是一条拖尾。
 
 ## 光照
-模组制作者对光照有许多不同的定义。如果你想添加粒子，请参阅粒子部分。如果你希望弹幕贴图不受黑暗影响，请参阅 `ModProjectile.GetAlpha`。如果你希望弹幕发出白光，可以在 `SetDefaults` 中设置 `Projectile.light = 1f;`（或 0 到 1 之间的任意数值）。最后，如果你想发出彩色光，且这种光不是来自生成的粒子，而是能照亮附近物块的光，可以在你的 `AI` 方法中使用 `Lighting.AddLight`:
+
+"光照"这个词各人理解不一样，分几种情况：想加粒子就看上面尘土那一节；想让贴图不受黑暗影响，用 `ModProjectile.GetAlpha`；想让弹幕本身发白光，在 `SetDefaults` 里设 `Projectile.light = 1f;`（0 到 1 之间的任意值都行）；最后，如果你要的是带颜色的光、而且能照亮周围方块的那种（不是靠撒尘土），就在 `AI` 方法里用 `Lighting.AddLight`：
 ```cs
-Lighting.AddLight(Projectile.Center, 0.9f, 0.1f, 0.3f); // R G B 值范围从 0 到 1f；这是猩红之心宠物的红色。
+Lighting.AddLight(Projectile.Center, 0.9f, 0.1f, 0.3f); // R G B values from 0 to 1f. This is the red from the Crimson Heart pet
 ```
 
-## 声音
-### 重复播放声音
-字段 `soundDelay` 每帧会自动递减。检查它是否为 0，然后将其设置为某个值并播放声音，就能实现重复播放声音。这个示例来自回旋镖的 aiStyle（3）。
+## 音效
+### 循环音效
+`Projectile.soundDelay` 这个字段每帧自动递减，所以只要在它归零时重新赋个值、放一次音效，循环音效就成了。下面这段来自回旋镖的 aiStyle (3)。
 ```cs
 if (Projectile.soundDelay == 0) 
 {
@@ -195,54 +209,61 @@ if (Projectile.soundDelay == 0)
 }
 ```
 
-## 分裂/生成弹幕
-水晶子弹 - (Crystal Bullet)或腐化者之戟 - (Scourge of the Corruptor)的弹幕(EatersBite)都会在消亡时生成新的弹幕。我们通常在 `OnKill` 或 `OnTileCollide` 中看到生成弹幕，但我们也可以在 `AI` 中这样做。生成弹幕时，我们需要注意多人兼容性，并确保只在 `Main.myPlayer == Projectile.owner` 为 true 时生成弹幕，以避免问题。按比例调低 `伤害 (Projectile.damage)` 是常见做法。请参阅 [Projectile.NewProjectile](https://github.com/tModLoader/tModLoader/wiki/Projectile-Class-Documentation#public-static-int-newprojectilefloat-x-float-y-float-speedx-float-speedy-int-type-int-damage-float-knockback-int-owner--255-float-ai0--0f-float-ai1--0f-) 了解参数以及考虑多人游戏时的用法。
+## 分裂 / 生成新弹幕
+
+水晶弹和腐化者之戟的弹幕（EatersBite）都是在消亡的那一刻生成新弹幕。这种代码通常写在 `OnKill` 或 `OnTileCollide` 里，写进 `AI` 也完全可以。生成弹幕时要考虑联机兼容：务必确认 `Main.myPlayer == Projectile.owner` 成立再生成，否则容易出问题。新弹幕的伤害一般要按比例调低。[Projectile.NewProjectile](https://github.com/tModLoader/tModLoader/wiki/Projectile-Class-Documentation#public-static-int-newprojectilefloat-x-float-y-float-speedx-float-speedy-int-type-int-damage-float-knockback-int-owner--255-float-ai0--0f-float-ai1--0f-) 的参数含义和联机注意事项看文档。
 ```cs
-// 这段代码会朝与原弹幕相反的方向生成 3 个弹幕，并具有随机速度。
+// This code spawns 3 projectiles in the opposite direction of the projectile, with random variance in velocity.
 if (OptionallySomeCondition && Projectile.owner == Main.myPlayer) 
 {
 	for (int i = 0; i < 3; i++)
 	{
-    // 计算其他弹幕的新速度。
-    // 朝反方向飞，速度为原速度的 40% 到 70%，再加 -8 到 8 之间的随机偏移。
+		// Calculate new speeds for other projectiles.
+		// Rebound at 40% to 70% speed, plus a random amount between -8 and 8
 		float speedX = -Projectile.velocity.X * Main.rand.NextFloat(.4f, .7f) + Main.rand.NextFloat(-8f, 8f);
-		float speedY = -Projectile.velocity.Y * Main.rand.Next(40, 70) * 0.01f + Main.rand.Next(-20, 21) * 0.4f; // 这是原版代码, 写法稍难理解; 放这里是为了告诉你: 有时可以把原版代码改写成更易读的形式。
+		float speedY = -Projectile.velocity.Y * Main.rand.Next(40, 70) * 0.01f + Main.rand.Next(-20, 21) * 0.4f; // This is Vanilla code, a little harder to comprehend. This is just here to teach you that you can convert vanilla code to more readable code sometimes.
 					
-		// 生成弹幕。
+		// Spawn the Projectile.
 		Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.position.X + speedX, Projectile.position.Y + speedY, speedX, speedY, ProjectileID.CrystalShard, (int)(Projectile.damage * 0.5), 0f, Projectile.owner, 0f, 0f);
 	}
 }
 ```
 
 ## 追踪
-追踪弹幕的工作方式是：先找到一个目标，然后调整速度使其指向目标。要寻找目标，通常会遍历 `Main.ActiveNPCs`，找出距离最近的敌人 `NPC`。确定目标后，调整 `Projectile.velocity`，使其指向目标的 `NPC.Center`。这种调整可以是渐进的，也可以是立即的，具体取决于你想要的弹幕飞行特性。你还可以在追踪逻辑中加入更多判断，以影响追踪的精准度和转向的突然程度。[ExampleHomingProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleHomingProjectile.cs) 展示了一个基础的追踪弹幕。
 
-## Follow Mouse
-To follow the mouse, we write code in `AI` to check `Main.MouseWorld` and adjust `Projectile.velocity` to move towards the mouse. This code must only run for the owner of the projectile using a check for `if(Main.myPlayer == projectile.owner)`. Failure to do this will lead to desync as the projectile is influenced by each users mouse locally. Other clients do not know the projectile owner's mouse position, so the resulting velocity and position changes are synced using `Projectile.netUpdate`. [MagicMissile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Old/Projectiles/MagicMissile.cs), despite not currently being updated to work on current tModLoader, shows the required code to properly implement a projectile that follows the mouse. 
+追踪弹幕的思路是：先找到目标，再把速度掰向目标。找目标一般是遍历 `Main.ActiveNPCs`，挑出最近的那只敌对 `NPC`；定下目标之后，把 `Projectile.velocity` 调向该目标的 `NPC.Center`。这个调整可以是一帧到位，也可以是慢慢转过去，取决于你想要的飞行手感。追踪的精度和转向的柔和程度，都能靠额外的逻辑继续调。[ExampleHomingProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleHomingProjectile.cs) 是一个基础的追踪弹幕示例。
 
-## Held Projectile
-Held projectiles are projectiles that appear to be held in the players hand similar to how a weapon item is held. As a projectile, it is easier to customize the behavior that it is if it were an item. The most prevalent example of held projectiles are drills, but many other weapons such as spears, shortswords, whips, and flails are commonly implemented as held projectiles. 
+## 跟随鼠标
 
-To implement a held projectile, you'll need an item that "shoots" the projectile. That item needs to set `Item.channel = true;`. In the projectile, code will check `player.channel` to see if the item is still being used. If it is, the projectile will be set to match the players position and item rotation. [ExampleDrillProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleDrillProjectile.cs) serves as an example of a held projectile and shows all the required code to implement a held projectile.
+跟随鼠标的做法是在 `AI` 里读 `Main.MouseWorld`，再把 `Projectile.velocity` 调整到朝鼠标的方向。这段代码只能对弹幕的拥有者执行，也就是外面套一层 `if(Main.myPlayer == projectile.owner)`。不做这个判断就会失步——每个客户端都拿自己本地的鼠标去影响这颗弹幕。别的客户端根本不知道弹幕拥有者的鼠标在哪，所以速度的变化和位置的改变都得靠 `Projectile.netUpdate` 同步过去。[MagicMissile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Old/Projectiles/MagicMissile.cs) 目前还没适配新版 tModLoader，但它展示了跟随鼠标弹幕需要写哪些代码。
+
+## 持握弹幕
+
+持握弹幕看起来就像被玩家握在手里，类似物品武器的拿法。做成弹幕之后，行为比做成物品好定制得多。最典型的例子是钻头，长矛、短剑、鞭子、连枷这类武器也常用持握弹幕实现。
+
+要实现持握弹幕，你得有一个"发射"它的物品。物品里要设 `Item.channel = true;`。弹幕这边则是读 `player.channel`，判断物品是否还在使用中；只要还在用，就每帧把弹幕的位置和旋转对齐到玩家的位置和物品的旋转上。[ExampleDrillProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleDrillProjectile.cs) 是持握弹幕的范例，实现所需的代码都在里面。
 
 ## Player Owner
-If a projectile was spawned by a player, we can use `Player player = Main.player[Projectile.owner];` to retrieve that `Player`. Once we do that we are free to access any player data needed. Not every projectile will be spawned by a player, make sure to only access the player if the projectile is only spawned by a player. Incorrect usage of `Projectile.owner` will cause issues especially in multiplayer.
 
-## Fade In/Out
-Many bullets fade in so that when they spawn they don't overlap the gun muzzle they appear from. You can set the projectile to spawn transparent with `Projectile.alpha = 255;` in `SetDefaults`. Then, in `AI`, you can decrease that transparency each update.
+弹幕是玩家发射的话，可以用 `Player player = Main.player[Projectile.owner];` 拿到对应的 `Player`，之后想读什么玩家数据都行。但不是每颗弹幕都出自玩家之手，所以只在"确实由玩家发射"的弹幕里去访问玩家对象。`Projectile.owner` 用错，尤其在联机下，是会出问题的。
+
+## 淡入 / 淡出
+
+很多子弹生成时会淡入，免得一出来就盖在枪口上。在 `SetDefaults` 里用 `Projectile.alpha = 255;` 让弹幕生成时全透明，再到 `AI` 里每帧把透明度降下来：
 ```cs
 if (Projectile.alpha > 0)
 {
 	Projectile.alpha -= 15; // Decrease alpha, increasing visibility.
 }
 ```
-[`ExampleAdvancedAnimatedProjectile`](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleAdvancedAnimatedProjectile.cs) shows using both fading in when spawning and fading out when despawning.
+[`ExampleAdvancedAnimatedProjectile`](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleAdvancedAnimatedProjectile.cs) 里既有生成时的淡入，也有消失时的淡出。
 
-## Animation/Multiple Frames
-Projectile animation, switching which frame of the sprite to draw, happens in `AI`. Make sure to set `Main.projFrames[Projectile.type] = #;` in `SetStaticDefaults` first. You can set `Projectile.frame` to whatever frame you want to be drawn. Do not attempt to use a .gif file for the texture, that will not work and it is not how animation is done.
+## 动画 / 多帧
 
-### Looping/Cycling
-You can use `Projectile.frameCounter` and `Main.projFrames[Projectile.type]` to implement a looping animation. Example: [`ExampleAdvancedAnimatedProjectile`](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleAdvancedAnimatedProjectile.cs)
+弹幕动画说白了就是换一张贴图里的哪一帧来画，逻辑写在 `AI` 里。动手前先在 `SetStaticDefaults` 里设好 `Main.projFrames[Projectile.type] = #;`，也就是总帧数，然后用 `Projectile.frame` 指定当前画第几帧。不要想着拿 `.gif` 当贴图，游戏不认，动画也不是这么做的。
+
+### 循环播放
+循环动画用 `Projectile.frameCounter` 加 `Main.projFrames[Projectile.type]` 就能写。例子见 [`ExampleAdvancedAnimatedProjectile`](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleAdvancedAnimatedProjectile.cs)
 ```cs
 // Loop through the 4 animation frames, spending 5 ticks on each.
 if (++Projectile.frameCounter >= 5)
@@ -261,9 +282,9 @@ if (++Projectile.frameCounter >= 5)
 }
 ```
 
-## Examples
+## 示例
 ### AiStyle 1
-Projectile AiStyle 1, also known as `ProjAIStyleID.Arrow`, used for many simple projectiles in the game, is over 3000 lines long. If you have tried to adapt this AI using the [Advanced Vanilla Code Adaption](https://github.com/tModLoader/tModLoader/wiki/Advanced-Vanilla-Code-Adaption) guide, you might have been frustrated. Here is brief outline of that AiStyle without all the ProjectileID-specific code:
+弹幕的 AiStyle 1，也就是 `ProjAIStyleID.Arrow`，游戏里一大堆简单弹幕都用它，原版代码超过 3000 行。如果你照着 [Advanced Vanilla Code Adaption](https://github.com/tModLoader/tModLoader/wiki/Advanced-Vanilla-Code-Adaption) 指南去改过它，大概率改得有点崩溃。把那些针对具体 `ProjectileID` 的代码全剥掉之后，这套 AiStyle 的骨架其实就这么点：
 ```cs
 // Optional: if the projectile should fade in, fade it in:
 if (Projectile.alpha > 0)
@@ -279,36 +300,40 @@ Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
 if (Projectile.velocity.Y > 16f)
 	Projectile.velocity.Y = 16f;
 ```
-As you can see, the Projectile AiStyle of 1 without all the ProjectileID specific code is only a few lines of code, and matches up with the fade-in and rotation examples above.
+看，剥掉那些弹幕专属代码之后，AiStyle 1 只剩下几行，而且正好和前面淡入、旋转的例子对得上。
 
-# Limited Projectile Count
-Most boomerang weapons have a limit to the number of active projectiles they can have "out" at one time (usually only 1). This isn't part of the projectile code, but rather a behavior of the item spawning the projectiles. The item usually checks how many projectiles owned by the player are in the game world and prevents the item from being used if it is greater than the desired limit. The following code is an example of this typical effect in a `ModItem` spawning a specific `ModProjectile`:
+# 限制弹幕数量
+
+大多数回旋镖武器都限制同时"在场"的弹幕数量（一般只允许 1 颗）。这个限制不属于弹幕的代码，而是发射它的物品干的事：物品在被使用前会数一下玩家当前拥有几颗该弹幕，超过上限就不让用。下面这段就是 `ModItem` 发射某个 `ModProjectile` 时实现该效果的典型写法：
 ```cs
 public override bool CanUseItem(Player player) {
 	return player.ownedProjectileCounts[Item.shoot] < 1;
 }
 ```
 
-# Bounce and OnTileCollide
-Many projectiles bounce when colliding with a solid tile. This behavior is technically not part of the `AI` as it happens in a method called `OnTileCollide`. By default, when a projectile collides with a tile, the velocity is quickly reduced so that the projectile will come to a stop and the projectile will be killed. By overriding `ModProjectile.OnTileCollide` and returning `false`, we can avoid that logic and implement our own logic. If we return `true`, we can add additional logic while keeping the vanilla logic. The most common use of this is to allow your projectile to bounce. Some projectiles bounce realistically by losing some velocity, while others bounce unrealistically and maintain their original speed in a new direction. Some projectiles have limited bounces, which is usually done by taking advantage of `Projectile.penetrate` to count down bounces. When overriding `ModProjectile.OnTileCollide`, killing the projectile, spawning tile collision dust, and playing collision sounds are all things that might need to be implemented. 
+# 反弹与 OnTileCollide
 
-## OnTileCollide Examples
+很多弹幕撞到实心方块会弹开。严格说这件事不算 `AI` 的一部分，它发生在 `OnTileCollide` 这个方法里。默认行为是：弹幕撞上方块后速度被迅速削掉，最终停下并被销毁。只要重写 `ModProjectile.OnTileCollide` 并返回 `false`，就能跳过这套逻辑、换成自己的；返回 `true` 则是在保留原版逻辑的前提下再补点东西。最常见的目标就是让弹幕反弹：有的弹幕会损失一部分速度，弹得比较真实；有的完全不掉速，换个方向继续原速飞。还有的只允许弹有限的次数，这通常是借用 `Projectile.penetrate` 来倒数。另外，重写 `ModProjectile.OnTileCollide` 之后，销毁弹幕、生成碰撞处的尘土、播放碰撞音效，这些都可能得你自己补上。
 
-[ExampleBullet.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleBullet.cs#L37) shows off limited bounces, tile collision dust, tile collision sounds, and bouncing while preserving the velocity completely.
+## OnTileCollide 示例
 
-[ExampleCloneProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleCloneProjectile.cs#L51) shows off multiple random collision sounds and returning true to keep the original collision logic. `OnKill` shows off spawning a small eruption of secondary projectiles.
+[ExampleBullet.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleBullet.cs#L37) 演示了有限次数反弹、碰撞尘土、碰撞音效，以及完全保留速度的反弹。
 
-[SparklingBall.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/SparklingBall.cs#L28) is similar to ExampleBullet.cs except the velocity is scaled by `0.75f`, thereby slowing the projectile down on every bounce.
+[ExampleCloneProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleCloneProjectile.cs#L51) 演示了随机播放多个碰撞音效，以及返回 `true` 保留原版碰撞逻辑；里面的 `OnKill` 还演示了爆出一小片次级弹幕。
 
-[ExampleAdvancedFlailProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleAdvancedFlailProjectile.cs#L315) shows off more dynamic examples of dust and bounce behaviors derived from the flail state and velocity. It also shows off an additional behavior of spawning a sparks visual effect. This dynamic behavior provides the signature feel of Flail weapons.
+[SparklingBall.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/SparklingBall.cs#L28) 和 ExampleBullet.cs 差不多，区别是速度每帧乘 `0.75f`，所以每弹一次都会更慢。
 
-With the above examples, you can craft the tile collision behavior you want. If you are attempting to clone a vanilla projectile behavior, search `Projectile.HandleMovement` for the `ProjectileID` number or the projectile `aiStyle` number to find the relevant code. The [Shadowbeam Staff Clone](https://github.com/tModLoader/tModLoader/wiki/Advanced-Vanilla-Code-Adaption#example-item-and-projectile-shadowbeam-staff-clone) example in the adaption guide shows this and other thought processes required to find vanilla code fragments not covered by the `AI` code.
+[ExampleAdvancedFlailProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleAdvancedFlailProjectile.cs#L315) 根据连枷的状态和速度，给出了更动态的尘土与反弹写法，还额外做了火花特效。连枷类武器的手感就来自这种动态表现。
 
-# Custom Drawing
-Sometimes the default drawing behavior is not what we want. We can override `PreDraw` or `PostDraw` to manually draw a projectile to customize it further.
+有了这些例子，你想要什么碰撞行为都能拼出来。如果是要克隆某个原版弹幕的行为，就去 `Projectile.HandleMovement` 里搜对应的 `ProjectileID` 编号或该弹幕的 `aiStyle` 编号，相关代码就在那儿。改编指南里的 [Shadowbeam Staff Clone](https://github.com/tModLoader/tModLoader/wiki/Advanced-Vanilla-Code-Adaption#example-item-and-projectile-shadowbeam-staff-clone) 例子演示了这个过程，也演示了如何找到那些没被 `AI` 代码覆盖到的原版代码片段。
 
-## Afterimage Trail
-An "afterimage trail" is when a projectile draws a faded copy of itself trailing behind it. (See also the [Dust Trail section](#Dust-Trail).) We can implement an afterimage trail by telling the game to remember previous projectile positions and then manually drawing the projectile at those positions. The following code is relevant code from [ExampleBullet.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleBullet.cs):
+# 自定义绘制
+
+有时候默认的绘制效果不是我们要的。重写 `PreDraw` 或 `PostDraw` 自己画，就能接着往细里调。
+
+## 残影拖尾
+
+"残影拖尾"就是弹幕一路飞出淡去的复制品（也可以看看上面的 [尘土拖尾](#尘土拖尾)）。实现思路是让游戏记住弹幕之前的位置，再手动把这些位置的弹幕画出来。下面是 [ExampleBullet.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleBullet.cs) 里的相关代码：
 
 ```cs
 public override void SetStaticDefaults() {
@@ -328,17 +353,17 @@ public override bool PreDraw(ref Color lightColor) {
 	return true;
 }
 ```
-In this code, first we make sure `ProjectileID.Sets.TrailCacheLength` and `ProjectileID.Sets.TrailingMode` have appropriate values, see their documentation for more information. Next, in `PreDraw` we iterate over the `Projectile.oldPos` entries in reverse and draw the projectile sprite with color values faded depending on their "age". The for loop makes sure not to draw entry 0, since that corresponds to the current position and will automatically be drawn since we are returning `true` from this method. Iterating in reverse, from oldest to newest, is important. It makes the overlapping draws look correct:
+这段代码里，先确认 `ProjectileID.Sets.TrailCacheLength` 和 `ProjectileID.Sets.TrailingMode` 取值合适（具体含义看它们的文档）。然后在 `PreDraw` 里倒着遍历 `Projectile.oldPos`，按"年龄"把颜色一点点调淡，逐个位置把弹幕贴图画出来。循环有意避开了第 0 项，它对应当前位置，反正方法返回 `true`，原版绘制会自己画。倒序（从最旧到最新）是必须的，这样重叠的部分才叠得对：
 
 ![image](https://github.com/user-attachments/assets/1eabb7d5-2a87-472f-9cc8-6a19d97bb2a4)    
 
-Modders can experiment with changing the draw scale as well.
+绘制的缩放值也可以拿来做点实验。
 
-### Afterimage Trail with `spriteDirection` and `rotation`
-`Projectile.oldSpriteDirection` and `Projectile.oldRot` can be used to facilitate a afterimage trail that needs `rotation` and `spriteDirection` information.
+### 带 `spriteDirection` 和 `rotation` 的残影拖尾
+残影如果也需要 `rotation` 和 `spriteDirection` 的信息，用 `Projectile.oldSpriteDirection` 和 `Projectile.oldRot`。
 
-### Afterimage Trail with `frame`
-There is no `Projectile.oldFrame` to remember previous values of `Projectile.frame`, but with some math a previous animation frame for a cycling animation can be calculated as follows:
+### 带 `frame` 的残影拖尾
+没有 `Projectile.oldFrame` 这种字段帮你记住 `Projectile.frame` 的历史值，不过循环动画的上一帧可以算出来：
 
 ```cs
 for (int k = Projectile.oldPos.Length - 1; k > 0; k--) {
@@ -359,28 +384,32 @@ for (int k = Projectile.oldPos.Length - 1; k > 0; k--) {
 https://github.com/user-attachments/assets/2307462e-b0f1-4195-a14c-b52268bd8dfc
 
 ## Glowmask
-A file named `[TextureName]_Glow.png` will automatically be used as a glowmask texture for this projectile, meaning it will draw at full brightness over the normal texture.
 
-## PreDraw/PostDraw Examples
-Here are some examples of custom drawing to learn from:
+只要放一个名为 `[TextureName]_Glow.png` 的文件，它就会被自动当成这颗弹幕的 Glowmask（发光遮罩）：以全亮度叠在正常贴图之上。
 
-[ExampleBullet.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleBullet.cs#L62) uses `PreDraw` to draw an afterimage trail.
+## PreDraw/PostDraw 示例
 
-[MinionBossPetProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Pets/MinionBossPet/MinionBossPetProjectile.cs#L67) shows off using `PostDraw` to draw additional details over the existing sprite.
+几个可以拿来学的自定义绘制例子：
 
-[ExampleWhipProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleWhipProjectile.cs#L88) uses `PreDraw` to draw a line and individual whip segments.
+[ExampleBullet.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleBullet.cs#L62) 用 `PreDraw` 画残影拖尾。
 
-[ExampleAdvancedAnimatedProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleAdvancedAnimatedProjectile.cs#L102) uses `PreDraw` to draw the projectile texture manually to avoid fighting against vanilla projectile drawing oddities.
+[MinionBossPetProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Pets/MinionBossPet/MinionBossPetProjectile.cs#L67) 用 `PostDraw` 在原有贴图上叠加额外细节。
 
-[ExampleSwingingEnergySwordProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleSwingingEnergySwordProjectile.cs#L190) uses `PreDraw` to draw an "energy sword" effect similar to the 1.4.4 changes made to Night's Edge, Excalibur, and others.
+[ExampleWhipProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleWhipProjectile.cs#L88) 用 `PreDraw` 画鞭子的连线，以及一节一节的鞭身。
+
+[ExampleAdvancedAnimatedProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleAdvancedAnimatedProjectile.cs#L102) 用 `PreDraw` 手动绘制弹幕贴图，绕开原版绘制里那些别扭的地方。
+
+[ExampleSwingingEnergySwordProjectile.cs](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleSwingingEnergySwordProjectile.cs#L190) 用 `PreDraw` 画出"能量剑"效果，类似 1.4.4 给永夜刃、断钢剑等武器加的那种。
 
 # Drawing and Collision
-You may find yourself noticing that your projectile is hitting walls when it shouldn't or otherwise having a weird hitbox. First off, it is worth reiterating that `Projectile.width` and `Projectile.height` correspond to the hitbox of the projectile, NOT the sprite used. You almost never want `width` or `height` to be different, it should be square. You also never want to use `Projectile.scale` since the vanilla drawing code doesn't really take it into account correctly. The drawing of the sprite attempts to overlay the hitbox with the sprite, the drawing of this sprite is influenced by various bits of math done in the `Main.DrawProj_DrawNormalProjs` method.
 
-## Vertical Sprite Example
-Lets work through this example as we explore collision and drawing issues and work to solve them. Here is the sprite, it is 48x70 pixels:    
+你可能已经发现弹幕会在不该撞墙的时候撞墙，或者判定框莫名其妙。先把话说清楚：`Projectile.width` 和 `Projectile.height` 对应的是弹幕的判定框，不是贴图。这两个值几乎永远不应该不相等，判定框应该是正方形。另外，`Projectile.scale` 也不要用，原版绘制代码并没有正确处理它。绘制贴图时会尽量把贴图叠到判定框上，具体怎么叠，受 `Main.DrawProj_DrawNormalProjs` 方法里一堆数学计算影响。
+
+## 竖直方向贴图的例子
+
+跟着下面这个例子走一遍，碰撞和绘制的问题以及解决思路就清楚了。贴图是这样的，48x70 像素：
 ![竖直方向的弹幕精灵（48x70）](/img/posts/tmodloader-basic-modprojectile/y4OcJAv.png)    
-The important parts of this `ModProjectile` are as follows:    
+这个 `ModProjectile` 里要紧的部分：
 ```cs
 // SetDefatults
 Projectile.width = 8;
@@ -388,62 +417,65 @@ Projectile.height = 8;
 // AI
 Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.ToRadians(90f);
 ```
-Our goal is to have the yellow part of this projectile be the hitbox. The yellow area is 8 by 8 pixels, so we set `width` and `height` to 8 already. The `Projectile.rotation` code there sets the rotation to the velocity while adding 90 degrees of rotation, since the sprite we happen to be using faces up instead of to the right as is expected by the game. In this guide, we'll be using the [Modders Toolkit](https://steamcommunity.com/sharedfiles/filedetails/?id=2573569299) mod to visualize hitboxes. This is very useful.
+我们的目标是让贴图里的黄色部分当判定框。黄色区域是 8x8 像素，所以 `width` 和 `height` 都设成 8。那段 `Projectile.rotation` 代码把旋转设成速度方向，另外多加 90 度，因为这张贴图是朝上的，而游戏默认期望它朝右。本篇里我们会用 [Modders Toolkit](https://steamcommunity.com/sharedfiles/filedetails/?id=2573569299) 这个模组来可视化判定框，非常好用。
 
-Here we see the hitbox, the yellow square, doesn't match up with the tip of our sprite:
+可以看到判定框（那个黄方块）和贴图的尖端对不上：
 
 https://github.com/tModLoader/tModLoader/assets/4522492/8efa67d9-5565-4076-b0af-5e1688dfde84
 
-The math for what vanilla code is doing is a little confusing, but basically we need to set `DrawOffsetX` and `DrawOriginOffsetY` to values that offset the drawing of our sprite in an attempt to properly place the sprite over the hitbox. If you are attempting this, either use [Modders Toolkit](https://steamcommunity.com/sharedfiles/filedetails/?id=2573569299) to change the offset values in-game or use [Edit and Continue](https://github.com/tModLoader/tModLoader/wiki/Why-Use-an-IDE#edit-and-continue) to adjust the values in-game. Another approach is to just measure it out on the sprite itself in your graphics program:    
+原版那套数学有点绕，但说到底就是把 `DrawOffsetX` 和 `DrawOriginOffsetY` 设成合适的值，把贴图的绘制位置挪一挪，让贴图正好压在判定框上。调这两个值时，可以在游戏里用 [Modders Toolkit](https://steamcommunity.com/sharedfiles/filedetails/?id=2573569299) 直接改，也可以开 [Edit and Continue](https://github.com/tModLoader/tModLoader/wiki/Why-Use-an-IDE#edit-and-continue) 边跑边调。还有个笨办法：在绘图软件里对着贴图量：
 ![在绘图软件里量出 DrawOffsetX / DrawOriginOffsetY](/img/posts/tmodloader-basic-modprojectile/m5DxkBm.png)   
-Here we see testing various values with Modders Toolkit. Make sure to replicate these values in your `SetDefaults` code:     
+这里是拿 Modders Toolkit 试各种值，试出来的结果记得写回 `SetDefaults` 里：
 
 https://github.com/tModLoader/tModLoader/assets/4522492/a21ae4df-e79f-4878-84ff-d8e30dd59583
 
-After some experimentation or measuring, we know that adding `DrawOffsetX = -20;` to this `ModProjectile.SetDefaults` will fix the positioning of the drawing relative to the hitbox.
+试了几轮、或者量过之后就知道，给这个 `ModProjectile.SetDefaults` 加上 `DrawOffsetX = -20;`，绘制位置和判定框就对上了。
 
-Lets now try to position the hitbox over the blue portion of our sprite. This time, lets use [Edit and Continue](https://github.com/tModLoader/tModLoader/wiki/Why-Use-an-IDE#edit-and-continue) to accomplish this. In the clip below, you can see how quickly we can test out new values:    
+接着让判定框落到贴图的蓝色部分。这次用 [Edit and Continue](https://github.com/tModLoader/tModLoader/wiki/Why-Use-an-IDE#edit-and-continue) 来试，下面这段录屏能看出试新值有多快：
 
 https://github.com/tModLoader/tModLoader/assets/4522492/d17b18ad-1d4b-46fb-90ee-dfa43789e484
 
-As you saw, we added `DrawOriginOffsetY = -16;` to position the hitbox lower on the sprite.
+如你所见，加上 `DrawOriginOffsetY = -16;` 就让判定框在贴图上往下移了。
 
-### Fixing upside-down sprite problem
-You might've noticed that the sprite is upside down when fired to the left. Remember that in our `AI`, we have this line of code: `Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.ToRadians(90f);`. If we rotate our sprite to the left, then it is upside-down. We can fix this with `spriteDirection`. `spriteDirection` will flip the drawing of the sprite horizontally. To implement this, simply add `Projectile.spriteDirection = Projectile.direction;` to the `AI` code after the `Projectile.rotation = ...` line. 
+### 修掉贴图上下颠倒的问题
 
-No fix:     
+你可能也注意到，向左发射时贴图是倒着的。回想一下 `AI` 里这行：`Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.ToRadians(90f);`。贴图一转到左边，自然就上下颠倒了。用 `spriteDirection` 能修：它会把贴图的绘制水平翻转。做法就是在 `AI` 里 `Projectile.rotation = ...` 那行之后补上 `Projectile.spriteDirection = Projectile.direction;`。
+
+没修之前：
 ![向左发射时精灵上下颠倒（未修复）](/img/posts/tmodloader-basic-modprojectile/sKUq94z.png)    
-Fixed:     
+修好之后：
 ![设置 spriteDirection 之后恢复正常](/img/posts/tmodloader-basic-modprojectile/w3ALhDX.png)    
 
-## Horizontal Sprite Example
-Things change a little if your sprite is oriented horizontally. Here is our new horizontal sprite, which is now 70x48 and oriented horizontally, pointing to the right instead of up as before:    
+## 水平方向贴图的例子
+
+贴图改成横向的话，事情会有点变化。新的水平贴图是 70x48，朝右，而不是像刚才那样朝上：
 ![水平方向的弹幕精灵（70x48）](/img/posts/tmodloader-basic-modprojectile/etzbzs0.png)
 
-Once again, we can see that the hitbox doesn't line up:    
+判定框还是对不齐：
 
 https://github.com/tModLoader/tModLoader/assets/4522492/50312b6e-ecc8-46fe-b356-f50b9164290e
 
-Unlike the vertical example, this time we set `Projectile.rotation = Projectile.velocity.ToRotation();` directly instead of adding additional 90 degrees. After some experimentation, we arrive at the following for a hitbox on the tip:
+和竖直例子不同，这次直接写 `Projectile.rotation = Projectile.velocity.ToRotation();`，不用再加 90 度。试了几轮之后，判定框落在尖端上的取值是这样：
 ```cs
 DrawOffsetX = -62;
 DrawOriginOffsetY = -20; 
 DrawOriginOffsetX = 31;
 ```
-These values are a bit odd because of some math Terraria is doing, so here is the algorithm for calculating them:
+这几个数看着有点怪，是因为泰拉瑞亚内部还有一层换算。计算规则：
 ```cs
 DrawOffsetX = Negative X pixel position of the top left corner of the intended hitbox
 DrawOriginOffsetY = Negative Y pixel position of the top left corner of the intended hitbox
 DrawOriginOffsetX = X pixel position of center of hitbox minus Texture Width divided by 2 
 ```
-Here is a diagram:    
+对照图：
 ![DrawOffsetX / DrawOriginOffsetY / DrawOriginOffsetX 的换算示意](/img/posts/tmodloader-basic-modprojectile/zQfxXM3.png)     
-If you don't like fighting against the vanilla projectile rendering code, you can always draw the projectile yourself as seen in [ExampleAdvancedAnimatedProjectile](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleAdvancedAnimatedProjectile.cs#L101)
+如果不想跟原版弹幕渲染代码较劲，自己画也行，见 [ExampleAdvancedAnimatedProjectile](https://github.com/tModLoader/tModLoader/blob/stable/ExampleMod/Content/Projectiles/ExampleAdvancedAnimatedProjectile.cs#L101)
 
-### Fixing upside-down sprite problem again
-With the vertical sprite, using `Projectile.spriteDirection` works because it controls a horizontal flip of the projectile sprite. Using a horizontal sprite, a horizontal flip makes the sprite move facing backwards:    
+### 再修一次贴图上下颠倒的问题
+
+竖直贴图那次，用 `Projectile.spriteDirection` 就能解决，因为它控制的是贴图的水平翻转。但贴图本身就是横向的，一水平翻转，弹幕就变成朝后飞了：
 ![水平精灵翻转后变成朝向后方](/img/posts/tmodloader-basic-modprojectile/vfKrRzZ.png)    
-To fix this, we need to adjust the offsets dynamically and conditionally add 180 degrees or Pi to the rotation. Here is the code:
+要修就得动态地调整偏移量，并且按朝向决定要不要给旋转加上 180 度（也就是 Pi）。代码如下：
 ```cs
 // Set both direction and spriteDirection to 1 or -1 (right and left respectively)
 // Projectile.direction is automatically set correctly in Projectile.Update, but we need to set it here or the textures will draw incorrectly on the 1st frame.
@@ -467,5 +499,4 @@ else
 ```
 ![按朝向动态调整偏移量后的最终效果](/img/posts/tmodloader-basic-modprojectile/FKfhtQ0.png)    
 
-Hopefully these answers can help you solve your projectile hitbox and drawing issues.
-
+希望这些内容能帮你把弹幕的判定框和绘制问题都解决掉。
