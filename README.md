@@ -204,10 +204,10 @@ git add -A && git commit -m "post: 文章标题" && git push
   文字仍在 DOM 中，读屏与 SEO 不受影响
 - 顶部导航滚动动画：顶部透明 → 滚动 80px 后玻璃底 0.4s 淡入，同时居中收窄到 980px
   （`cubic-bezier(.34,1.36,.44,1)` 模拟 spring 回弹）；触发用哨兵元素 + `IntersectionObserver`
-  （`source/custom/effects/nav-glass.js`）
+  （`source/custom/nav/nav-glass.js`）
 - **浅色模式已关闭**（主题 `darkmode.button: false`），全站只有深色
 - **图片点击放大（v19）**：主题 `lightbox: medium_zoom`（原来是留空的，点图毫无反应）。
-  另配 `source/custom/effects/image-zoom.js` 增强：自然宽度 ≤ 160px 的小贴图（Terraria 的弹幕
+  另配 `source/custom/widgets/image-zoom.js` 增强：自然宽度 ≤ 160px 的小贴图（Terraria 的弹幕
   贴图动辄 48x70）按**整数倍**放大到约 480px 宽，并用 `image-rendering: pixelated` 最近邻缩放，
   像素点看得清、不发糊（实测 48x70 → 384x560，8 倍）；大图仍走 medium-zoom 原本的
   "适应视口"行为，不干预
@@ -247,7 +247,7 @@ git add -A && git commit -m "post: 文章标题" && git push
 - **站内锚点大小写容错**：文章锚点多是从 tModLoader 官方 Wiki 搬来的，Wiki 锚点全小写
   （`#drawing-and-collision`），而本站 Hexo 生成的标题 id 保留大小写（`Drawing-and-Collision`），
   URL 片段大小写敏感 —— 匹配不上时浏览器既不跳转也不报错。处理：正文写实际 id，
-  另加 `source/custom/effects/anchor-fallback.js` 做归一化兜底（覆盖大小写、`/`、`,`、空格、中文），
+  另加 `source/custom/utils/anchor-fallback.js` 做归一化兜底（覆盖大小写、`/`、`,`、空格、中文），
   命中后用 `scrollIntoView`，仍遵守 `toc.css` 的 `scroll-margin-top`
 - 文章底部「文章作者」链接走主题 `post_copyright.author_href` → B 站主页
 

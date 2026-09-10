@@ -78,8 +78,8 @@ shiki:
   highlight_height_limit: 0 # 0 = 不限高，代码块完整显示(不折叠)
   is_highlight_shrink: false # false=默认展开
   # 本地化 CSS/JS, 避免依赖 jsdelivr CDN (博客可离线/自托管)
-  css_cdn: /custom/effects/shiki-codeblock.css
-  js_cdn: /custom/effects/shiki-codeblock.js
+  css_cdn: /custom/assets/vendor/shiki-codeblock.css
+  js_cdn: /custom/assets/vendor/shiki-codeblock.js
   skip_languages:            # 不应由 shiki 高亮的语言(交由 Butterfly 处理)
     - mermaid
   copy:                      # 复制提示文案
