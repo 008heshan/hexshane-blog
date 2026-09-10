@@ -70,16 +70,22 @@
     var mq = window.matchMedia('(max-width: 900px), (hover: none)')
 
     function place() {
-      if (mq.matches) return
+      if (mq.matches) {
+        // 小屏走 CSS 常显分支：清掉 JS 设的等高水平布局
+        dock.style.height = ''
+        return
+      }
       var hostRect = host.getBoundingClientRect()
       var cardRect = card.getBoundingClientRect()
+      var gap = 8                        // 与卡片之间的间距
       var w = dock.offsetWidth || 48
-      var h = dock.offsetHeight || 130
-      var top = (cardRect.top - hostRect.top) + Math.max(0, (cardRect.height - h) / 2)
-      var left = (cardRect.right - hostRect.left) - 1
-      // 右侧空间不足时把图标条压回卡片右缘内侧，保证三个图标都在视口内
+      // 高度与作者卡片齐平（图标由 CSS space-evenly 均分）
+      dock.style.height = Math.round(cardRect.height) + 'px'
+      var top = cardRect.top - hostRect.top
+      var left = (cardRect.right - hostRect.left) + gap
+      // 右侧空间不足时把图标条压回，保证整条都在视口内
       var room = window.innerWidth - cardRect.right
-      if (room < w + 6) left = (cardRect.right - hostRect.left) - w + Math.max(0, room - 6)
+      if (room < w + gap + 6) left = (cardRect.right - hostRect.left) + Math.max(0, room - w - 6)
       dock.style.top = Math.round(top) + 'px'
       dock.style.left = Math.round(left) + 'px'
     }
