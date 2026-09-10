@@ -35,6 +35,9 @@ include ./head/Open_Graph.pug
 include ./head/structured_data.pug
 
 !=favicon_tag(theme.favicon || config.favicon)
+//- 站点图标补充：苹果触屏图标 + PNG 兜底（都走 url_for，子路径部署同样有效）
+link(rel='apple-touch-icon' sizes='180x180' href=url_for('/img/apple-touch-icon.png'))
+link(rel='icon' type='image/png' sizes='32x32' href=url_for('/img/favicon-32.png'))
 link(rel="canonical" href=urlNoIndex(null,config.pretty_urls.trailing_index,config.pretty_urls.trailing_html))
 
 //- 預解析

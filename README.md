@@ -222,7 +222,14 @@ git add -A && git commit -m "post: 文章标题" && git push
   本站文章都是"整理自官方 Wiki"的搬运稿，正文第一段永远是同一句来源说明 —— 用默认的
   method 3 会让首页与 `/articles/` 的每张卡片摘要长得一模一样。现在 27 篇都写了
   `description`（一句话中文摘要），卡片摘要与 `<meta name="description">` 都用它
-- **后台「站点文案」标签页**：`/admin/` 里除「文章 / 公告」外，多了一处文案集中入口，省得为改一句话去翻文件：
+- **站点图标（favicon）**：`source/img/favicon.svg` —— 取导航左上角那枚莫比乌斯 ∞（与
+  `custom/assets/mobius.svg` 同一套几何），重排成方形：深空冷底 + 圆角，线体钢青到冷白渐变，
+  交叉处留一道缺口做出扭转错觉。favicon 在 16px 下会糊，所以刻意做了三件事：**加粗线条、
+  加大占比（图形占满 88%）、去掉网格/星点/辉光等所有细节**。
+  一套四个文件：`favicon.svg`（矢量，主用）、`favicon-32.png`（PNG 兜底）、
+  `apple-touch-icon.png`（180，iOS 加到桌面用）、`favicon-512.png`（备用/PWA）。
+  PNG 由无头 Edge 渲染 SVG 得到（透明底），接入方式：主题 `favicon:` 指向 svg，
+  另两条 `<link>` 走 `url_for` 写在 `layout/includes/head.pug`（子路径部署也不会 404）- **后台「站点文案」标签页**：`/admin/` 里除「文章 / 公告」外，多了一处文案集中入口，省得为改一句话去翻文件：
   - **关于页正文** —— 与文章/公告同一个编辑器（工具栏、Ctrl+B/K、Tab 缩进、编辑/分栏/预览、撤回重做、
     插图上传到 `source/img/about/`）。保存只覆盖正文，`source/about/index.md` 的 front-matter 与文末结构保留
   - **站点文案** —— 根 `_config.yml` 的 `subtitle` / `description`

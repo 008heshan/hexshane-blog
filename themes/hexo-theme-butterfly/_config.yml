@@ -56,7 +56,7 @@ social:
 # Image Settings
 # --------------------------------------
 
-favicon: /img/favicon.ico
+favicon: /img/favicon.svg    # 站点图标：∞ 莫比乌斯标（矢量，任意尺寸都清晰）
 
 avatar:
   img: /img/hexshane.jpg
