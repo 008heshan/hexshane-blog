@@ -1,5 +1,6 @@
 ---
 title: Conditions
+description: Condition 类怎么用：预定义条件、自定义条件与描述，以及在配方、商店、掉落里的实际应用。
 date: 2026-08-15 20:00:00
 tags:
   - tModLoader

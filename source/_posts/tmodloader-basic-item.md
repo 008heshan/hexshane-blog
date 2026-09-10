@@ -1,5 +1,6 @@
 ---
 title: Basic ModItem Guide
+description: 物品最小实现：ModItem 模板、SetDefaults 与本地化键，以及内部命名的注意事项。
 date: 2026-08-28 20:00:00
 tags:
   - tModLoader

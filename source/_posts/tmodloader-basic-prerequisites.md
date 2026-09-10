@@ -1,5 +1,6 @@
 ---
 title: Basic Prerequisites
+description: 动手写模组之前的三样准备：看得懂 C# 基本语法、一个称手的文本编辑器、一个能存透明像素的绘图软件。
 date: 2026-09-10 20:40:00
 tags:
   - tModLoader

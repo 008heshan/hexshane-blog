@@ -1,5 +1,6 @@
 ---
 title: Basic glowmask guide
+description: 发光贴图（glowmask）是什么、贴图怎么画、怎么用 PostDraw 系列钩子挂到物品与弹幕上。
 date: 2026-09-04 20:00:00
 tags:
   - tModLoader

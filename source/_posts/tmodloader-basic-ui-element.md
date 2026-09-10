@@ -1,5 +1,6 @@
 ---
 title: Basic UI Element Guide
+description: 自定义 UI 入门：UIElement / UIState / UserInterface 三件套怎么串起来，从按钮到画到屏幕的完整流程。
 date: 2026-08-17 20:00:00
 tags:
   - tModLoader

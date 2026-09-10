@@ -1,5 +1,6 @@
 ---
 title: Basic ModDust Guide
+description: 粒子（Dust）用法：三种生成方法的差别、自定义 ModDust 的贴图规格，以及怎么查原版粒子。
 date: 2026-08-29 20:00:00
 tags:
   - tModLoader

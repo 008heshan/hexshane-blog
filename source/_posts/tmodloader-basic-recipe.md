@@ -1,5 +1,6 @@
 ---
 title: Basic Recipe
+description: 配方三要素（材料 / 制作站 / 产物）：ModItem 与 ModSystem 两种写法、链式写法、配方条件与常见报错。
 date: 2026-09-05 16:30:00
 tags:
   - tModLoader

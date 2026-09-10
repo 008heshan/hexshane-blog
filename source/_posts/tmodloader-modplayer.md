@@ -1,5 +1,6 @@
 ---
 title: ModPlayer Guide
+description: 用 ModPlayer 给玩家挂效果：ResetEffects 为什么每帧重算、钩子怎么挑、多个 ModPlayer 的职责划分。
 date: 2026-08-26 20:00:00
 tags:
   - tModLoader

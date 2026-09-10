@@ -1,5 +1,6 @@
 ---
 title: Basic Sound Guide
+description: 音效播放：SoundStyle 的字段、音量与音调、循环音效、实例数限制，以及几个常见错误。
 date: 2026-08-19 20:00:00
 tags:
   - tModLoader

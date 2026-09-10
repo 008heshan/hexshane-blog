@@ -1,5 +1,6 @@
 ---
 title: Basic Netcode Guide
+description: 联机同步入门：谁有权改、NetSend / NetReceive 的写法、失步（desync）的成因与避免方式。
 date: 2026-08-22 20:00:00
 tags:
   - tModLoader

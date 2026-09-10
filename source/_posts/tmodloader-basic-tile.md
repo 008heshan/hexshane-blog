@@ -1,5 +1,6 @@
 ---
 title: Basic ModTile Guide
+description: 物块全解：地形块与家具块的区别、SetStaticDefaults 的全部常用选项、TileObjectData 与多种样式的组织方式。
 date: 2026-08-24 20:00:00
 tags:
   - tModLoader

@@ -1,5 +1,6 @@
 ---
 title: Basic Autoloading Guide
+description: 自动加载（Autoload）的命名与目录规则：类名、命名空间、贴图文件名三者怎么对应，哪些内容会被自动收进来。
 date: 2026-09-07 20:00:00
 tags:
   - tModLoader

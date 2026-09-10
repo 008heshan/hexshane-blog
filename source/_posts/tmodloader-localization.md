@@ -1,5 +1,6 @@
 ---
 title: Localization
+description: 本地化全流程：hjson 文件结构与键名规则、可本地化属性注册、多语言切换，以及 1.4.3→1.4.4 的迁移。
 date: 2026-09-02 20:00:00
 tags:
   - tModLoader

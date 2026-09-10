@@ -1,5 +1,6 @@
 ---
 title: Basic ModConfig Guide
+description: 用 JSON 存模组配置：结构写法、ModConfig 目录与命名约定、和 XML/YAML 的取舍。
 date: 2026-08-30 20:00:00
 tags:
   - tModLoader

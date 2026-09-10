@@ -1,5 +1,6 @@
 ---
 title: Basic Time and Timers Guide
+description: 计时器怎么写：别用循环、用 ai[] 或 timeLeft、取模与插值，以及游戏时间与世界时间的取用。
 date: 2026-08-18 20:00:00
 tags:
   - tModLoader

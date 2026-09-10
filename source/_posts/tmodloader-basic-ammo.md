@@ -1,5 +1,6 @@
 ---
 title: Basic Ammo Guide
+description: 弹药类物品怎么写：弹药类别、让游戏自动消耗还是自己扣，以及 CanChooseAmmo 的两种用法。
 date: 2026-09-08 20:00:00
 tags:
   - tModLoader

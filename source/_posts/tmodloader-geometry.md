@@ -1,5 +1,6 @@
 ---
 title: Geometry
+description: 写弹幕/位移绕不开的向量基础：长度、归一化、旋转、朝向目标，以及速度和加速度的直觉。
 date: 2026-09-05 20:00:00
 tags:
   - tModLoader

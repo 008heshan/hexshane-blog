@@ -186,7 +186,15 @@ git add -A && git commit -m "post: 文章标题" && git push
   （`cubic-bezier(.34,1.36,.44,1)` 模拟 spring 回弹）；触发用哨兵元素 + `IntersectionObserver`
   （`source/custom/effects/nav-glass.js`）
 - **浅色模式已关闭**（主题 `darkmode.button: false`），全站只有深色
-- **站内锚点大小写容错**：文章锚点多是从 tModLoader 官方 Wiki 搬来的，Wiki 锚点全小写
+- **图片点击放大（v19）**：主题 `lightbox: medium_zoom`（原来是留空的，点图毫无反应）。
+  另配 `source/custom/effects/image-zoom.js` 增强：自然宽度 ≤ 160px 的小贴图（Terraria 的弹幕
+  贴图动辄 48x70）按**整数倍**放大到约 480px 宽，并用 `image-rendering: pixelated` 最近邻缩放，
+  像素点看得清、不发糊（实测 48x70 → 384x560，8 倍）；大图仍走 medium-zoom 原本的
+  "适应视口"行为，不干预
+- **列表页摘要不再千篇一律**：`index_post_content.method: 2`（优先 `description`，没有才截正文）。
+  本站文章都是"整理自官方 Wiki"的搬运稿，正文第一段永远是同一句来源说明 —— 用默认的
+  method 3 会让首页与 `/articles/` 的每张卡片摘要长得一模一样。现在 27 篇都写了
+  `description`（一句话中文摘要），卡片摘要与 `<meta name="description">` 都用它- **站内锚点大小写容错**：文章锚点多是从 tModLoader 官方 Wiki 搬来的，Wiki 锚点全小写
   （`#drawing-and-collision`），而本站 Hexo 生成的标题 id 保留大小写（`Drawing-and-Collision`），
   URL 片段大小写敏感 —— 匹配不上时浏览器既不跳转也不报错。处理：正文写实际 id，
   另加 `source/custom/effects/anchor-fallback.js` 做归一化兜底（覆盖大小写、`/`、`,`、空格、中文），

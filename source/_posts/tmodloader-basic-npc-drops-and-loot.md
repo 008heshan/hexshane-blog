@@ -1,5 +1,6 @@
 ---
 title: Basic NPC Drops and Loot Guide
+description: 掉落规则表怎么写：IItemDropRule 与三种登记位置、掉落条件、Boss 袋，以及战利品系统的注意事项。
 date: 2026-08-21 20:00:00
 tags:
   - tModLoader

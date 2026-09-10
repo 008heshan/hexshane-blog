@@ -1,5 +1,6 @@
 ---
 title: Spriting
+description: 画贴图的基础：帧与贴图集、像素大小必须一致、帧间留白规则、朝向约定，以及发光贴图（glowmask）。
 date: 2026-09-09 20:00:00
 tags:
   - tModLoader

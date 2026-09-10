@@ -1,5 +1,6 @@
 ---
 title: Basic ModTileEntity Guide
+description: 方块实体：什么情况才需要它、数据保存与网络同步、放置与破坏时的钩子。
 date: 2026-08-23 20:00:00
 tags:
   - tModLoader

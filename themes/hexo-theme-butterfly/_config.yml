@@ -185,7 +185,12 @@ index_layout: 3
 # 3: auto_excerpt (default)
 # false: do not show the article introduction
 index_post_content:
-  method: 3
+  # 1: description 字段 / 2: 优先 description，没有才截正文 / 3: 自动截取正文（默认）
+  # 2026-09-10：改成 2 —— 本站文章都是"整理自官方 Wiki"的搬运稿，正文第一段
+  # 永远是同一句「本文内容整理自 tModLoader 官方 Wiki…」，用 method 3 会让首页与
+  # /articles/ 的每张卡片摘要长得一模一样。现在每篇都写了 description（一句话摘要），
+  # 卡片直接用它；没写 description 的文章自动退回截正文，不会空着。
+  method: 2
   # If you set method to 2 or 3, the length need to config
   length: 500
 
@@ -930,7 +935,10 @@ clickShowText:
 # https://github.com/francoischalifour/medium-zoom
 # https://fancyapps.com/fancybox/
 # Leave it empty if you don't need lightbox
-lightbox:
+# 2026-09-10：启用图片点击放大（搬运过来的文章里全是截图/示意图，不放大看不清）
+# 选 medium_zoom：轻量、点击放大再点关闭，不带多余 UI，契合本站克制的风格。
+# 想要图集轮播/标题/双指缩放就换成 fancybox。
+lightbox: medium_zoom
 
 # --------------------------------------
 # Tag Plugins settings
@@ -1122,6 +1130,8 @@ inject:
     - <script src="/custom/effects/anchor-fallback.js?v=20260910f"></script>
     # --- 代码块：长行换行后对齐行号 ---
     - <script src="/custom/effects/code-wrap-align.js?v=20260908e"></script>
+    # --- 图片放大增强：小贴图（像素画）整数倍放大 + 最近邻，配合 lightbox: medium_zoom ---
+    - <script src="/custom/effects/image-zoom.js?v=20260910k"></script>
     # --- widgets 卡片/挂件/页脚 ---
     - <script src="/custom/widgets/announce-hover.js"></script>
     # 作者卡片右侧滑出社媒条（抖音 / B站 / GitHub 仓库）

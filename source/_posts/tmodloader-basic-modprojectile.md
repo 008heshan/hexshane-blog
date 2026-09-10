@@ -1,5 +1,6 @@
 ---
 title: Basic ModProjectile Guide
+description: 弹幕从零到进阶：SetDefaults、自定义 AI、命中与反弹、绘制偏移与判定框对位、残影拖尾、发光贴图。
 date: 2026-09-05 16:30:00
 tags:
   - tModLoader

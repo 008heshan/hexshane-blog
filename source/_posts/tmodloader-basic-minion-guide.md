@@ -1,5 +1,6 @@
 ---
 title: Basic Minion Guide
+description: 召唤物三件套（ModBuff / ModItem / ModProjectile）的配合，以及索敌、移动、接触伤害、射击与动画。
 date: 2026-08-31 20:00:00
 tags:
   - tModLoader

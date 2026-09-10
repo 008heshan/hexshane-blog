@@ -1,5 +1,6 @@
 ---
 title: Wall Guide
+description: 墙的做法：ModWall 与物品配对、贴图分区与拼接、安全墙与不安全墙的区别。
 date: 2026-08-16 20:00:00
 tags:
   - tModLoader

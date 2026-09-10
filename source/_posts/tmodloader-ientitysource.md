@@ -1,5 +1,6 @@
 ---
 title: IEntitySource
+description: IEntitySource 的作用：按"来源"区分生成的时机，并把属性或增益传给生成出来的实体。
 date: 2026-09-03 20:00:00
 tags:
   - tModLoader

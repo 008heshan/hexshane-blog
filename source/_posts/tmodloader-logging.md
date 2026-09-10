@@ -1,5 +1,6 @@
 ---
 title: Basic Logging Guide
+description: 日志该怎么记：分级用法、什么时候该写日志、日志文件怎么分与归档，以及排查问题的思路。
 date: 2026-09-01 20:00:00
 tags:
   - tModLoader

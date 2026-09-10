@@ -1,5 +1,6 @@
 ---
 title: Basic NPC Spawning
+description: 刷怪概率 SpawnChance 的写法：生物群系、高度、时间、难度等条件的组合，以及平衡与常见错误。
 date: 2026-09-05 16:30:00
 tags:
   - tModLoader

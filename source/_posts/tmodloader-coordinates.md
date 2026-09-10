@@ -1,5 +1,6 @@
 ---
 title: Coordinates
+description: 世界坐标、物块坐标、屏幕坐标的区别与换算，以及 Main.MouseWorld 这类常用取坐标方式与常见坑。
 date: 2026-09-06 20:00:00
 tags:
   - tModLoader
