@@ -1080,7 +1080,7 @@ inject:
     - <link rel="stylesheet" href="/custom/nav/nav-search.css">
     - <link rel="stylesheet" href="/custom/nav/nav-darkmode.css">
     # --- effects 背景/玻璃/光效 ---
-    - <link rel="stylesheet" href="/custom/effects/theme-glass.css?v=20260910i">
+    - <link rel="stylesheet" href="/custom/effects/theme-glass.css?v=20260910j">
     - <link rel="stylesheet" href="/custom/effects/code-highlight.css?v=20260910i">
     - <link rel="stylesheet" href="/custom/effects/force-glow.css">
     # --- widgets 卡片/挂件/页脚 ---
@@ -1103,7 +1103,7 @@ inject:
     # --- widgets 作者卡片右侧滑出社媒条 ---
     - <link rel="stylesheet" href="/custom/widgets/author-dock.css?v=20260910h">
     # --- 科幻/科技/极客皮肤（必须放在最后，覆盖上面所有自定义样式） ---
-    - <link rel="stylesheet" href="/custom/theme/sci-fi.css?v=20260910i">
+    - <link rel="stylesheet" href="/custom/theme/sci-fi.css?v=20260910j">
   bottom:
     # - <script src="xxxx"></script>
     # --- nav 顶部导航栏 + 检索 ---

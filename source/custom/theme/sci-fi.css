@@ -426,30 +426,26 @@ html body #page-header #scroll-down .scroll-down-effects {
 }
 
 /* ---------------------------------------------------------------
-   5. 面板：真·磨砂玻璃（中性白膜 + 高光 + 实时背景模糊，不自带颜色）
+   5. 面板：真·磨砂玻璃（中性白膜 + 实时背景模糊，不自带颜色）
    ---------------------------------------------------------------
-   旧版是 rgba(10,16,23,.72) 的深色蒙层 —— 那是"带颜色的半透明板"，不是玻璃。
-   现在三层构成，全部无色相：
-   · --sf-glass-sheen：顶部白色高光（玻璃的"反光面"，这是元素自身的
-     高光而不是给背景染色），让面板在纯色背景前也能看出是块玻璃
-   · --sf-glass：极低 alpha 中性白膜，负责"透"
-   · backdrop-filter: blur()：实时模糊元素背后的真实内容，负责"磨砂"
-   为什么不能只靠 blur：Chromium 在【硬件加速不可用/GPU 进程崩溃回退】时
-   会静默丢掉 backdrop-filter（玻璃直接消失，卡片看起来"没做玻璃效果"），
-   而且纯色背景 blur 前后没有可见差别。所以高光 + 白膜必须自己撑起质感，
-   blur 只负责锦上添花 —— 这样任何环境下卡片都还是玻璃的样子。
+   卡片与文章面板（#page / #archive / #post）**铺的是同一层膜**：
+   `--sf-glass` 白膜 + 一条 1px 内高光，没有顶部渐变高光 ——
+   这样两者的"通透度"完全一致，卡片不会比文章背景更厚更白。
+   卡片比文章面板多的只有 backdrop-filter（实时模糊背后内容），
+   模糊只改变"背后长什么样"，不会让面板变得更不透明。
+   为什么不能只靠 blur：Chromium 在硬件加速不可用 / GPU 进程回退时会静默
+   丢掉 backdrop-filter，只靠模糊的"玻璃"会直接消失（表现为卡片看起来根本没
+   做玻璃效果）。所以内高光 + 白膜负责质感，blur 只负责锦上添花。
    --------------------------------------------------------------- */
 html body .card-widget,
 html body #recent-posts .recent-post-item,
 html body .relatedPosts-list a.pagination-related,
 html body .post-copyright {
-  background-image: var(--sf-glass-sheen) !important;
-  background-color: var(--sf-glass) !important;
+  background: var(--sf-glass) !important;
   border: 1px solid var(--sf-glass-line) !important;
   box-shadow:
     0 24px 60px -38px rgba(0, 0, 0, .95),
-    inset 0 1px 0 rgba(255, 255, 255, .16),
-    inset 0 -1px 0 rgba(255, 255, 255, .04) !important;
+    inset 0 1px 0 rgba(255, 255, 255, .10) !important;
   -webkit-backdrop-filter: blur(var(--sf-glass-blur));
   backdrop-filter: blur(var(--sf-glass-blur));
   transition: border-color .22s ease, box-shadow .22s ease;
@@ -578,8 +574,7 @@ html body #post #article-container a:hover {
 }
 
 html body #post #article-container blockquote {
-  background-image: var(--sf-glass-sheen) !important;
-  background-color: rgba(255, 255, 255, .04) !important;
+  background: rgba(255, 255, 255, .04) !important;
   border-left: 3px solid rgba(157, 192, 212, .6) !important;
   border-radius: 0 6px 6px 0;
   color: #a9c0d6 !important;

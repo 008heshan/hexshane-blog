@@ -336,25 +336,17 @@ html[data-theme='dark'] #archive::after {
     inset 0 -1px 0 rgba(255, 255, 255, .22) !important;
 }
 
-/* 文章/归档长文容器：静态预渲染磨砂(替代实时 backdrop)
-   v12 性能：#post 高数千px, 滚动时其 backdrop-filter 每帧重采样
-   背后光斑(全文最长最贵)。去除 blur, 用「已模糊光斑平均色」的
-   静态多层渐变模拟磨砂 → 可一次性预渲染, 滚动零重绘。 */
+/* 文章/归档长文容器：只铺中性薄膜（v18 与首页卡片同一层膜）
+   v12 性能：这里**不用**实时 backdrop-filter —— #post 高数千px，
+   滚动时其 backdrop-filter 每帧重采样全文最长最贵的区域。
+   背后就是页面底色，模糊本来就看不出来，静态薄膜即可。
+   注意用 `background` 简写：只用 background-color 的话，下面那条
+   light 规则的渐变图会残留在上面，面板就比卡片更厚更白。 */
 #post,
 #archive {
-  background:
-    radial-gradient(1200px 900px at 20% 6%, rgba(140, 175, 235, .10), transparent 70%),
-    radial-gradient(1000px 800px at 88% 96%, rgba(120, 165, 220, .08), transparent 70%),
-    linear-gradient(
-      155deg,
-      rgba(255, 255, 255, .16) 0%,
-      rgba(255, 255, 255, .07) 50%,
-      rgba(255, 255, 255, .13) 100%
-    ) !important;
+  background: var(--sf-glass) !important;
   border: 0 !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .48),
-    inset 0 -1px 0 rgba(255, 255, 255, .22) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .10) !important;
 }
 
 /* 顶部镜面高光已按用户要求去除（不再显示） */
@@ -372,29 +364,25 @@ html[data-theme='dark'] #archive::after {
   display: none;
 }
 
-/* ---- dark：真·磨砂玻璃（v17 材质统一到 sci-fi.css 的令牌） ----
-   三层：顶部白色高光（--sf-glass-sheen）+ 极低 alpha 中性白膜（--sf-glass）
-   + backdrop-filter 实时模糊。高光与白膜自己就能撑起玻璃质感，
-   所以即使浏览器丢掉 backdrop-filter（硬件加速关闭 / GPU 回退），
-   卡片也不会"看起来没做玻璃效果"。 */
+/* ---- dark：真·磨砂玻璃（v18 与文章面板同一层膜） ----
+   只铺 --sf-glass 白膜 + 一条 1px 内高光，不再叠顶部渐变高光 ——
+   卡片与 #post / #page 的通透度因此完全一致；卡片多出来的只有
+   backdrop-filter（实时模糊背后内容），模糊不改变透明度。 */
 html[data-theme='dark'] .recent-post-item,
 html[data-theme='dark'] .card-widget {
-  background-image: var(--sf-glass-sheen) !important;
-  background-color: var(--sf-glass) !important;
+  background: var(--sf-glass) !important;
   -webkit-backdrop-filter: blur(var(--sf-glass-blur));
   backdrop-filter: blur(var(--sf-glass-blur));
   border: 0 !important;
   /* box-shadow 只保留 inset 高光, 外阴影由 ::after 伪元素预渲染 */
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .16),
-    inset 0 -1px 0 rgba(255, 255, 255, .04) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .10) !important;
 }
 
 /* dark 文章/归档长文容器：背后就是页面底, 做实时模糊没意义(且贵),
    所以只铺中性薄膜；静态预渲染即可 */
 html[data-theme='dark'] #post,
 html[data-theme='dark'] #archive {
-  background-color: var(--sf-glass) !important;
+  background: var(--sf-glass) !important;
   border: 0 !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .10) !important;
 }
@@ -418,7 +406,7 @@ html[data-theme='dark'] #archive::before {
    背后就是页面底色，模糊看不出来，静态中性薄膜即可。 */
 #page:not(.nc) {
   position: relative;
-  background: rgba(255, 255, 255, .03) !important;
+  background: var(--sf-glass) !important;
   border: 0 !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, .14),
@@ -426,7 +414,7 @@ html[data-theme='dark'] #archive::before {
 }
 
 html[data-theme='dark'] #page:not(.nc) {
-  background: rgba(255, 255, 255, .03) !important;
+  background: var(--sf-glass) !important;
   border: 0 !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .10) !important;
 }
@@ -469,14 +457,13 @@ html[data-theme='dark'] #page:not(.nc)::after {
   }
   .recent-post-item,
   .card-widget {
-    background-image: var(--sf-glass-sheen) !important;
-    background-color: var(--sf-glass) !important;
+    background: var(--sf-glass) !important;
     -webkit-backdrop-filter: blur(14px);
     backdrop-filter: blur(14px);
     border: 0 !important;
     box-shadow:
       0 0 0 1px rgba(255, 255, 255, .10),
-      inset 0 1px 0 rgba(255, 255, 255, .16) !important;
+      inset 0 1px 0 rgba(255, 255, 255, .10) !important;
   }
   /* 文章/归档长文容器：移动端同样静态中性薄膜 + 无实时 backdrop */
   #post,
