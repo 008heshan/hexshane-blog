@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "hexo generate",
-    "build:ghpages": "hexo generate --config _config.yml,_config.ghpages.yml && node scripts/fix-ghpages-paths.js",
+    "build:ghpages": "hexo generate --config _config.yml,_config.ghpages.yml && node tools/fix-ghpages-paths.js",
     "clean": "hexo clean",
     "deploy": "hexo deploy",
     "server": "hexo server"

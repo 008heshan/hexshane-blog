@@ -12,7 +12,8 @@
    补上 /hexshane-blog 前缀（HTML 的 href/src 与 CSS 的 url() 都处理），
    顺便覆盖 JS 里出现的同类字符串。只在镜像构建里使用，主站不受影响。
 
-   用法：node scripts/fix-ghpages-paths.js [root]
+   用法：node tools/fix-ghpages-paths.js [root]（放在 tools/ 而不是 scripts/：Hexo 会递归加载
+         scripts/ 下所有 .js 当插件执行，维护工具放那里会在每次构建时被误执行）
          root 默认取 _config.ghpages.yml 里的 root（/hexshane-blog/）
    ============================================================ */
 'use strict'
