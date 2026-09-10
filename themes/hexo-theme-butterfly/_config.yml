@@ -1110,6 +1110,8 @@ inject:
     - <link rel="stylesheet" href="/custom/widgets/translate-btn.css?v=20260908b">
     # --- widgets 作者卡片右侧滑出社媒条 ---
     - <link rel="stylesheet" href="/custom/widgets/author-dock.css?v=20260910h">
+    # --- widgets /articles/ 列表页：页头 + 分类筛选 + 卡片强调（只在 #articles-index 内生效） ---
+    - <link rel="stylesheet" href="/custom/widgets/articles-index.css?v=20260910k">
     # --- 科幻/科技/极客皮肤（必须放在最后，覆盖上面所有自定义样式） ---
     - <link rel="stylesheet" href="/custom/theme/sci-fi.css?v=20260910j">
   bottom:

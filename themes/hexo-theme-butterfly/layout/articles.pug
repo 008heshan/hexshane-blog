@@ -1,7 +1,30 @@
 //- 导航栏「文章」独立页面 /articles/
-//- 与首页共用同一套卡片（indexPostUI），保证玻璃卡片样式完全一致
+//- 与首页共用同一套卡片（indexPostUI），保证玻璃卡片样式完全一致；
+//- 2026-09-10：加页头（标题 / 篇数 / 分类筛选），让列表页看起来像个正经索引，
+//- 样式全部走 source/custom/widgets/articles-index.css（作用域限定在 #articles-index）
 extends includes/layout.pug
 
 block content
   include ./includes/mixins/indexPostUI.pug
-  +indexPostUI
+  - const cats = site.categories.sort('length', -1).toArray()
+  - const tags = site.tags.sort('length', -1).toArray()
+  #articles-index
+    .articles-hero
+      .articles-hero__head
+        h1.articles-hero__title= '全部 ' + site.posts.length + ' 篇'
+        p.articles-hero__desc 按 tModLoader 官方 Wiki 顺序整理的模组开发指南，外加前端、性能与折腾笔记。序号即系列顺序。
+      .articles-hero__stats
+        a.articles-hero__stat(href=url_for(config.archive_dir) + '/')
+          b= site.posts.length
+          span 篇
+        a.articles-hero__stat(href=url_for(config.category_dir) + '/')
+          b= site.categories.length
+          span 个分类
+        a.articles-hero__stat(href=url_for(config.tag_dir) + '/')
+          b= site.tags.length
+          span 个标签
+      .articles-chips
+        a.articles-chip.is-active(href=url_for('/articles/')) 全部
+        each cat in cats
+          a.articles-chip(href=url_for(cat.path))= cat.name + ' · ' + cat.length
+    +indexPostUI

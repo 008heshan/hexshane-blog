@@ -1,0 +1,232 @@
+/* ============================================================
+   /articles/ 列表页：让它"醒目"起来
+   ------------------------------------------------------------
+   原来这个页面只是把首页卡片原样铺一遍：每张卡标题一样大、摘要一样灰、
+   没有层次，27 篇扫下来分不清主次。这里在不改动首页的前提下（样式全部
+   限定在 #articles-index 内）补三件事：
+   1) 页头：大标题 + 篇数/分类/标签数字 + 分类筛选胶囊（可点着跳分类页）
+   2) 卡片：标题放大、左侧钢青竖条、分类胶囊换成强调色、悬停抬升 + 描边点亮
+   3) 摘要放开到 3 行，信息更足
+   配色沿用 sci-fi 皮肤的令牌（--sf-ice / --sf-glass 等），不加新颜色。
+   ============================================================ */
+
+/* ---------- 1. 页头 ---------- */
+#articles-index .articles-hero {
+  position: relative;
+  margin: 0 0 18px;
+  padding: 26px 28px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--sf-glass-line, rgba(255, 255, 255, .12));
+  background: var(--sf-glass, rgba(255, 255, 255, .055));
+  box-shadow:
+    0 24px 60px -38px rgba(0, 0, 0, .95),
+    inset 0 1px 0 rgba(255, 255, 255, .10);
+  overflow: hidden;
+}
+
+/* 左侧一条钢青竖光，给页头一个视觉锚点 */
+#articles-index .articles-hero::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 18px;
+  bottom: 18px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, var(--sf-ice, #9dc0d4), rgba(157, 192, 212, .12));
+}
+
+#articles-index .articles-hero__title {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.2;
+  letter-spacing: .06em;
+  color: #eaf2f8;
+}
+
+#articles-index .articles-hero__desc {
+  margin: 8px 0 0;
+  font-size: .95rem;
+  color: var(--sf-muted, #7c8a95);
+}
+
+#articles-index .articles-hero__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin-top: 16px;
+}
+
+#articles-index .articles-hero__stat {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  text-decoration: none !important;
+  border: 0 !important;
+}
+
+#articles-index .articles-hero__stat b {
+  font-family: var(--sf-mono, monospace);
+  font-size: 1.55rem;
+  font-weight: 600;
+  color: var(--sf-ice-2, #cbe2ef);
+  letter-spacing: .02em;
+}
+
+#articles-index .articles-hero__stat span {
+  font-size: .85rem;
+  color: var(--sf-muted, #7c8a95);
+}
+
+#articles-index .articles-hero__stat:hover b {
+  color: #fff;
+}
+
+/* ---------- 2. 分类筛选胶囊 ---------- */
+#articles-index .articles-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
+#articles-index .articles-chip {
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--sf-glass-line, rgba(255, 255, 255, .12));
+  background: rgba(255, 255, 255, .04);
+  font-family: var(--sf-mono, monospace);
+  font-size: .82rem;
+  color: var(--sf-muted, #7c8a95);
+  text-decoration: none !important;
+  transition: color .18s ease, border-color .18s ease, background-color .18s ease;
+}
+
+#articles-index .articles-chip:hover,
+#articles-index .articles-chip.is-active {
+  color: #04101a;
+  background: var(--sf-ice, #9dc0d4);
+  border-color: var(--sf-ice, #9dc0d4);
+}
+
+#articles-index .articles-chip.is-active {
+  cursor: default;
+}
+
+/* ---------- 3. 卡片：放大标题 / 竖条 / 悬停抬升 ---------- */
+#articles-index .recent-post-item {
+  --art-accent: var(--sf-ice, #9dc0d4);
+  position: relative;
+  padding-left: 22px !important;
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+
+/* 左侧竖条：默认很淡，悬停点亮 */
+#articles-index .recent-post-item::before {
+  content: '';
+  display: block !important;
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 3px;
+  height: auto;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, rgba(157, 192, 212, .35), rgba(157, 192, 212, .06));
+  transition: background .22s ease, box-shadow .22s ease;
+}
+
+#articles-index .recent-post-item:hover {
+  transform: translateY(-2px);
+}
+
+#articles-index .recent-post-item:hover::before {
+  background: linear-gradient(180deg, var(--sf-ice, #9dc0d4), rgba(157, 192, 212, .25));
+  box-shadow: 0 0 14px rgba(157, 192, 212, .35);
+}
+
+#articles-index .recent-post-item .article-title {
+  font-size: 1.18rem !important;
+  font-weight: 600;
+  letter-spacing: .01em;
+}
+
+#articles-index .recent-post-item .article-title a,
+#articles-index .recent-post-item .article-title {
+  color: #e9f2f8 !important;
+}
+
+#articles-index .recent-post-item:hover .article-title,
+#articles-index .recent-post-item:hover .article-title a {
+  color: var(--sf-ice-2, #cbe2ef) !important;
+}
+
+/* 分类做成强调色胶囊，别再和日期一样灰 */
+#articles-index .recent-post-item .article-meta__categories {
+  padding: 1px 9px 2px;
+  border-radius: 999px;
+  background: rgba(157, 192, 212, .12);
+  color: var(--sf-ice-2, #cbe2ef) !important;
+  font-size: .8rem !important;
+}
+
+#articles-index .recent-post-item .article-meta__categories i {
+  display: none;   /* 胶囊里不必再放 inbox 图标 */
+}
+
+#articles-index .recent-post-item .article-meta-label,
+#articles-index .recent-post-item .article-meta-separator {
+  opacity: .55;
+}
+
+/* 摘要放开到 3 行，信息更足 */
+#articles-index .recent-post-item .content {
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: #9fb0bd !important;
+}
+
+/* ---------- 4. 序号徽章（系列第几篇） ---------- */
+#articles-index .recent-post-info {
+  position: relative;
+}
+
+#articles-index .article-index-badge {
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 1px 8px 2px;
+  border-radius: 6px;
+  border: 1px solid rgba(157, 192, 212, .28);
+  background: rgba(157, 192, 212, .10);
+  font-family: var(--sf-mono, monospace);
+  font-size: .78rem;
+  letter-spacing: .06em;
+  color: var(--sf-ice, #9dc0d4);
+}
+
+#articles-index .recent-post-item:hover .article-index-badge {
+  background: var(--sf-ice, #9dc0d4);
+  border-color: var(--sf-ice, #9dc0d4);
+  color: #04101a;
+}
+
+/* ---------- 小屏：收一收页头 ---------- */
+@media (max-width: 768px) {
+  #articles-index .articles-hero {
+    padding: 20px 18px 16px;
+  }
+  #articles-index .articles-hero__title {
+    font-size: 1.6rem;
+  }
+  #articles-index .articles-hero__stats {
+    gap: 16px;
+  }
+  #articles-index .recent-post-item {
+    padding-left: 16px !important;
+  }
+}
