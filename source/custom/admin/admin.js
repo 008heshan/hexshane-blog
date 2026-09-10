@@ -1519,8 +1519,13 @@
     var file = (state.meta && state.meta.announceFile) || 'source/_data/announcement.yml'
     var body = $('#announce-body').value
     var indented = body.split('\n').map(function (l) { return l ? '  ' + l : '' }).join('\n')
+    // 文件头注释要保持和仓库里那份一致 —— 否则在后台保存一次就把它抹掉了
     var text = '# 公告内容（由管理页 /admin/ 的「公告」标签页读写）\n' +
       '# 优先级：本文件 > 主题 _config.yml 的 aside.card_announcement.content\n' +
+      '# 渲染方式：站点用 Hexo 的 markdown()（marked）渲染本字段 ——\n' +
+      '#   Markdown（**加粗**、- 列表、[链接](…)、`代码`…）会真的生效，\n' +
+      '#   内联/块级 HTML（<p> <b> <a> <ul>…）原样放行，两者可混用。\n' +
+      '# 悬停展开全文由 announce-hover.js 负责。\n' +
       'content: |\n' + indented + '\n'
     ghGetFile(file).then(function (f) {
       return ghPutFile(file, text, 'admin: 更新侧栏公告', f ? f.sha : null)
