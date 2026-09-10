@@ -204,6 +204,45 @@ git add -A && git commit -m "post: 文章标题" && git push
 - `/admin/` 的 Token 只存在访问者的浏览器里；换设备要重新填
 - 后台写操作会直接提交到仓库，触发 Cloudflare Pages 构建（约 1 分钟）
 
+## 内容计划：tModLoader 指南搬运进度
+
+按 tModLoader 官方 Wiki [Home](https://github.com/tModLoader/tModLoader/wiki) 的 **Easy guides** 顺序逐篇搬过来并译成中文。
+翻译约定：**代码与 API 名一律保留英文原文**，正文译成中文并化繁为简（口语、能听懂、不留机翻味）；
+每篇开头保留"整理自官方 Wiki + 原文链接"的引用块，插图一律下载到 `source/img/posts/<文章名>/` 自托管。
+
+| # | Wiki 页面 | 本地文件 | 状态 |
+| --- | --- | --- | --- |
+| 1 | [Basic-Prerequisites](https://github.com/tModLoader/tModLoader/wiki/Basic-Prerequisites) | `tmodloader-basic-prerequisites.md` | ✅ 已译 |
+| 2 | [Spriting](https://github.com/tModLoader/tModLoader/wiki/Spriting) | — | ⬜ 待搬 |
+| 3 | [Basic-Ammo](https://github.com/tModLoader/tModLoader/wiki/Basic-Ammo) | — | ⬜ 待搬 |
+| 4 | [Basic-Autoload](https://github.com/tModLoader/tModLoader/wiki/Basic-Autoload) | — | ⬜ 待搬 |
+| 5 | [Coordinates](https://github.com/tModLoader/tModLoader/wiki/Coordinates) | — | ⬜ 待搬 |
+| 6 | [Geometry](https://github.com/tModLoader/tModLoader/wiki/Geometry) | — | ⬜ 待搬 |
+| 7 | [Basic-glowmask-guide](https://github.com/tModLoader/tModLoader/wiki/Basic-glowmask-guide) | — | ⬜ 待搬 |
+| 8 | [IEntitySource](https://github.com/tModLoader/tModLoader/wiki/IEntitySource) | — | ⬜ 待搬 |
+| 9 | [Localization](https://github.com/tModLoader/tModLoader/wiki/Localization) | — | ⬜ 待搬 |
+| 10 | [Logging](https://github.com/tModLoader/tModLoader/wiki/Logging) | — | ⬜ 待搬 |
+| 11 | [Basic-Minion-Guide](https://github.com/tModLoader/tModLoader/wiki/Basic-Minion-Guide) | — | ⬜ 待搬 |
+| 12 | [Basic-JSON-&-ModConfigs](https://github.com/tModLoader/tModLoader/wiki/Basic-JSON-%26-ModConfigs) | — | ⬜ 待搬 |
+| 13 | [Basic-Dust](https://github.com/tModLoader/tModLoader/wiki/Basic-Dust) | — | ⬜ 待搬 |
+| 14 | [Basic-Item](https://github.com/tModLoader/tModLoader/wiki/Basic-Item) | — | ⬜ 待搬 |
+| 15 | [Basic-Projectile](https://github.com/tModLoader/tModLoader/wiki/Basic-Projectile) | `tmodloader-basic-modprojectile.md` | 🚧 原文已搬、待重译 |
+| 16 | [ModPlayer](https://github.com/tModLoader/tModLoader/wiki/ModPlayer) | — | ⬜ 待搬 |
+| 17 | [Basic-Recipes](https://github.com/tModLoader/tModLoader/wiki/Basic-Recipes) | `tmodloader-basic-recipe.md` | 🚧 原文已搬、待重译 |
+| 18 | [Basic-Tile](https://github.com/tModLoader/tModLoader/wiki/Basic-Tile) | — | ⬜ 待搬 |
+| 19 | [Basic-Tile-Entity](https://github.com/tModLoader/tModLoader/wiki/Basic-Tile-Entity) | — | ⬜ 待搬 |
+| 20 | [Basic-Netcode](https://github.com/tModLoader/tModLoader/wiki/Basic-Netcode) | — | ⬜ 待搬 |
+| 21 | [Basic-NPC-Drops-and-Loot-1.4](https://github.com/tModLoader/tModLoader/wiki/Basic-NPC-Drops-and-Loot-1.4) | — | ⬜ 待搬 |
+| 22 | [Basic-NPC-Spawning](https://github.com/tModLoader/tModLoader/wiki/Basic-NPC-Spawning) | `tmodloader-basic-npc-spawning.md` | 🚧 原文已搬、待重译 |
+| 23 | [Basic-Sounds](https://github.com/tModLoader/tModLoader/wiki/Basic-Sounds) | — | ⬜ 待搬 |
+| 24 | [Time-and-Timers](https://github.com/tModLoader/tModLoader/wiki/Time-and-Timers) | — | ⬜ 待搬 |
+| 25 | [Basic-UI-Element](https://github.com/tModLoader/tModLoader/wiki/Basic-UI-Element) | — | ⬜ 待搬 |
+| 26 | [Wall](https://github.com/tModLoader/tModLoader/wiki/Wall) | — | ⬜ 待搬 |
+| 27 | [Conditions](https://github.com/tModLoader/tModLoader/wiki/Conditions) | — | ⬜ 待搬 |
+
+> 抓取提示：`raw.githubusercontent.com/wiki/tModLoader/tModLoader/<页面名>.md` 直接就是 Wiki 原稿
+> （本机直连时通时不通，多试几次或走代理）；原稿里的 imgur 图可用 `https://cors.eu.org/<原图地址>` 取回本地（会限流）。
+
 ## 已知事项
 
 - 未启用 `hexo-generator-feed` / `hexo-generator-sitemap`，站点没有 `atom.xml`、`sitemap.xml`。
