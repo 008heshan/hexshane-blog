@@ -51,18 +51,6 @@
 }
 
 /* 液态玻璃的光斑漂移（transform 平移，走 GPU 合成层） */
-@keyframes glass-liquid-drift {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    transform: translate3d(-7%, -5%, 0);
-  }
-  100% {
-    transform: translate3d(-15%, -10%, 0);
-  }
-}
-
 /* 噪点抖动(dither)：细微随机噪点打散 8-bit 渐变色带(banding)。
    用内联 SVG feTurbulence 生成噪声，低透明度叠加，肉眼几乎不可见，
    但足以让相邻色阶间的生硬边界被填平。
@@ -93,15 +81,6 @@
 }
 
 /* 液态旋涡：纹理缓慢旋转/位移，仿佛液体被搅动 */
-@keyframes glass-liquid-swirl {
-  0% {
-    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
-  }
-  100% {
-    transform: translate3d(1.5%, -.8%, 0) rotate(4deg) scale(1.04);
-  }
-}
-
 /* dark：背景层换深色光斑(同样降透明度、拉长过渡去 banding)
    [v10 层次] 提高冷暖光斑对比度, 中心高光+暗角叠加 → 层次分明 */
 html[data-theme='dark'] .bg-liquid {

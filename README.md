@@ -47,20 +47,34 @@
 ```
 .
 ├─ .github/workflows/pages.yml   # GitHub Pages 备用部署（npm ci → build:ghpages → deploy）
-├─ scripts/                      # 构建期自定义生成器 / 过滤器
+├─ scripts/                      # Hexo 插件（generator / filter / helper）—— 会被自动加载执行
 │  ├─ articles-generator.js      # /articles/ 列表页（复用首页卡片样式，支持分页）
 │  ├─ index-pin-order.js         # 首页置顶：sticky 数字越小越靠前
 │  ├─ admin-generator.js         # /admin/ 管理后台 + posts.json / meta.json
 │  ├─ search-json.js             # /search.json 检索索引
 │  ├─ fix-shiki-fences.js        # 修复 shiki 插件代码围栏贪婪匹配
 │  └─ translate-posts.js         # 构建期翻译（需配置 deepl_api_key，默认不启用）
+├─ tools/                        # 维护工具（只能手动调用；不能放 scripts/，那里会被自动执行）
+│  └─ fix-ghpages-paths.js       # 镜像站构建后给 /custom/ 资源补子路径前缀
 ├─ source/
 │  ├─ _posts/                    # 文章（Markdown）
 │  ├─ img/posts/<文章名>/        # 文章插图（自托管，不外链图床）
+│  ├─ img/favicon.svg 等         # 站点图标一套（svg + 32/180/512 png）
 │  ├─ _data/announcement.yml     # 侧栏公告（后台 /admin/ 可写）
 │  ├─ about/index.md             # 关于页
-│  └─ custom/                    # 自定义样式 / 脚本 / 字体 / 图标等静态资源
-├─ themes/hexo-theme-butterfly/  # 主题（含改过的 _config.yml、admin.pug）
+│  ├─ robots.txt                 # 屏蔽后台路径收录
+│  └─ custom/                    # 自定义资源，按职责分目录：
+│     ├─ theme/                  #   皮肤与版式：sci-fi.css（令牌 + 材质收口）、字体、TOC、阅读模式、移动端修复、主题切换动效
+│     ├─ nav/                    #   导航：nav-core（外壳）、nav-search（检索）、nav-glass（滚动玻璃底）、sidebar-mask（抽屉状态机）
+│     ├─ code/                   #   代码块：code-highlight.css（皮肤）、code-wrap-align.js（换行后行号对齐）
+│     ├─ effects/                #   背景与特效：glass-bg / starlink / hero-fx / force-glow
+│     ├─ perf/                   #   性能守门：scroll-perf（快速滚动降级）、tab-visibility（隐藏页暂停动画）
+│     ├─ utils/                  #   兜底修复：anchor-fallback（锚点归一化）、anchor-offset（避让固定导航）
+│     ├─ widgets/                #   页面挂件：公告悬停、作者社媒条、翻译按钮、页脚、图片放大、/articles/ 页头样式
+│     ├─ admin/                  #   管理后台（admin.js / admin.css / admin-key.js / admin-space.js）
+│     ├─ assets/                 #   静态资源：字体、Font Awesome、品牌 svg、vendor/（第三方插件资源本地副本）
+│     └─ cursor/                 #   自定义光标
+├─ themes/hexo-theme-butterfly/  # 主题（含改过的 _config.yml、admin.pug、articles.pug）
 ├─ _config.yml                   # 站点配置：url = https://hexshane.top，root = /
 ├─ _config.ghpages.yml           # GitHub Pages 子路径覆盖配置（仅 CI 用）
 └─ package.json / package-lock.json
