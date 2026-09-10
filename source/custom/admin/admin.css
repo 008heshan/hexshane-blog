@@ -797,6 +797,29 @@ body.admin-body {
 
 .editor-draft-btn:hover { background: rgba(255, 190, 90, .14); }
 
+/* 编辑器头部（写文章 / 公告共用）：状态文字 + 草稿提示排一行 */
+.admin-editor-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-height: 22px;
+  margin-bottom: 10px;
+}
+
+.admin-editor-head .editor-draft {
+  margin: 0;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+/* 把图片拖进正文输入框时的落点提示 */
+.admin-textarea.is-drop-target {
+  outline: 2px dashed rgba(255, 255, 255, .34);
+  outline-offset: -6px;
+  background-color: rgba(255, 255, 255, .045);
+}
+
 /* ---------- 正文区 ---------- */
 .editor-body { display: flex; flex-direction: column; }
 

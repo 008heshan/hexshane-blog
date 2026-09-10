@@ -1,0 +1,116 @@
+/* ============================================================
+   作者卡片 · 右侧滑出社媒条（author-dock）
+   ------------------------------------------------------------
+   结构由 author-dock.js 注入：把一条竖排图标条挂在
+   #aside-content 下（不是卡片内部 —— .card-widget 自带
+   overflow: hidden，放里面会被裁掉），绝对定位贴在作者卡片右缘。
+   鼠标移到卡片上时向右滑出，只有图标，没有文字。
+   玻璃材质与卡片一致（--sf-glass* 令牌在 sci-fi.css）。
+   ============================================================ */
+
+/* 定位锚点：dock 用绝对定位挂在它下面 */
+#aside-content {
+  position: relative;
+}
+
+.author-dock {
+  position: absolute;
+  top: 0;                 /* 真实位置由 JS 按卡片位置算 */
+  left: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 7px 6px;
+  border-radius: 0 12px 12px 0;
+  border: 1px solid var(--sf-glass-line, rgba(255, 255, 255, .12));
+  border-left: 0;
+  background-image: var(--sf-glass-sheen);
+  background-color: var(--sf-glass-2, rgba(255, 255, 255, .075));
+  -webkit-backdrop-filter: blur(var(--sf-glass-blur, 20px));
+  backdrop-filter: blur(var(--sf-glass-blur, 20px));
+  box-shadow:
+    12px 18px 40px -24px rgba(0, 0, 0, .85),
+    inset 0 1px 0 rgba(255, 255, 255, .16);
+  /* 收起态：贴近卡片右缘，未滑出 */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-10px) scaleX(.96);
+  transform-origin: left center;
+  transition:
+    opacity .18s ease,
+    transform .3s cubic-bezier(.34, 1.36, .44, 1),
+    visibility .3s;
+  pointer-events: none;
+}
+
+.author-dock.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0) scaleX(1);
+  pointer-events: auto;
+}
+
+.author-dock__item {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 17px;
+  line-height: 1;
+  color: var(--sf-muted, #7c8a95);
+  background: transparent;
+  border: 0;
+  text-decoration: none !important;
+  transition: color .16s ease, background-color .16s ease, transform .16s ease;
+}
+
+.author-dock__item:hover,
+.author-dock__item:focus-visible {
+  color: var(--sf-ice-2, #cbe2ef);
+  background-color: rgba(255, 255, 255, .08);
+  transform: translateX(1px);
+  outline: none;
+}
+
+/* 各站一点点品牌识别色（只在 hover 时用，静止时保持中性） */
+.author-dock__item[data-site='bilibili']:hover { color: #fb7299; }
+.author-dock__item[data-site='douyin']:hover { color: #25f4ee; }
+.author-dock__item[data-site='github']:hover { color: #e6eef4; }
+
+/* 卡片 hover 时给一点提示：右缘亮一档，暗示"有东西会滑出来" */
+.card-info.dock-ready {
+  transition: border-color .22s ease, box-shadow .22s ease;
+}
+
+.card-info.dock-ready.dock-open {
+  border-color: var(--sf-glass-line-strong, rgba(255, 255, 255, .2)) !important;
+}
+
+/* 小屏 / 触屏：不滑出，直接作为一行图标常显在卡片下方（可见即可点） */
+@media (max-width: 900px), (hover: none) {
+  .author-dock {
+    position: static;
+    flex-direction: row;
+    justify-content: center;
+    gap: 6px;
+    margin: 10px 0 0;
+    padding: 8px;
+    border: 1px solid var(--sf-glass-line, rgba(255, 255, 255, .12));
+    border-radius: 10px;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    pointer-events: auto;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .author-dock {
+    transition: opacity .01ms;
+    transform: none;
+  }
+}

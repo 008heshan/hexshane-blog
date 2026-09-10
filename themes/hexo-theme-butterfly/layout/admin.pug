@@ -11,7 +11,7 @@ html(lang='zh-CN' data-theme='dark')
     link(rel='stylesheet' href=url_for('/custom/assets/fontawesome/all.min.css'))
     link(rel='stylesheet' href=url_for('/custom/cursor/site-cursor.css'))
     //- 带版本号：静态托管对自定义资源无 cache-control，不加版本号浏览器会长期跑旧文件
-    link(rel='stylesheet' href=url_for('/custom/admin/admin.css') + '?v=20260909c')
+    link(rel='stylesheet' href=url_for('/custom/admin/admin.css') + '?v=20260910i')
   body.admin-body
     //- ============ 背景：canvas 液态玻璃 + 星链 + 流星 ============
     canvas#admin-space(aria-hidden='true')
@@ -124,7 +124,7 @@ html(lang='zh-CN' data-theme='dark')
                   input#ed-desc.admin-input(type='text')
                 .admin-field
                   label 正文（Markdown）
-                  .editor-body#editor-body
+                  .editor-body.mode-edit#editor-body
                     .editor-bar
                       .editor-tools
                         button.editor-tool(type='button' data-md='bold' title='加粗（Ctrl+B）')
@@ -149,8 +149,10 @@ html(lang='zh-CN' data-theme='dark')
                           i.fas.fa-file-code
                         button.editor-tool(type='button' data-md='link' title='链接（Ctrl+K）')
                           i.fas.fa-link
-                        button.editor-tool(type='button' data-md='image' title='图片')
+                        button.editor-tool(type='button' data-md='image' title='插入图片：选文件上传到仓库（或直接把图片粘贴 / 拖进来）')
                           i.fas.fa-image
+                        button.editor-tool(type='button' data-md='image-url' title='插入外链图片（手填图片网址）')
+                          i.fas.fa-link
                         button.editor-tool(type='button' data-md='table' title='表格')
                           i.fas.fa-table
                         button.editor-tool(type='button' data-md='hr' title='分割线')
@@ -162,9 +164,10 @@ html(lang='zh-CN' data-theme='dark')
                     .editor-panes
                       textarea#ed-body.admin-textarea(rows='22' spellcheck='false' placeholder='用 Markdown 写正文…')
                       .editor-preview#editor-preview
+                    input#ed-image-file(type='file' accept='image/*' multiple hidden)
                     .editor-foot
                       span#ed-stats.editor-stats 0 字 · 0 行 · 约 1 分钟
-                      span.editor-tip Ctrl+B 加粗 · Ctrl+K 链接 · Ctrl+S 保存 · Tab 缩进
+                      span.editor-tip Ctrl+B 加粗 · Ctrl+K 链接 · Ctrl+S 保存 · Tab 缩进 · 插入图片：点图钉选文件，或直接 Ctrl+V 粘贴 / 拖图片进来
                 .admin-actions
                   button#btn-save-post.admin-btn.admin-btn-primary(type='button')
                     i.fas.fa-floppy-disk
@@ -177,14 +180,61 @@ html(lang='zh-CN' data-theme='dark')
         //- ---------- 公告 ----------
         section#tab-announce.admin-pane
           .admin-panel
-            .admin-panel-title 侧栏公告内容（支持 HTML）
-            textarea#announce-body.admin-textarea(rows='16' spellcheck='false')
+            .admin-panel-title 侧栏公告内容
+            .admin-editor-head
+              span#announce-state.admin-editor-state
+              #announce-draft.editor-draft(style='display:none')
+                i.fas.fa-clock-rotate-left
+                span#announce-draft-text 检测到本地草稿
+                button#btn-restore-announce-draft.editor-draft-btn(type='button') 恢复
+                button#btn-drop-announce-draft.editor-draft-btn(type='button') 忽略
+            .editor-body.mode-edit#announce-editor(data-editor='announce')
+              .editor-bar
+                .editor-tools
+                  button.editor-tool(type='button' data-md='bold' title='加粗（Ctrl+B）')
+                    i.fas.fa-bold
+                  button.editor-tool(type='button' data-md='italic' title='斜体（Ctrl+I）')
+                    i.fas.fa-italic
+                  button.editor-tool(type='button' data-md='strike' title='删除线')
+                    i.fas.fa-strikethrough
+                  span.editor-tools-sep
+                  button.editor-tool(type='button' data-md='h2' title='二级标题')
+                    i.fas.fa-heading
+                  button.editor-tool(type='button' data-md='quote' title='引用')
+                    i.fas.fa-quote-left
+                  button.editor-tool(type='button' data-md='ul' title='无序列表')
+                    i.fas.fa-list-ul
+                  button.editor-tool(type='button' data-md='ol' title='有序列表')
+                    i.fas.fa-list-ol
+                  span.editor-tools-sep
+                  button.editor-tool(type='button' data-md='code' title='行内代码')
+                    i.fas.fa-code
+                  button.editor-tool(type='button' data-md='link' title='链接（Ctrl+K）')
+                    i.fas.fa-link
+                  button.editor-tool(type='button' data-md='image' title='插入图片：选文件上传到仓库（或直接把图片粘贴 / 拖进来）')
+                    i.fas.fa-image
+                  button.editor-tool(type='button' data-md='image-url' title='插入外链图片（手填图片网址）')
+                    i.fas.fa-link
+                  button.editor-tool(type='button' data-md='hr' title='分割线')
+                    i.fas.fa-minus
+                .editor-modes
+                  button.editor-mode.is-active(type='button' data-mode='edit') 编辑
+                  button.editor-mode(type='button' data-mode='split') 分栏
+                  button.editor-mode(type='button' data-mode='preview') 预览
+              .editor-panes
+                textarea#announce-body.admin-textarea(rows='12' spellcheck='false' placeholder='写侧栏公告：Markdown 或直接写 HTML 标签都行（站点按 HTML 渲染）')
+                .editor-preview#announce-preview
+              input#announce-image-file(type='file' accept='image/*' multiple hidden)
+              .editor-foot
+                span#announce-stats.editor-stats 0 字 · 0 行
+                span.editor-tip Ctrl+B 加粗 · Ctrl+K 链接 · Ctrl+S 保存 · Tab 缩进 · 插入图片：点图钉选文件，或直接 Ctrl+V 粘贴 / 拖图片进来
             .admin-actions
               button#btn-save-announce.admin-btn.admin-btn-primary(type='button')
                 i.fas.fa-floppy-disk
                 span 保存公告
               button#btn-reload-announce.admin-btn(type='button') 重新拉取
-            .admin-hint 保存后写入 <code>source/_data/announcement.yml</code>，站点重新构建后生效。
+              button#btn-clear-announce.admin-btn(type='button') 清空
+            .admin-hint 保存后写入 <code>source/_data/announcement.yml</code>，站点重新构建（推送后由 Cloudflare Pages 自动构建）即可生效。图片会自动上传到 <code>source/img/announce/</code> 并以 <code>/img/announce/…</code> 引用。
 
         //- ---------- 标签 / 分类 ----------
         section#tab-taxonomy.admin-pane
@@ -250,4 +300,4 @@ html(lang='zh-CN' data-theme='dark')
     script(src=url_for('/custom/cursor/site-cursor.js'))
     script(src=url_for('/custom/admin/admin-key.js'))
     script(src=url_for('/custom/admin/admin-space.js'))
-    script(src=url_for('/custom/admin/admin.js') + '?v=20260910g')
+    script(src=url_for('/custom/admin/admin.js') + '?v=20260910i')

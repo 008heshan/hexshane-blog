@@ -267,6 +267,13 @@
     return ghFetch('/contents/' + ghPath(path), { method: 'PUT', body: body })
   }
 
+  // 二进制文件（图片）上传：content 必须是 base64，不能先当文本再编码
+  function ghPutFileB64(path, b64, message, sha) {
+    var body = { message: message, content: b64, branch: state.gh.branch }
+    if (sha) body.sha = sha
+    return ghFetch('/contents/' + ghPath(path), { method: 'PUT', body: body })
+  }
+
   function ghDeleteFile(path, sha, message) {
     return ghFetch('/contents/' + ghPath(path), {
       method: 'DELETE',
@@ -482,14 +489,19 @@
   }
 
   // ---- 字数统计 ----
-  function updateStats() {
-    var v = $('#ed-body').value
+  function statsText(v) {
     var cn = (v.match(/[\u4e00-\u9fa5]/g) || []).length
     var words = (v.replace(/[\u4e00-\u9fa5]/g, ' ').match(/[A-Za-z0-9_'-]+/g) || []).length
     var lines = v ? v.split('\n').length : 0
     var count = cn + words
     var minutes = Math.max(1, Math.round(count / 400))
-    $('#ed-stats').textContent = count + ' 字 · ' + lines + ' 行 · 约 ' + minutes + ' 分钟'
+    return { count: count, lines: lines, minutes: minutes, text: count + ' 字 · ' + lines + ' 行 · 约 ' + minutes + ' 分钟' }
+  }
+
+  function updateStats() {
+    var el = $('#ed-stats')
+    if (!el) return
+    el.textContent = statsText($('#ed-body').value).text
   }
 
   // ---- 置顶权重：把"当前效果"直接写在旁边，不再云里雾里 ----
@@ -624,25 +636,44 @@
     return out.join('\n')
   }
 
-  function updatePreview() {
-    var host = $('#editor-preview')
-    if (!host) return
-    host.innerHTML = mdToHtml($('#ed-body').value)
-  }
+  // 写文章编辑器（默认实例）：公告编辑器共用同一套函数，靠 .editor-body 区分
+  function updatePreview() { updatePreviewFor($('#editor-body')) }
 
-  function schedulePreview() {
-    clearTimeout(previewTimer)
-    previewTimer = setTimeout(updatePreview, 180)
-  }
+  function schedulePreview() { schedulePreviewFor($('#editor-body')) }
 
-  function setEditorMode(mode) {
-    editorMode = mode
-    var body = $('#editor-body')
-    if (body) body.className = 'editor-body mode-' + mode
+  function setEditorMode(mode, root) {
+    var body = root || $('#editor-body')
+    if (!body) return
+    body.className = 'editor-body mode-' + mode
     $$('.editor-mode').forEach(function (b) {
-      b.classList.toggle('is-active', b.getAttribute('data-mode') === mode)
+      if (body.contains(b)) b.classList.toggle('is-active', b.getAttribute('data-mode') === mode)
     })
-    if (mode !== 'edit') updatePreview()
+    body.__mode = mode
+    if (mode !== 'edit') updatePreviewFor(body)
+  }
+
+  // 预览：写文章走 Markdown 渲染；公告按站点实际渲染方式（HTML）直出
+  function updatePreviewFor(body) {
+    if (!body) return
+    var ta = body.querySelector('textarea')
+    var host = body.querySelector('.editor-preview')
+    if (!ta || !host) return
+    if (body.getAttribute('data-editor') === 'announce') {
+      var src = ta.value.trim()
+      // 看起来像纯文本（没有标签）时也顺手用 Markdown 渲染，两边都不吃亏
+      host.innerHTML = /<[a-z][\s\S]*>/i.test(src) ? src : mdToHtml(ta.value)
+    } else {
+      host.innerHTML = mdToHtml(ta.value)
+    }
+  }
+
+  function schedulePreviewFor(body) {
+    clearTimeout(previewTimer)
+    previewTimer = setTimeout(function () { updatePreviewFor(body) }, 180)
+  }
+
+  function editorOf(el) {
+    return el && el.closest ? el.closest('.editor-body') : null
   }
 
   // 编辑器内容变化后的统一收尾
@@ -651,19 +682,24 @@
     scheduleDraft()
     updateStats()
     updateStickyState()
-    if (editorMode !== 'edit') schedulePreview()
+    var b = $('#editor-body')
+    if (((b && b.__mode) || editorMode) !== 'edit') schedulePreview()
   }
 
   // 打开文章 / 新建文章后同步整块 UI
   function syncEditorUI() {
     updateStats()
     updateStickyState()
-    if (editorMode !== 'edit') updatePreview()
+    var b = $('#editor-body')
+    if (((b && b.__mode) || editorMode) !== 'edit') updatePreview()
   }
 
   // ---- Markdown 工具栏：在光标处插入 / 包裹选区 ----
-  function insertMarkdown(kind) {
-    var ta = $('#ed-body')
+  // ta 省略时作用于写文章编辑器；公告编辑器传自己的 textarea + onChange
+  function insertMarkdown(kind, ta, onChange) {
+    ta = ta || $('#ed-body')
+    if (!ta) return
+    onChange = onChange || afterEdit
     var val = ta.value
     var start = ta.selectionStart
     var end = ta.selectionEnd
@@ -713,9 +749,10 @@
       out = val.slice(0, start) + pre2 + '```\n' + text2 + '\n```\n' + val.slice(end)
       selStart = start + pre2.length + 4
       selEnd = selStart + text2.length
-    } else if (kind === 'link' || kind === 'image') {
+    } else if (kind === 'link' || kind === 'image' || kind === 'image-url') {
+      var isImg = kind !== 'link'
       var label = sel || (kind === 'link' ? '链接文字' : '图片描述')
-      var s = (kind === 'link' ? '[' : '![') + label + ']()'
+      var s = (isImg ? '![' : '[') + label + ']()'
       out = val.slice(0, start) + s + val.slice(end)
       selStart = selEnd = start + s.length - 1
     } else if (kind === 'table') {
@@ -729,7 +766,163 @@
     ta.value = out
     ta.focus()
     ta.setSelectionRange(selStart, selEnd)
-    afterEdit()
+    onChange()
+  }
+
+  /* ==================== 插入图片（真·上传） ====================
+     以前"图片"按钮只是插一个 ![]() 空壳、让你自己填网址 —— 等于没法用。
+     现在：选文件 / Ctrl+V 粘贴 / 拖进来 → 直接用 Contents API 传到仓库
+     （source/img/posts/<文章名>/ 或 source/img/announce/），再把引用插到光标处。
+     插入格式随编辑器：写文章用 Markdown ![](...)，公告用 <img src="...">。
+     ============================================================ */
+  var IMG_EXT_OK = /\.(png|jpe?g|gif|webp|avif|svg|bmp)$/i
+
+  function imageDirFor(body) {
+    if (body && body.getAttribute('data-editor') === 'announce') return 'source/img/announce'
+    var ed = state.editing
+    var name = ''
+    if (ed && ed.mode === 'edit' && ed.path) {
+      name = String(ed.path).split('/').pop().replace(/\.md$/i, '')
+    } else {
+      name = slugify(($('#ed-title') && $('#ed-title').value) || '') || 'post'
+    }
+    return 'source/img/posts/' + name
+  }
+
+  function safeImageName(fileName) {
+    var base = String(fileName || 'image').replace(/[^\w.-]+/g, '-').replace(/^-+|-+$/g, '')
+    if (!IMG_EXT_OK.test(base)) {
+      var ext = (String(fileName).match(/\.([a-z0-9]+)$/i) || [, 'png'])[1].toLowerCase()
+      base = base.replace(/\.[a-z0-9]+$/i, '') + '.' + ext
+    }
+    return base || 'image.png'
+  }
+
+  function readFileB64(file) {
+    return new Promise(function (resolve, reject) {
+      var fr = new FileReader()
+      fr.onload = function () {
+        var s = String(fr.result || '')
+        resolve(s.slice(s.indexOf(',') + 1))   // 去掉 data:image/png;base64,
+      }
+      fr.onerror = function () { reject(new Error('读取文件失败')) }
+      fr.readAsDataURL(file)
+    })
+  }
+
+  // 同名文件已存在时自动让路（xxx.png → xxx-2.png）
+  function uploadImage(file, body) {
+    var dir = imageDirFor(body)
+    var name = safeImageName(file.name)
+    var isAnnounce = body && body.getAttribute('data-editor') === 'announce'
+    var ext = (name.match(/\.[a-z0-9]+$/i) || ['.png'])[0]
+    var stem = name.slice(0, name.length - ext.length)
+    var attempt = 0
+
+    function tryPath() {
+      var candidate = dir + '/' + (attempt ? stem + '-' + (attempt + 1) + ext : name)
+      return ghGetFile(candidate).then(function (existing) {
+        if (existing && attempt < 6) { attempt++; return tryPath() }
+        return readFileB64(file).then(function (b64) {
+          return ghPutFileB64(candidate, b64, 'admin: 上传图片 ' + candidate).then(function () {
+            return candidate
+          })
+        })
+      })
+    }
+
+    toast('正在上传图片：' + name + ' …')
+    return tryPath().then(function (path) {
+      var web = '/' + path.replace(/^source\//, '')
+      var alt = stem
+      insertAtCursor(body, isAnnounce ? '<img src="' + web + '" alt="' + alt + '">' : '![' + alt + '](' + web + ')')
+      toast('已插入图片：' + web, 'ok')
+      return web
+    })
+  }
+
+  // 在指定编辑器光标处插入文本（并触发它的收尾逻辑）
+  function insertAtCursor(body, text) {
+    var ta = body ? body.querySelector('textarea') : $('#ed-body')
+    if (!ta) return
+    var val = ta.value
+    var start = ta.selectionStart == null ? val.length : ta.selectionStart
+    var end = ta.selectionEnd == null ? start : ta.selectionEnd
+    var pre = (start > 0 && val[start - 1] !== '\n') ? '\n\n' : ''
+    var post = (end < val.length && val[end] !== '\n') ? '\n\n' : ''
+    var ins = pre + text + post
+    ta.value = val.slice(0, start) + ins + val.slice(end)
+    ta.focus()
+    ta.setSelectionRange(start + ins.length, start + ins.length)
+    if (body && body.getAttribute('data-editor') === 'announce') announceAfterEdit()
+    else afterEdit()
+  }
+
+  function pickImages(body) {
+    var input = body && body.getAttribute('data-editor') === 'announce'
+      ? $('#announce-image-file')
+      : $('#ed-image-file')
+    if (!input) return
+    input.value = ''
+    input.onchange = function () {
+      var files = Array.prototype.slice.call(input.files || []).filter(function (f) {
+        return /^image\//.test(f.type) || IMG_EXT_OK.test(f.name)
+      })
+      if (!files.length) { toast('没有选到图片文件', 'err'); return }
+      var chain = Promise.resolve()
+      files.forEach(function (f) {
+        chain = chain.then(function () { return uploadImage(f, body) })
+      })
+      chain.catch(function (e) { toast('图片上传失败：' + e.message, 'err') })
+    }
+    input.click()
+  }
+
+  // 粘贴 / 拖拽图片 → 直接上传
+  function bindImageDrop(body) {
+    if (!body) return
+    var ta = body.querySelector('textarea')
+    if (!ta) return
+    ta.addEventListener('paste', function (e) {
+      var items = (e.clipboardData && e.clipboardData.items) || []
+      var files = []
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].kind === 'file' && /^image\//.test(items[i].type)) {
+          var f = items[i].getAsFile()
+          if (f) files.push(f)
+        }
+      }
+      if (!files.length) return
+      e.preventDefault()
+      var chain = Promise.resolve()
+      files.forEach(function (f) {
+        chain = chain.then(function () { return uploadImage(f, body) })
+      })
+      chain.catch(function (err) { toast('图片上传失败：' + err.message, 'err') })
+    })
+    ;['dragover', 'drop'].forEach(function (type) {
+      ta.addEventListener(type, function (e) {
+        if (type === 'dragover') {
+          var types = (e.dataTransfer && e.dataTransfer.types) || []
+          if (Array.prototype.indexOf.call(types, 'Files') > -1) {
+            e.preventDefault()
+            ta.classList.add('is-drop-target')
+          }
+          return
+        }
+        ta.classList.remove('is-drop-target')
+        var files = Array.prototype.slice.call((e.dataTransfer && e.dataTransfer.files) || []).filter(function (f) {
+          return /^image\//.test(f.type) || IMG_EXT_OK.test(f.name)
+        })
+        if (!files.length) return
+        e.preventDefault()
+        var chain = Promise.resolve()
+        files.forEach(function (f) {
+          chain = chain.then(function () { return uploadImage(f, body) })
+        })
+        chain.catch(function (err) { toast('图片上传失败：' + err.message, 'err') })
+      })
+    })
   }
 
   // 光标是否落在围栏代码块里（代码块内不做列表续行）
@@ -745,17 +938,21 @@
   }
 
   // ---- 正文键盘行为：Tab 缩进 / Enter 续行 / 选区自动包裹 ----
-  function onBodyKeydown(e) {
-    var ta = $('#ed-body')
+  // 写文章与公告共用：body 指定编辑器容器，onChange 是该编辑器自己的收尾函数
+  function onEditorKeydown(e, body, onChange) {
+    var ta = (body && body.querySelector('textarea')) || $('#ed-body')
+    if (!ta) return
     var val = ta.value
     var start = ta.selectionStart
     var end = ta.selectionEnd
+    var done = onChange || afterEdit
+    var mk = function (kind) { insertMarkdown(kind, ta, done) }
 
     if ((e.ctrlKey || e.metaKey) && !e.altKey) {
       var k = (e.key || '').toLowerCase()
-      if (k === 'b') { e.preventDefault(); insertMarkdown('bold'); return }
-      if (k === 'i') { e.preventDefault(); insertMarkdown('italic'); return }
-      if (k === 'k') { e.preventDefault(); insertMarkdown('link'); return }
+      if (k === 'b') { e.preventDefault(); mk('bold'); return }
+      if (k === 'i') { e.preventDefault(); mk('italic'); return }
+      if (k === 'k') { e.preventDefault(); mk('link'); return }
     }
 
     if (e.key === 'Tab') {
@@ -780,7 +977,7 @@
         ta.value = val.slice(0, ls2) + shifted + val.slice(end)
         ta.setSelectionRange(ls2, ls2 + shifted.length)
       }
-      afterEdit()
+      done()
       return
     }
 
@@ -800,7 +997,7 @@
           ta.value = val.slice(0, start) + ins + val.slice(end)
           ta.setSelectionRange(start + ins.length, start + ins.length)
         }
-        afterEdit()
+        done()
         return
       }
     }
@@ -814,7 +1011,7 @@
         var rep = e.key + selected + pair
         ta.value = val.slice(0, start) + rep + val.slice(end)
         ta.setSelectionRange(start + 1, start + 1 + selected.length)
-        afterEdit()
+        done()
       }
     }
   }
@@ -825,14 +1022,30 @@
       var el = $(sel)
       if (el) el.addEventListener('input', afterEdit)
     })
+    var postBody = $('#editor-body')
     $('#ed-body').addEventListener('input', afterEdit)
-    $('#ed-body').addEventListener('keydown', onBodyKeydown)
+    $('#ed-body').addEventListener('keydown', function (e) { onEditorKeydown(e, postBody, afterEdit) })
+    bindImageDrop(postBody)
 
+    // 工具栏 / 模式切换：按所在 .editor-body 派发（写文章 & 公告共用一套按钮）
     $$('.editor-tool').forEach(function (b) {
-      b.addEventListener('click', function () { insertMarkdown(b.getAttribute('data-md')) })
+      b.addEventListener('click', function () {
+        var body = editorOf(b)
+        var kind = b.getAttribute('data-md')
+        if (kind === 'image') {
+          // 真·插入图片：选文件 → 上传到仓库 → 插入引用
+          pickImages(body)
+          return
+        }
+        if (body && body.getAttribute('data-editor') === 'announce') {
+          insertMarkdown(kind, announceBody(), announceAfterEdit)
+        } else {
+          insertMarkdown(kind)
+        }
+      })
     })
     $$('.editor-mode').forEach(function (b) {
-      b.addEventListener('click', function () { setEditorMode(b.getAttribute('data-mode')) })
+      b.addEventListener('click', function () { setEditorMode(b.getAttribute('data-mode'), editorOf(b)) })
     })
     $('#btn-restore-draft').addEventListener('click', restoreDraft)
     $('#btn-drop-draft').addEventListener('click', function () {
@@ -840,9 +1053,15 @@
       toast('已忽略本地草稿')
     })
 
-    // Ctrl/Cmd+S 保存（编辑器打开时）
+    // Ctrl/Cmd+S 保存（哪个编辑器开着就存哪个）
     document.addEventListener('keydown', function (e) {
       if (!(e.ctrlKey || e.metaKey) || (e.key || '').toLowerCase() !== 's') return
+      var announcePane = $('#tab-announce')
+      if (announcePane && announcePane.classList.contains('is-active')) {
+        e.preventDefault()
+        saveAnnouncement()
+        return
+      }
       var view = $('#post-editor-view')
       if (!view || view.style.display === 'none') return
       e.preventDefault()
@@ -850,10 +1069,117 @@
     })
     // 有未保存修改时，关页面/刷新给一次确认
     window.addEventListener('beforeunload', function (e) {
-      if (!editorDirty) return
+      if (!editorDirty && !announceDirty) return
       e.preventDefault()
       e.returnValue = ''
     })
+  }
+
+  /* ==================== 公告编辑器 ====================
+     与写文章同级：Markdown 工具栏、快捷键（Ctrl+B/I/K、Tab、Ctrl+S）、
+     编辑 / 分栏 / 预览、字数统计、本地草稿自动保存与恢复、未保存提醒、
+     插图上传。公告最终按 HTML 渲染，所以预览对 HTML 直出、纯文本走 Markdown。
+     ============================================================ */
+  var ANNOUNCE_DRAFT = 'admin_announce_draft_v1'
+  var announceDirty = false
+  var announceDraftTimer = 0
+
+  function announceBody() { return $('#announce-body') }
+  function announceEditor() { return $('#announce-editor') }
+
+  function announceStats() {
+    var el = $('#announce-stats')
+    var ta = announceBody()
+    if (!el || !ta) return
+    var s = statsText(ta.value)
+    el.textContent = s.count + ' 字 · ' + s.lines + ' 行'
+  }
+
+  function markAnnounceDirty(v, label) {
+    announceDirty = !!v
+    var el = $('#announce-state')
+    if (!el) return
+    if (!announceDirty) { el.className = 'admin-editor-state'; el.textContent = label || ''; return }
+    el.className = 'admin-editor-state is-dirty'
+    el.textContent = '● 有未保存的修改'
+  }
+
+  function scheduleAnnounceDraft() {
+    clearTimeout(announceDraftTimer)
+    announceDraftTimer = setTimeout(function () {
+      try {
+        localStorage.setItem(ANNOUNCE_DRAFT, JSON.stringify({ body: announceBody().value, ts: Date.now() }))
+      } catch (e) {}
+    }, 700)
+  }
+
+  function announceAfterEdit() {
+    markAnnounceDirty(true)
+    scheduleAnnounceDraft()
+    announceStats()
+    var b = announceEditor()
+    if (b && b.__mode && b.__mode !== 'edit') schedulePreviewFor(b)
+  }
+
+  function checkAnnounceDraft() {
+    var banner = $('#announce-draft')
+    var ta = announceBody()
+    if (!banner || !ta) return
+    var raw = null
+    try { raw = JSON.parse(localStorage.getItem(ANNOUNCE_DRAFT) || 'null') } catch (e) {}
+    if (!raw || !raw.body || String(raw.body) === ta.value) {
+      banner.style.display = 'none'
+      return
+    }
+    banner.__draft = raw
+    var t = $('#announce-draft-text')
+    if (t) t.textContent = '发现本地草稿（' + relTime(raw.ts) + '自动保存）'
+    banner.style.display = ''
+  }
+
+  function initAnnounceEditor() {
+    var body = announceEditor()
+    var ta = announceBody()
+    if (!body || !ta) return
+
+    ta.addEventListener('input', announceAfterEdit)
+    ta.addEventListener('keydown', function (e) { onEditorKeydown(e, body, announceAfterEdit) })
+    bindImageDrop(body)
+    setEditorMode(body.__mode || 'edit', body)
+    announceStats()
+
+    var restore = $('#btn-restore-announce-draft')
+    if (restore) {
+      restore.addEventListener('click', function () {
+        var banner = $('#announce-draft')
+        var raw = banner && banner.__draft
+        if (!raw) return
+        ta.value = raw.body || ''
+        banner.style.display = 'none'
+        markAnnounceDirty(true)
+        announceStats()
+        toast('已恢复本地草稿', 'ok')
+      })
+    }
+    var drop = $('#btn-drop-announce-draft')
+    if (drop) {
+      drop.addEventListener('click', function () {
+        try { localStorage.removeItem(ANNOUNCE_DRAFT) } catch (e) {}
+        var banner = $('#announce-draft')
+        if (banner) banner.style.display = 'none'
+        toast('已忽略本地草稿')
+      })
+    }
+    var clear = $('#btn-clear-announce')
+    if (clear) {
+      clear.addEventListener('click', function () {
+        if (!confirm('清空公告输入框？（不会立即提交，点保存才生效）')) return
+        ta.value = ''
+        announceAfterEdit()
+        ta.focus()
+      })
+    }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(announceStats)
   }
 
   // ==================== 门禁 ====================
@@ -1142,8 +1468,14 @@
       } else {
         $('#announce-body').value = (state.meta && state.meta.announcement) || ''
       }
+      markAnnounceDirty(false, '与仓库一致')
+      announceStats()
+      checkAnnounceDraft()
     }).catch(function (e) {
       $('#announce-body').value = (state.meta && state.meta.announcement) || ''
+      markAnnounceDirty(false, '读取失败，用的是本地缓存')
+      announceStats()
+      checkAnnounceDraft()
       toast('公告读取失败（已用本地缓存）：' + e.message, 'err')
     })
   }
@@ -1158,6 +1490,8 @@
     ghGetFile(file).then(function (f) {
       return ghPutFile(file, text, 'admin: 更新侧栏公告', f ? f.sha : null)
     }).then(function () {
+      try { localStorage.removeItem(ANNOUNCE_DRAFT) } catch (e) {}
+      markAnnounceDirty(false, '已提交，等构建')
       toast('公告已提交，站点重新构建后生效', 'ok')
     }).catch(function (e) { toast('公告保存失败：' + e.message, 'err') })
   }
@@ -1339,6 +1673,7 @@
     $('#btn-save-admin-key').addEventListener('click', changeAdminKey)
 
     initEditorUI()
+    initAnnounceEditor()
     decorateCards()
     observeCards()
     reloadManifest(true)

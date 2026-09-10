@@ -28,16 +28,27 @@
   --sf-bg-0: #03060a;
   --sf-bg-1: #070d14;
   /* ---- 真·磨砂玻璃材质 ----
-     只有一层【中性白膜】（无任何色相）：背景越接近 0，越"通透"；
-     磨砂感全部交给 backdrop-filter 实时模糊元素背后的真实内容。
-     想再透一点就把 .035 调到 .02；想更结实就调到 .06。 */
-  --sf-glass: rgba(255, 255, 255, .035);
-  --sf-glass-2: rgba(255, 255, 255, .055);
-  --sf-glass-blur: 18px;
+     三层构成，全部无色相（想整体调透/调厚，只改这几个值即可）：
+     · --sf-glass-sheen 顶部白色高光（玻璃反光面，属于元素自身的高光）
+     · --sf-glass / --sf-glass-2 中性白膜，负责"透"
+     · --sf-glass-blur 实时背景模糊半径，负责"磨砂"
+     blur 在硬件加速不可用时会被浏览器静默丢掉，所以高光和白膜必须
+     自己就能撑起质感（详见第 5 节注释）。 */
+  --sf-glass: rgba(255, 255, 255, .055);
+  --sf-glass-2: rgba(255, 255, 255, .075);
+  --sf-glass-sheen: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, .07) 0%,
+    rgba(255, 255, 255, .012) 38%,
+    rgba(255, 255, 255, .012) 100%
+  );
+  --sf-glass-line: rgba(255, 255, 255, .12);
+  --sf-glass-line-strong: rgba(255, 255, 255, .2);
+  --sf-glass-blur: 20px;
   --sf-panel: var(--sf-glass);
   --sf-panel-2: var(--sf-glass-2);
-  --sf-line: rgba(255, 255, 255, .10);
-  --sf-line-strong: rgba(255, 255, 255, .18);
+  --sf-line: var(--sf-glass-line);
+  --sf-line-strong: var(--sf-glass-line-strong);
   --sf-ice: #9dc0d4;
   --sf-ice-2: #cbe2ef;
   --sf-slate: #5b7285;
@@ -415,21 +426,30 @@ html body #page-header #scroll-down .scroll-down-effects {
 }
 
 /* ---------------------------------------------------------------
-   5. 面板：真·磨砂玻璃（中性白膜 + 实时背景模糊，不自带颜色）
+   5. 面板：真·磨砂玻璃（中性白膜 + 高光 + 实时背景模糊，不自带颜色）
    ---------------------------------------------------------------
-   旧版是 rgba(10,16,23,.72) 的深色蒙层 —— 那是"带颜色的半透明板"，
-   不是玻璃。现在：
-   · 背景只剩一层中性白膜（--sf-glass，无任何色相），透光率极高
-   · 磨砂感 100% 由 backdrop-filter 实时模糊背后内容承担
-   · 描边改为中性白（--sf-line），不再发蓝
+   旧版是 rgba(10,16,23,.72) 的深色蒙层 —— 那是"带颜色的半透明板"，不是玻璃。
+   现在三层构成，全部无色相：
+   · --sf-glass-sheen：顶部白色高光（玻璃的"反光面"，这是元素自身的
+     高光而不是给背景染色），让面板在纯色背景前也能看出是块玻璃
+   · --sf-glass：极低 alpha 中性白膜，负责"透"
+   · backdrop-filter: blur()：实时模糊元素背后的真实内容，负责"磨砂"
+   为什么不能只靠 blur：Chromium 在【硬件加速不可用/GPU 进程崩溃回退】时
+   会静默丢掉 backdrop-filter（玻璃直接消失，卡片看起来"没做玻璃效果"），
+   而且纯色背景 blur 前后没有可见差别。所以高光 + 白膜必须自己撑起质感，
+   blur 只负责锦上添花 —— 这样任何环境下卡片都还是玻璃的样子。
    --------------------------------------------------------------- */
 html body .card-widget,
 html body #recent-posts .recent-post-item,
 html body .relatedPosts-list a.pagination-related,
 html body .post-copyright {
-  background: var(--sf-glass) !important;
-  border: 1px solid var(--sf-line) !important;
-  box-shadow: 0 24px 60px -38px rgba(0, 0, 0, .95) !important;
+  background-image: var(--sf-glass-sheen) !important;
+  background-color: var(--sf-glass) !important;
+  border: 1px solid var(--sf-glass-line) !important;
+  box-shadow:
+    0 24px 60px -38px rgba(0, 0, 0, .95),
+    inset 0 1px 0 rgba(255, 255, 255, .16),
+    inset 0 -1px 0 rgba(255, 255, 255, .04) !important;
   -webkit-backdrop-filter: blur(var(--sf-glass-blur));
   backdrop-filter: blur(var(--sf-glass-blur));
   transition: border-color .22s ease, box-shadow .22s ease;
@@ -440,24 +460,41 @@ html body .post-copyright {
 html body #page,
 html body #archive,
 html body #post {
-  background: var(--sf-glass) !important;
-  border: 1px solid var(--sf-line) !important;
-  box-shadow: 0 24px 60px -38px rgba(0, 0, 0, .95) !important;
+  background-color: var(--sf-glass) !important;
+  border: 1px solid var(--sf-glass-line) !important;
+  box-shadow:
+    0 24px 60px -38px rgba(0, 0, 0, .95),
+    inset 0 1px 0 rgba(255, 255, 255, .10) !important;
 }
 
 /* 检索弹窗是浮层，给稍厚一点的白膜 + 模糊，保证文字仍然清楚 */
 html body .search-dialog {
-  background: var(--sf-glass-2) !important;
-  border: 1px solid var(--sf-line) !important;
+  background-color: var(--sf-glass-2) !important;
+  border: 1px solid var(--sf-glass-line) !important;
   box-shadow: 0 24px 60px -38px rgba(0, 0, 0, .95) !important;
   -webkit-backdrop-filter: blur(var(--sf-glass-blur));
   backdrop-filter: blur(var(--sf-glass-blur));
 }
 
+/* 浏览器拿不到 backdrop-filter（硬件加速关闭 / GPU 回退）时，
+   把白膜与描边加厚一档，卡片依旧是玻璃板，只是少了实时模糊 */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  html body .card-widget,
+  html body #recent-posts .recent-post-item,
+  html body .relatedPosts-list a.pagination-related,
+  html body .post-copyright,
+  html body .search-dialog {
+    background-color: rgba(255, 255, 255, .09) !important;
+    border-color: rgba(255, 255, 255, .16) !important;
+  }
+}
+
 html body .card-widget:hover,
 html body #recent-posts .recent-post-item:hover {
-  border-color: var(--sf-line-strong) !important;
-  box-shadow: 0 28px 70px -34px rgba(0, 0, 0, 1) !important;
+  border-color: var(--sf-glass-line-strong) !important;
+  box-shadow:
+    0 28px 70px -34px rgba(0, 0, 0, 1),
+    inset 0 1px 0 rgba(255, 255, 255, .22) !important;
 }
 
 html body #recent-posts .recent-post-item .recent-post-info > .article-title {
@@ -541,12 +578,11 @@ html body #post #article-container a:hover {
 }
 
 html body #post #article-container blockquote {
-  background: rgba(255, 255, 255, .04) !important;
+  background-image: var(--sf-glass-sheen) !important;
+  background-color: rgba(255, 255, 255, .04) !important;
   border-left: 3px solid rgba(157, 192, 212, .6) !important;
   border-radius: 0 6px 6px 0;
   color: #a9c0d6 !important;
-  -webkit-backdrop-filter: blur(var(--sf-glass-blur));
-  backdrop-filter: blur(var(--sf-glass-blur));
 }
 
 html body #post #article-container hr {
@@ -590,11 +626,16 @@ html body #post #article-container :not(pre) > code {
    --------------------------------------------------------------- */
 html body #post #article-container figure.shiki,
 html body #post #article-container figure.highlight {
-  background: rgba(255, 255, 255, .05) !important;
-  border: 1px solid var(--sf-line) !important;
-  box-shadow: 0 18px 44px -30px rgba(0, 0, 0, 1) !important;
-  -webkit-backdrop-filter: blur(var(--sf-glass-blur));
-  backdrop-filter: blur(var(--sf-glass-blur));
+  background-image: var(--sf-glass-sheen) !important;
+  background-color: rgba(255, 255, 255, .05) !important;
+  border: 1px solid var(--sf-glass-line) !important;
+  box-shadow:
+    0 18px 44px -30px rgba(0, 0, 0, 1),
+    inset 0 1px 0 rgba(255, 255, 255, .12) !important;
+  /* 这里故意【不用】backdrop-filter：一篇文章可以有十几个代码块，
+     每个都是一层实时模糊合成层，既贵（长文滚动掉帧）又容易触发
+     Chromium 的合成层上限导致"有时模糊失效/闪一下"。代码块背后
+     就是文章面板本身（纯色），模糊也看不出差别，所以只留白膜 + 高光。 */
 }
 
 html body #post #article-container figure.shiki .codeblock,
