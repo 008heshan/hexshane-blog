@@ -8,7 +8,7 @@ categories:
   - Terraria 模组开发
 ---
 
-> 本文内容整理自 tModLoader 官方 Wiki（Terraria 模组开发指南），原文：[Basic-Tile](https://github.com/tModLoader/tModLoader/wiki/Basic-Tile)。
+> 本文内容整理自 tModLoader 官方 Wiki（Terraria 模组开发指南），原文：[Basic ModTile Guide](https://github.com/tModLoader/tModLoader/wiki/Basic-Tile)。
 >
 > 搬运说明：原文配图很多，其中托管在 imgur 的图在当前网络下取不到，已省略（相关段落都改写成了不依赖配图也能读懂的说明）；GitHub 上的图片与动图保留了原链接。
 

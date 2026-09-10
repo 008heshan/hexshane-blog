@@ -8,7 +8,7 @@ categories:
   - Terraria 模组开发
 ---
 
-> 本文内容整理自 tModLoader 官方 Wiki（Terraria 模组开发指南），原文：[Basic JSON & ModConfigs](https://github.com/tModLoader/tModLoader/wiki/Basic-JSON-%26-ModConfigs)。
+> 本文内容整理自 tModLoader 官方 Wiki（Terraria 模组开发指南），原文：[Basic ModConfig Guide](https://github.com/tModLoader/tModLoader/wiki/Basic-JSON-%26-ModConfigs)。
 
 # 简介
 

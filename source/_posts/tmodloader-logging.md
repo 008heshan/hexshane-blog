@@ -8,7 +8,7 @@ categories:
   - Terraria 模组开发
 ---
 
-> 本文内容整理自 tModLoader 官方 Wiki（Terraria 模组开发指南），原文：[Introduction](https://github.com/tModLoader/tModLoader/wiki/Logging)。
+> 本文内容整理自 tModLoader 官方 Wiki（Terraria 模组开发指南），原文：[Basic Logging Guide](https://github.com/tModLoader/tModLoader/wiki/Logging)。
 
 tModLoader 会把各种有用的信息写进日志文件。玩家那边一旦出问题，翻日志就能找出是哪个模组在捣乱，然后把它禁用掉 —— 怎么读自己的日志，见[用户 FAQ 里「Reading client.log」那一节](https://github.com/tModLoader/tModLoader/wiki/Basic-tModLoader-Usage-FAQ#reading-clientlog)。
 

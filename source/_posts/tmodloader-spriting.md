@@ -8,7 +8,7 @@ categories:
   - Terraria 模组开发
 ---
 
-> 本文内容整理自 tModLoader 官方 Wiki（Terraria 模组开发指南），原文：[What is a Sprite?](https://github.com/tModLoader/tModLoader/wiki/Spriting)。
+> 本文内容整理自 tModLoader 官方 Wiki（Terraria 模组开发指南），原文：[Spriting](https://github.com/tModLoader/tModLoader/wiki/Spriting)。
 
 Sprite（精灵图）就是 2D 游戏里随处可见的那种平面图像。拿金锭（Gold Bar）来说，它的物品贴图是 `Item_19.png`，长这样：![金锭的物品贴图](https://user-images.githubusercontent.com/4522492/159594962-1a594c3c-cd6c-4741-b60e-f8409461d845.png)。做模组时，你往游戏里加的每一处视觉内容，基本都得自己配一张 sprite。下面讲的就是画 sprite 的基本功，以及 sprite 在 tModLoader 里是怎么组织、怎么被游戏读进去的。
 
@@ -28,7 +28,7 @@ tModLoader 的贴图必须是 `.png`。只要你没在绘图软件里乱改设�
 
 ## 绘图工具
 
-**必须**有一款像样的绘画 / spriting 软件。Windows 11 之前的"画图"（MS Paint）不行 —— 它存不了透明像素，而你想画的多数 sprite 都要用到透明。合适的软件清单见[基础准备篇的绘图软件一节](https://github.com/tModLoader/tModLoader/wiki/Basic-Prerequisites#drawing-program)。下面的演示图都用 Aseprite 画，但这类软件的能力都差不多。
+**必须**有一款像样的绘画 / spriting 软件。Windows 11 之前的"画图"（MS Paint）不行 —— 它存不了透明像素，而你想画的多数 sprite 都要用到透明。合适的软件清单见[基础准备篇的绘图软件一节](https://github.com/tModLoader/tModLoader/wiki/Basic-Prerequisites#drawing-program)。原文的示例用的是 Aseprite，不过这几款软件的能力都差不多，用哪个都行。
 
 Aseprite 完整版要花钱，不过它也有可以自己编译的免费版本，100% 合法、没有安全隐患，编译方法看[这份说明](https://github.com/aseprite/aseprite/blob/main/INSTALL.md)。
 

@@ -8,7 +8,7 @@ categories:
   - Terraria 模组开发
 ---
 
-> 本文内容整理自 tModLoader 官方 Wiki（Terraria 模组开发指南），原文：[Why Geometry](https://github.com/tModLoader/tModLoader/wiki/Geometry)。
+> 本文内容整理自 tModLoader 官方 Wiki（Terraria 模组开发指南），原文：[Geometry](https://github.com/tModLoader/tModLoader/wiki/Geometry)。
 
 # 为什么需要几何
 
