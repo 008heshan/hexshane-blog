@@ -5,41 +5,31 @@ updated: 2026-09-08 18:40:00
 comments: false
 ---
 
-## 你好呀，我是善姐 👋
+# **HexShane**
 
-也可以叫我 **HexShane**，不过熟人都喊善姐。
+我是 **神**
 
-白天写代码，晚上也写代码 —— 区别是晚上写的是自己想写的：给泰拉瑞亚做模组、
-给这个博客加些其实没必要但很好玩的特效、把踩过的坑一条条记下来，免得下次再踩一遍。
-
-**最近在折腾**
+**最近**
 
 - 🧩 **tModLoader 全中译指南** —— 官方 Wiki 的 Easy guides 全 27 篇，[已经全部翻完](/articles/)
-- 🎨 **这个站本身** —— Hexo + Butterfly，玻璃材质、星链背景、幽灵代码都是自己手搓的
-- 🎮 **泰拉瑞亚** —— 挖矿、盖房子、写模组，三件事循环播放
 
 **在这里能读到什么**
 
-tModLoader 模组开发（从 C# 基础一路到弹幕、物块、联机同步）、Web 前端与性能折腾，
-偶尔夹一点生活杂谈。写得不算快，但每一篇都想让你一遍看懂。
+你能发现这个网站你也是神人了👍，别指望能读到点有用的了（桀桀桀）
 
 **想找我玩**
 
-- GitHub：[008heshan](https://github.com/008heshan)
-- B 站：[善姐的空间](https://space.bilibili.com/448793040)（有做模组的视频）
-- 抖音：[戳这里](https://www.douyin.com/user/MS4wLjABAAAAVagbpZnsrACyaBI9a3H_FS4x3muOxK-DSPu4ddC7kz4)
-
-> 「纪元」这个名字取的是"新的开始"。希望你也能在这里捡到一点有用的东西 ✨
+- GitHub：[本站仓库](https://github.com/008heshan)
+- B 站：[神的主页](https://space.bilibili.com/448793040)
+- 抖音：[神的主页](https://www.douyin.com/user/MS4wLjABAAAAVagbpZnsrACyaBI9a3H_FS4x3muOxK-DSPu4ddC7kz4)
 
 ## 关于本站
 
-「纪元」是善姐的个人技术博客，记录折腾 Terraria / tModLoader 模组开发、Web 前端与其它技术杂谈，
-偶尔也写点生活。全站由 **HexShane** 独立编写与维护。
+烂完了，耍起！
 
-- **站长**：HexShane（叫我善姐就好）
-- **建站时间**：2025 年，至今一直在改
-- **内容方向**：tModLoader 模组开发、前端 / 性能优化、工具与踩坑记录
-- **更新频率**：随缘，写得出就写，写不出就去玩游戏
+- **站长**：HexShane（**神**）
+- **建站时间**：公元114514年1919月810日
+- **更新频率**：!?咕咕?!
 
 本站内容均为个人学习与实践记录，力求准确，但不做任何正确性担保——**动手前请以官方文档为准**。
 
