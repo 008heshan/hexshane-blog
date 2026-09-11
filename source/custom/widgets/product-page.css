@@ -1,0 +1,328 @@
+/* ============================================================
+   产品发布页样式（IEML）
+   ------------------------------------------------------------
+   作用域全部限定在 #ieml-page 内，不会碰到其它页面。
+   材质沿用站点既有令牌（--sf-glass* / --sf-ice*），所以和卡片、
+   文章面板是一套玻璃观感；这里只加"发布页"特有的版式：
+   Hero 版本徽章 / 亮点卡网格 / 预览图框 / 版本信息表 / 更新日志时间线 /
+   下载卡 / 折叠问答。
+   ============================================================ */
+
+#ieml-page {
+  --pp-line: var(--sf-glass-line, rgba(255, 255, 255, .13));
+  --pp-film: var(--sf-glass, rgba(255, 255, 255, .03));
+  --pp-sheen: var(--sf-glass-sheen);
+  --pp-ice: var(--sf-ice, #9dc0d4);
+  --pp-ice-2: var(--sf-ice-2, #cbe2ef);
+  --pp-muted: var(--sf-muted, #7c8a95);
+}
+
+/* 统一的玻璃面板底色（与站点卡片同一套） */
+#ieml-page .pp-hero,
+#ieml-page .pp-card,
+#ieml-page .pp-meta,
+#ieml-page .pp-log__item,
+#ieml-page .pp-dl,
+#ieml-page .pp-faq,
+#ieml-page .pp-shot {
+  background-color: var(--pp-film);
+  background-image: var(--pp-sheen);
+  border: 1px solid var(--pp-line);
+  border-radius: 12px;
+  box-shadow:
+    0 24px 60px -38px rgba(0, 0, 0, .95),
+    inset 0 1px 0 rgba(255, 255, 255, .16);
+}
+
+/* ---------- Hero ---------- */
+#ieml-page .pp-hero {
+  position: relative;
+  padding: 30px 30px 26px;
+  margin-bottom: 26px;
+  overflow: hidden;
+}
+
+#ieml-page .pp-hero::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 20px; bottom: 20px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, var(--pp-ice), rgba(157, 192, 212, .12));
+}
+
+#ieml-page .pp-hero__kind {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 2px 10px 3px;
+  border-radius: 999px;
+  border: 1px solid rgba(157, 192, 212, .28);
+  background: rgba(157, 192, 212, .1);
+  font-family: var(--sf-mono, monospace);
+  font-size: .78rem;
+  color: var(--pp-ice);
+}
+
+#ieml-page .pp-hero__title {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  font-size: 2.3rem !important;
+  letter-spacing: .04em;
+  color: #eaf2f8 !important;
+}
+
+#ieml-page .pp-hero__tagline {
+  margin: 10px 0 0;
+  font-size: 1rem;
+  color: #b9c9d4;
+}
+
+#ieml-page .pp-hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  font-family: var(--sf-mono, monospace);
+  font-size: .84rem;
+  color: var(--pp-muted);
+}
+
+#ieml-page .pp-hero__dot { opacity: .45; }
+
+#ieml-page .pp-badge {
+  padding: 2px 10px 3px;
+  border-radius: 6px;
+  border: 1px solid var(--pp-line);
+  background: rgba(255, 255, 255, .05);
+  color: var(--pp-ice-2);
+}
+
+#ieml-page .pp-badge--ver { font-weight: 600; }
+
+#ieml-page .pp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+#ieml-page .pp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 9px;
+  border: 1px solid var(--pp-line);
+  background: rgba(255, 255, 255, .04);
+  font-size: .92rem;
+  color: var(--pp-ice-2) !important;
+  text-decoration: none !important;
+  transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+}
+
+#ieml-page .pp-btn:hover {
+  background: rgba(255, 255, 255, .09);
+  border-color: rgba(157, 192, 212, .5);
+  transform: translateY(-1px);
+}
+
+#ieml-page .pp-btn--primary {
+  background: linear-gradient(135deg, var(--pp-ice), var(--sf-slate, #5b7285));
+  border-color: transparent;
+  color: #04101a !important;
+  font-weight: 600;
+}
+
+#ieml-page .pp-btn--primary:hover { filter: brightness(1.08); }
+
+/* ---------- 章节 ---------- */
+#ieml-page .pp-section { margin: 30px 0 0; }
+
+#ieml-page .pp-h2 {
+  margin: 0 0 14px !important;
+  padding: 0 0 0 12px !important;
+  border: 0 !important;
+  border-left: 3px solid rgba(157, 192, 212, .55) !important;
+  font-size: 1.22rem !important;
+  color: #e6eef4 !important;
+  letter-spacing: .02em;
+}
+
+/* ---------- 亮点卡 ---------- */
+#ieml-page .pp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px;
+}
+
+#ieml-page .pp-card { padding: 18px 18px 16px; transition: border-color .2s ease, transform .2s ease; }
+#ieml-page .pp-card:hover { border-color: rgba(157, 192, 212, .38); transform: translateY(-2px); }
+#ieml-page .pp-card__icon { color: var(--pp-ice); font-size: 1.05rem; }
+#ieml-page .pp-card h3 { margin: 10px 0 6px !important; font-size: 1rem !important; color: #e9f2f8 !important; }
+#ieml-page .pp-card p { margin: 0; font-size: .9rem; color: #9fb0bd; }
+
+/* ---------- 预览图 ---------- */
+#ieml-page .pp-shot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 22px;
+  text-align: center;
+  color: var(--pp-muted);
+  font-size: .9rem;
+}
+
+#ieml-page .pp-shot img { max-width: 100%; border-radius: 10px; display: block; }
+
+/* ---------- 版本信息表 ---------- */
+#ieml-page .pp-meta { padding: 6px 18px; }
+
+#ieml-page .pp-meta__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, .06);
+  font-size: .9rem;
+}
+
+#ieml-page .pp-meta__row:last-child { border-bottom: 0; }
+#ieml-page .pp-meta__row span { color: var(--pp-muted); }
+#ieml-page .pp-meta__row b { color: var(--pp-ice-2); font-family: var(--sf-mono, monospace); font-weight: 500; }
+
+/* ---------- 更新日志 ---------- */
+#ieml-page .pp-log { list-style: none; margin: 0; padding: 0; }
+#ieml-page .pp-log__item { padding: 16px 18px; margin-bottom: 12px; }
+#ieml-page .pp-log__head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+#ieml-page .pp-log__head b { font-family: var(--sf-mono, monospace); font-size: 1rem; color: var(--pp-ice-2); }
+#ieml-page .pp-log__date { font-size: .82rem; color: var(--pp-muted); font-family: var(--sf-mono, monospace); }
+#ieml-page .pp-log__tag {
+  padding: 1px 9px 2px;
+  border-radius: 999px;
+  font-size: .74rem;
+  border: 1px solid var(--pp-line);
+  color: var(--pp-muted);
+}
+#ieml-page .pp-log__tag--new { border-color: rgba(157, 192, 212, .4); background: rgba(157, 192, 212, .12); color: var(--pp-ice-2); }
+#ieml-page .pp-log__item ul { margin: 10px 0 0; padding-left: 1.2em; }
+#ieml-page .pp-log__item li { margin: 4px 0; font-size: .9rem; color: #a9bac6; }
+
+/* ---------- 下载卡 ---------- */
+#ieml-page .pp-download {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+}
+
+#ieml-page .pp-dl {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 18px;
+  text-decoration: none !important;
+  transition: border-color .2s ease, transform .2s ease;
+}
+
+#ieml-page .pp-dl:hover { border-color: rgba(157, 192, 212, .42); transform: translateY(-2px); }
+#ieml-page .pp-dl i { color: var(--pp-ice); font-size: 1.05rem; }
+#ieml-page .pp-dl b { margin-top: 6px; color: #e9f2f8; font-size: .98rem; }
+#ieml-page .pp-dl span { font-size: .84rem; color: var(--pp-muted); }
+
+/* ---------- 折叠问答 ---------- */
+#ieml-page .pp-faq { margin-bottom: 10px; padding: 13px 18px; }
+#ieml-page .pp-faq summary { cursor: pointer; color: #e2ebf1; font-size: .95rem; }
+#ieml-page .pp-faq summary::-webkit-details-marker { color: var(--pp-ice); }
+#ieml-page .pp-faq[open] summary { color: var(--pp-ice-2); }
+#ieml-page .pp-faq p { margin: 10px 0 0; font-size: .9rem; color: #a9bac6; }
+
+/* ---------- 占位标记（内容填好后删掉 <span class="pp-ph"> 即可） ---------- */
+#ieml-page .pp-ph {
+  padding: 0 6px;
+  border-radius: 4px;
+  background: rgba(255, 200, 90, .12);
+  border: 1px dashed rgba(255, 200, 90, .45);
+  color: #e8c37a;
+  font-size: .86em;
+}
+
+#ieml-page .pp-section--foot p { color: #a9bac6; font-size: .9rem; }
+
+/* ---------- 小屏 ---------- */
+@media (max-width: 768px) {
+  #ieml-page .pp-hero { padding: 22px 18px 20px; }
+  #ieml-page .pp-hero__title { font-size: 1.9rem !important; }
+  #ieml-page .pp-grid,
+  #ieml-page .pp-download { grid-template-columns: 1fr; }
+}
+
+/* ---------- 界面截图组 ---------- */
+#ieml-page .pp-shots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+#ieml-page .pp-shots .pp-shot {
+  display: block;
+  min-height: 0;
+  padding: 10px;
+  overflow: hidden;
+}
+
+#ieml-page .pp-shots .pp-shot img {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, .08);
+  transition: transform .25s ease;
+}
+
+#ieml-page .pp-shots .pp-shot:hover img { transform: scale(1.015); }
+
+#ieml-page .pp-shots figcaption {
+  margin-top: 9px;
+  font-family: var(--sf-mono, monospace);
+  font-size: .8rem;
+  color: var(--pp-muted);
+  text-align: left;
+}
+
+/* ---------- 段落说明 ---------- */
+#ieml-page .pp-note {
+  margin: 12px 0 0;
+  padding-left: 12px;
+  border-left: 2px solid rgba(157, 192, 212, .32);
+  font-size: .88rem;
+  color: #9fb0bd;
+}
+
+/* ---------- 两栏：能用 / 没做完 ---------- */
+#ieml-page .pp-two {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+#ieml-page .pp-two .pp-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px !important;
+}
+
+#ieml-page .pp-ok { color: #6ddba0; }
+#ieml-page .pp-warn { color: #e8c37a; }
+
+#ieml-page .pp-list { margin: 0; padding-left: 1.15em; }
+#ieml-page .pp-list li { margin: 6px 0; font-size: .89rem; color: #a9bac6; }
+#ieml-page .pp-list b { color: #d7e3ea; font-weight: 500; }
+#ieml-page code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, .06);
+  font-family: var(--sf-mono, monospace);
+  font-size: .88em;
+}

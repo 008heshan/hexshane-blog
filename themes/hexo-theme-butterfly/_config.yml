@@ -23,6 +23,7 @@ menu:
   #   Music: /music/ || fas fa-music
   #   Movie: /movies/ || fas fa-video
   文章: /articles/ || fas fa-fire
+  IEML: /ieml/ || fas fa-cube
   归档: /archives/ || fas fa-box-archive
   关于: /about/ || fas fa-circle-info
 
@@ -1115,6 +1116,8 @@ inject:
     - <link rel="stylesheet" href="/custom/widgets/author-dock.css?v=20260911b">
     # --- widgets /articles/ 列表页：页头 + 分类筛选 + 卡片强调（只在 #articles-index 内生效） ---
     - <link rel="stylesheet" href="/custom/widgets/articles-index.css?v=20260911a">
+    # --- widgets 产品发布页（IEML）：样式作用域限定在 #ieml-page，不影响其它页面 ---
+    - <link rel="stylesheet" href="/custom/widgets/product-page.css?v=20260911b">
     # --- 科幻/科技/极客皮肤（必须放在最后，覆盖上面所有自定义样式） ---
     - <link rel="stylesheet" href="/custom/theme/sci-fi.css?v=20260911a">
   bottom:
