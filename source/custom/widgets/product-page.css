@@ -392,3 +392,25 @@
   #ieml-page .pp-wip__body { padding: 34px 20px 38px; }
   #ieml-page .pp-wip__title { font-size: 1.4rem !important; }
 }
+/* 施工页底部一行"关注我"（B 站 / 抖音），用极淡的分隔线与上面的文案区分 */
+#ieml-page .pp-wip__follow {
+  margin: 22px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, .07);
+  font-size: .86rem;
+  color: var(--pp-muted);
+}
+
+#ieml-page .pp-wip__follow a {
+  color: var(--pp-ice-2) !important;
+  text-decoration: none !important;
+  border-bottom: 1px solid rgba(157, 192, 212, .3);
+  transition: border-color .18s ease, color .18s ease;
+}
+
+#ieml-page .pp-wip__follow a:hover {
+  color: #fff !important;
+  border-bottom-color: var(--pp-ice) !important;
+}
+
+#ieml-page .pp-wip__sep { margin: 0 8px; opacity: .45; }
