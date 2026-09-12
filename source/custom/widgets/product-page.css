@@ -326,3 +326,69 @@
   font-family: var(--sf-mono, monospace);
   font-size: .88em;
 }
+/* ============================================================
+   施工中占位（页面发布前的状态）
+   ------------------------------------------------------------
+   产品还没发行时 /ieml/ 只显示这一块：一句"正在施工"+ 一句"发行时间：敬请期待"。
+   顶部一条静态的斜纹警示带（不用动画，避免无意义的性能开销），整体仍是站点的
+   玻璃材质，所以看起来不像"坏掉的页面"。
+   完整发布页已存为 source/_drafts/ieml-release.md，发行时把它换回来即可。
+   ============================================================ */
+#ieml-page .pp-wip {
+  position: relative;
+  margin: 10vh auto;
+  max-width: 620px;
+  border-radius: 14px;
+  border: 1px solid var(--pp-line);
+  background-color: var(--pp-film);
+  background-image: var(--pp-sheen);
+  box-shadow:
+    0 30px 70px -40px rgba(0, 0, 0, .95),
+    inset 0 1px 0 rgba(255, 255, 255, .16);
+  overflow: hidden;
+}
+
+/* 顶部斜纹警示带（静态，只做视觉提示） */
+#ieml-page .pp-wip__tape {
+  height: 8px;
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(232, 195, 122, .55) 0 10px,
+    rgba(232, 195, 122, .12) 10px 20px
+  );
+  opacity: .8;
+}
+
+#ieml-page .pp-wip__body {
+  padding: 44px 28px 48px;
+  text-align: center;
+}
+
+#ieml-page .pp-wip__icon {
+  font-size: 2.1rem;
+  color: var(--pp-ice);
+  opacity: .9;
+}
+
+#ieml-page .pp-wip__title {
+  margin: 18px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  font-size: 1.7rem !important;
+  letter-spacing: .06em;
+  color: #eaf2f8 !important;
+}
+
+#ieml-page .pp-wip__sub {
+  margin: 14px 0 0;
+  font-family: var(--sf-mono, monospace);
+  font-size: .95rem;
+  letter-spacing: .08em;
+  color: var(--pp-ice-2);
+}
+
+@media (max-width: 768px) {
+  #ieml-page .pp-wip { margin: 6vh auto; }
+  #ieml-page .pp-wip__body { padding: 34px 20px 38px; }
+  #ieml-page .pp-wip__title { font-size: 1.4rem !important; }
+}
