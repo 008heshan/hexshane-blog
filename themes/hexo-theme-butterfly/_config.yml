@@ -1120,7 +1120,7 @@ inject:
     # --- widgets 产品发布页（IEML）：样式作用域限定在 #ieml-page，不影响其它页面 ---
     - <link rel="stylesheet" href="/custom/widgets/product-page.css?v=20260911d">
     # --- widgets MC 新闻页（/mcnews/）：作用域限定在 #mc-news ---
-    - <link rel="stylesheet" href="/custom/widgets/mc-news.css?v=20261015e">
+    - <link rel="stylesheet" href="/custom/widgets/mc-news.css?v=20261015f">
     # --- widgets 404 页（/404.html）：作用域限定在 #nf-page ---
     - <link rel="stylesheet" href="/custom/widgets/not-found.css?v=20261015a">
     # --- 科幻/科技/极客皮肤（必须放在最后，覆盖上面所有自定义样式） ---
