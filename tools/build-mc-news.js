@@ -276,13 +276,19 @@ async function main() {
   fs.mkdirSync(OUT_DIR, { recursive: true })
 
   const text = JSON.stringify(out, null, 1) + '\n'
-  /* "有没有变化"要看**实质内容**，不能把 baked / bakedAt 这两个时间戳算进去：
-     否则每次跑都"有变化"，CI 会每小时提交一次只有时间戳不同的无意义提交。
-     踩过的坑：一开始只把 baked 归零、漏了 bakedAt，离线重烘第二次照样改文件。 */
+  /* "有没有变化"要看**实质内容**，不能把"运行环境状态"算进去：
+       · baked / bakedAt 是时间戳 —— 否则每次跑都"有变化"，CI 会每小时提交一次
+         只有时间戳不同的无意义提交
+       · mojangOk 反映"这一次跑的时候连没连上 Mojang" —— 本地离线跑是 false、
+         CI 联网跑是 true，两边来回翻，同样会刷出无意义提交
+         实测踩过：本地跑完 --offline 提交，CI 第一次跑就只提交了 mojangOk true→false。
+     另外离线/降级运行时**沿用上一次的值**，不要把它写坏。 */
+  if (!mojangOk && prev && typeof prev.mojangOk === 'boolean') out.mojangOk = prev.mojangOk
+
   const strippable = (o) => {
     if (!o) return o
     const c = JSON.parse(JSON.stringify(o))
-    delete c.baked; delete c.bakedAt
+    delete c.baked; delete c.bakedAt; delete c.mojangOk
     return c
   }
   const same = prev && JSON.stringify(strippable(prev)) === JSON.stringify(strippable(out))
