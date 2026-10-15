@@ -1121,8 +1121,12 @@ inject:
     - <link rel="stylesheet" href="/custom/widgets/product-page.css?v=20260911d">
     # --- widgets MC 新闻页（/mcnews/）：作用域限定在 #mc-news ---
     - <link rel="stylesheet" href="/custom/widgets/mc-news.css?v=20260911a">
+    # --- widgets 404 页（/404.html）：作用域限定在 #nf-page ---
+    - <link rel="stylesheet" href="/custom/widgets/not-found.css?v=20261015a">
     # --- 科幻/科技/极客皮肤（必须放在最后，覆盖上面所有自定义样式） ---
     - <link rel="stylesheet" href="/custom/theme/sci-fi.css?v=20260911a">
+    # --- 第三方库自托管后的样式（分享按钮 + 图标字体）---
+    - <link rel="stylesheet" href="/custom/assets/vendor/share.min.css?v=20261015a">
   bottom:
     # - <script src="xxxx"></script>
     # --- nav 顶部导航栏 + 检索 ---
@@ -1180,6 +1184,18 @@ CDN:
   custom_format:
 
   option:
+    # ---- 第三方库自托管（2026-10-15）----
+    # 主题默认从 cdn.jsdelivr.net 取这三个文件。CDN 被投毒/被墙，就等于把别人的脚本
+    # 喂进本站源里跑（能读 localStorage 里的 GitHub Token），国内访问也慢。
+    # CDN.option 会在 CDN 过滤器里最后 merge 进 theme.asset，所以这里写死本地路径即可生效。
+    # 资源本体在 source/custom/assets/（vendor/ 与 fonts/），随仓库一起发布。
+    typed: /custom/assets/vendor/typed.umd.min.js         # 首页打字机标语（typed.js 3.0.0）
+    medium_zoom: /custom/assets/vendor/medium-zoom.min.js # 图片点击放大（medium-zoom 1.1.0）
+    sharejs: /custom/assets/vendor/social-share.min.js    # 文章分享（share.js 1.1.6）
+    sharejs_css: /custom/assets/vendor/share.min.css      # 分享按钮样式 + 图标字体
+    # 首页卡片瀑布流用的 @egjs/infinitegrid（当前首页是普通列表，不会请求；留着以防
+    # 以后把 index 改成 masonry —— 那时也不该再去连 CDN）
+    egjs_infinitegrid: /custom/assets/vendor/infinitegrid.min.js
     # abcjs_basic_js:
     # activate_power_mode:
     # algolia_js:

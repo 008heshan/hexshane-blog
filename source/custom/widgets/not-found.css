@@ -1,0 +1,185 @@
+/* ============================================================
+   404 页面（/404.html）
+   ------------------------------------------------------------
+   作用域全部限定在 #nf-page 内，不会碰到其它页面。
+   站点只有深色一套皮肤（sci-fi.css 里写明「浅色模式已关闭」），
+   所以这里直接沿用本站玻璃令牌与冷色文字，不另造一套配色。
+
+   触发方式：
+   · Cloudflare Pages / GitHub Pages 都会把根目录的 404.html 当作
+     自定义 404 页 —— 只有这一步才能让不存在的地址真的返回 404
+     状态码（此前站点没有 404.html，任何乱写的地址都会拿到 200 + 首页）。
+   ============================================================ */
+
+#nf-page {
+  --nf-line: var(--sf-glass-line, rgba(255, 255, 255, .13));
+  --nf-film: var(--sf-glass, rgba(255, 255, 255, .03));
+  --nf-sheen: var(--sf-glass-sheen);
+  --nf-ice: var(--sf-ice, #9dc0d4);
+  --nf-ice-2: var(--sf-ice-2, #cbe2ef);
+  --nf-muted: var(--sf-muted, #7c8a95);
+
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 40px;
+}
+
+#nf-page .nf-card {
+  width: 100%;
+  max-width: 660px;
+  padding: 40px 36px 34px;
+  text-align: center;
+  background-color: var(--nf-film);
+  background-image: var(--nf-sheen);
+  border: 1px solid var(--nf-line);
+  border-radius: 14px;
+  box-shadow:
+    0 24px 60px -38px rgba(0, 0, 0, .95),
+    inset 0 1px 0 rgba(255, 255, 255, .16);
+}
+
+/* ---------- 404 数字 ---------- */
+#nf-page .nf-code {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 6px;
+  font-family: var(--sf-mono, monospace);
+  font-size: 4.1rem;
+  line-height: 1;
+  letter-spacing: .1em;
+}
+
+/* 两层错位：底层是偏色的"回声"，做出一点故障感，不刺眼 */
+#nf-page .nf-code__layer {
+  display: block;
+}
+
+#nf-page .nf-code__layer--main {
+  position: relative;
+  color: var(--nf-ice-2);
+  text-shadow: 0 0 26px rgba(157, 192, 212, .3);
+}
+
+#nf-page .nf-code__layer--echo {
+  position: absolute;
+  left: 4px;
+  top: 3px;
+  color: rgba(157, 192, 212, .22);
+  user-select: none;
+}
+
+/* ---------- 文案 ---------- */
+#nf-page .nf-title {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  font-size: 1.42rem !important;
+  line-height: 1.5;
+  color: #eaf2f8 !important;
+}
+
+#nf-page .nf-sub {
+  margin: 10px 0 0;
+  font-size: .92rem;
+  line-height: 1.8;
+  color: #a9bac6;
+}
+
+/* ---------- 走丢的地址 ---------- */
+#nf-page .nf-path {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  margin: 20px 0 0;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--nf-line);
+  background: rgba(0, 0, 0, .22);
+  font-size: .82rem;
+  color: var(--nf-muted);
+}
+
+#nf-page .nf-path i {
+  color: var(--nf-ice);
+}
+
+#nf-page .nf-path code {
+  padding: 0;
+  background: none;
+  font-family: var(--sf-mono, monospace);
+  font-size: .82rem;
+  color: #b9c9d4;
+  word-break: break-all;
+}
+
+/* ---------- 按钮 ---------- */
+#nf-page .nf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+#nf-page .nf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--nf-line);
+  background: rgba(255, 255, 255, .04);
+  font-size: .88rem;
+  color: var(--nf-ice-2) !important;
+  text-decoration: none !important;
+  transition: background-color .16s ease, border-color .16s ease, transform .16s ease;
+}
+
+#nf-page .nf-btn:hover {
+  background: rgba(255, 255, 255, .1);
+  border-color: rgba(157, 192, 212, .5);
+  transform: translateY(-1px);
+}
+
+#nf-page .nf-btn--primary {
+  border-color: rgba(157, 192, 212, .45);
+  background: rgba(157, 192, 212, .14);
+}
+
+/* ---------- 底部提示 ---------- */
+#nf-page .nf-tip {
+  margin: 22px 0 0;
+  font-size: .82rem;
+  line-height: 1.9;
+  color: var(--nf-muted);
+}
+
+#nf-page .nf-tip i {
+  margin: 0 4px;
+  color: var(--nf-ice);
+}
+
+@media (max-width: 768px) {
+  #nf-page .nf-card { padding: 30px 20px 26px; }
+  #nf-page .nf-code { font-size: 3.2rem; }
+  #nf-page .nf-title { font-size: 1.2rem !important; }
+  #nf-page .nf-path { border-radius: 10px; }
+}
+
+/* 窄屏：三个按钮并排会溢出卡片（实测 430px 宽下最右那个被切掉一截），
+   改成整行堆叠 —— 顺带把点击目标做大，比挤在一行好按 */
+@media (max-width: 520px) {
+  #nf-page .nf-actions { gap: 8px; }
+  #nf-page .nf-btn {
+    flex: 1 1 100%;
+    justify-content: center;
+    padding: 11px 16px;
+  }
+}
+
+/* 关掉动效偏好下不做位移动画 */
+@media (prefers-reduced-motion: reduce) {
+  #nf-page .nf-btn { transition: none; }
+  #nf-page .nf-btn:hover { transform: none; }
+}

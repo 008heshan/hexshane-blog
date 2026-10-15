@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>测量：元素溢出</title>
+<!--
+  临时排查工具（不发布）：
+  node tools/measure-overflow.js <目标页面 URL> [视口宽] [视口高] [输出路径]
+  用无头 Chrome 打开这个壳页面，把目标站地址套进 iframe 量一遍
+  "哪些元素比视口宽"，结果写成 JSON 落到文件里。
+  做移动端布局排查时用它定位横向溢出的元凶，比肉眼截图猜快得多。
+-->
+<style>html,body{margin:0}iframe{width:100vw;height:100vh;border:0;display:block}</style>
+</head>
+<body>
+<iframe id="f"></iframe>
+<script>
+  var params = new URLSearchParams(location.search)
+  var target = params.get('u')
+  var out = params.get('out') || 'overflow.json'
+  var f = document.getElementById('f')
+  var results = { url: target, steps: [] }
+  var stepIndex = 0
+  var steps = [430, 390, 360, 768, 1024, 1300]
+  // 只读模式：只量当前视口（用于配合浏览器窗口宽度截图/测量），不逐档改 iframe 宽度
+  if (params.get('fixed')) steps = [window.innerWidth]
+
+  function measure() {
+    var d
+    try { d = f.contentDocument } catch (e) { return { error: String(e) } }
+    if (!d || !d.documentElement) return { error: 'no document' }
+    var vw = f.contentWindow.innerWidth
+    var de = d.documentElement
+    var bad = []
+    var all = d.querySelectorAll('body *')
+    for (var i = 0; i < all.length; i++) {
+      var el = all[i]
+      var r = el.getBoundingClientRect()
+      if (r.width === 0 && r.height === 0) continue
+      var over = Math.round(r.right - vw)
+      if (over > 2) {
+        bad.push({
+          sel: el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + (el.className && typeof el.className === 'string' ? '.' + el.className.trim().split(/\s+/).slice(0, 3).join('.') : ''),
+          w: Math.round(r.width), left: Math.round(r.left), right: Math.round(r.right), over: over
+        })
+      }
+    }
+    bad.sort(function (a, b) { return b.over - a.over })
+    return {
+      viewport: vw,
+      docScrollWidth: de.scrollWidth,
+      bodyScrollWidth: d.body.scrollWidth,
+      overflowPx: de.scrollWidth - vw,
+      worst: bad.slice(0, 12)
+    }
+  }
+
+  function next() {
+    if (stepIndex >= steps.length) return finish()
+    var w = steps[stepIndex++]
+    f.style.width = w + 'px'
+    f.style.height = '900px'
+    setTimeout(function () {
+      results.steps.push(Object.assign({ step: w }, measure()))
+      next()
+    }, 1200)
+  }
+
+  function finish() {
+    var pre = document.createElement('pre')
+    pre.id = 'result'
+    pre.textContent = JSON.stringify(results, null, 1)
+    document.body.appendChild(pre)
+  }
+
+  f.src = target
+  setTimeout(next, 2500)
+</script>
+</body>
+</html>

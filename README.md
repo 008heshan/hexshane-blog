@@ -55,9 +55,11 @@
 │  ├─ fix-shiki-fences.js        # 修复 shiki 插件代码围栏贪婪匹配
 │  └─ translate-posts.js         # 构建期翻译（需配置 deepl_api_key，默认不启用）
 ├─ tools/                        # 维护工具（只能手动调用；不能放 scripts/，那里会被自动执行）
-│  └─ fix-ghpages-paths.js       # 镜像站构建后给 /custom/ 资源补子路径前缀
+│  ├─ fix-ghpages-paths.js       # 镜像站构建后给 /custom/ 资源补子路径前缀
+│  └─ measure-overflow-shell.html # 无头浏览器量"哪些元素比视口宽"的排查壳页（配合 CDP/--dump-dom）
 ├─ source/
 │  ├─ _posts/                    # 文章（Markdown）
+│  ├─ 404.md                     # 404 页（构建成根目录 404.html，见下文「404 页」）
 │  ├─ img/posts/<文章名>/        # 文章插图（自托管，不外链图床）
 │  ├─ img/favicon.svg 等         # 站点图标一套（svg + 32/180/512 png）
 │  ├─ _data/announcement.yml     # 侧栏公告（后台 /admin/ 可写）
@@ -272,6 +274,30 @@ git add -A && git commit -m "post: 文章标题" && git push
 
 - **自定义资源要带版本号**：静态托管对 `/custom/**` 没有 cache-control，不改 URL
   浏览器会长期跑旧文件。改动后记得把 `inject` 里的 `?v=YYYYMMDDx` 往上推一档
+- **第三方库全部自托管**（2026-10-15 起）。主题默认从 `cdn.jsdelivr.net` 取脚本，那等于
+  让外部 CDN 有机会往本站源里注入代码（localStorage 里存着后台用的 GitHub Token），
+  国内访问也慢。现在在主题 `_config.yml` 的 `CDN.option` 里写死本地路径，
+  资源本体随仓库发布：
+
+  | 键 | 用途 | 本地文件 |
+  | --- | --- | --- |
+  | `typed` | 首页打字机标语（typed.js 3.0.0） | `source/custom/assets/vendor/typed.umd.min.js` |
+  | `medium_zoom` | 图片点击放大（medium-zoom 1.1.0） | `source/custom/assets/vendor/medium-zoom.min.js` |
+  | `sharejs` / `sharejs_css` | 文章分享（share.js 1.1.6） | `source/custom/assets/vendor/social-share.min.js` / `share.min.css` |
+  | `egjs_infinitegrid` | 首页卡片瀑布流（当前未启用，预防用） | `source/custom/assets/vendor/infinitegrid.min.js` |
+
+  - 分享按钮的图标字体也一并拿下（`source/custom/assets/fonts/iconfont-share.woff2|woff|ttf`），
+    `share.min.css` 顶部的 `@font-face` 已改指向它；注意**上游那份 CSS 里的字体路径
+    （`../fonts/…`）本身是 404 的**，直接照抄会拿到 HTML 报错页当字体
+  - `CDN.option` 是在 CDN 过滤器里**最后** merge 进 `theme.asset` 的，所以能盖掉 provider 推导
+  - 另改了主题 `layout/includes/head/preconnect.pug`：`third_party_provider` 仍是 jsdelivr
+    （只是个默认值），但已经没有第三方请求，就别再给这个域名做预连接
+  - 升级某个库：换掉 `vendor/` 里的文件 → 推 `?v=` 版本号（分享 CSS 在 `inject.head` 里单独引了一份带版本号的）
+- **404 页**：`source/404.md`（构建产物 `public/404.html`）。静态托管**只有存在根目录
+  404.html 时**，访问不存在的地址才会返回真正的 404 状态码；此前没有这个文件，
+  `/随便什么/` 一律返回 200 + 首页内容，垃圾 URL 会被搜索引擎当正常页收录。
+  页面自带 `source/custom/widgets/not-found.css`（作用域 `#nf-page`），并用 `textContent`
+  回显走丢的路径 —— 不要改成 `innerHTML`，那是拿地址栏往页面里插 HTML
 - 图片全部自托管在 `source/img/` 下，不依赖任何图床
 - 管理后台的写入凭证只保存在**使用者的本机浏览器**里，仓库里没有任何密钥；换设备要重新填
   （入口方式与权限配置见本地 `NOTES-private.md`）
