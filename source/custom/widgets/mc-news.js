@@ -354,45 +354,60 @@
     } catch (e) { return null }
   }
 
-  function fetchJson(url) {
-    return fetch(url, { cache: 'no-cache' }).then(function (r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status)
-      return r.json()
-    })
+  /* 给 fetch 加超时：Mojang 那个域名在国内时通时不通，实测会出现
+     "TLS 握手直接卡住"（ECONNRESET / 一直不返回）。没有超时的话，
+     Promise.all 永远不 resolve —— 页面就停在骨架屏上，连烘焍好的数据都出不来。 */
+  function fetchJson(url, ms) {
+    var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null
+    var timer = setTimeout(function () { if (ctl) ctl.abort() }, ms || 8000)
+    return fetch(url, { cache: 'no-cache', signal: ctl ? ctl.signal : undefined })
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status)
+        return r.json()
+      })
+      .then(function (d) { clearTimeout(timer); return d }, function (e) { clearTimeout(timer); throw e })
   }
 
   function boot() {
-    var bakedP = fetchJson(BAKED_URL).catch(function () { return null })
-    var liveP = fetchJson(LIST_URL).catch(function () { return null })
-
-    Promise.all([bakedP, liveP]).then(function (res) {
-      var baked = res[0]
-      var live = res[1]
-      var failures = []
-
+    /* 先只等烘焍清单：它就在自己站点上，快且稳。
+       拿到就立刻渲染，不再等 Mojang 实时核对 —— 那一步只是"看看有没有更新的版本"，
+       不该挡着正文显示（实测它卡住时整页会停在"加载中…"）。 */
+    fetchJson(BAKED_URL, 6000).then(function (baked) {
       if (baked && baked.latest) {
         state.baked = baked
         saveCache({ baked: baked })
       } else {
         /* 构建期数据没取到（本地没跑烘焙 / 网络问题）→ 用本机缓存兜底。
-           注意这里不能 return：下面还要靠实时清单出卡片，
+           注意这里不能 return：后面还要靠实时清单出卡片，
            之前漏了这一步的 render()，页面就永远停在"加载中…"。 */
-        failures.push('烘焍清单')
         var c = fromCache()
         if (c) state.baked = c.baked
+        state.bakedFailed = true
       }
-
-      if (live && live.entries && live.entries.length) state.entries = live.entries
-      else failures.push('Mojang 实时接口')
-
       render()
-
-      if (failures.length === 2) {
-        status('⚠ 烘焍清单和 Mojang 实时接口都没取到（' + esc(failures.join(' / ')) + '）—— 下面是最后一次成功的结果。', true)
-      } else if (failures.length === 1 && !state.entries) {
-        status('⚠ 没连上 Mojang 实时接口，显示的是构建时烘焍的数据（版本可能不是最新）。', true)
-      }
+      checkLive()
     })
+  }
+
+  /* 实时核对：Mojang 接口出了更新的版本就当场补一张卡。
+     失败**不报警**：正文来自构建期烘焍，本来就不依赖它；
+     原来那句"没连上 Mojang 实时接口，版本可能不是最新"在国内会时常见到，
+     等于拿一句吓人的话去说一件其实没影响的事。 */
+  function checkLive() {
+    fetchJson(LIST_URL, 8000).then(function (live) {
+      if (!live || !live.entries || !live.entries.length) return finishLive(false)
+      state.entries = live.entries
+      render()
+      finishLive(true)
+    }, function () { finishLive(false) })
+  }
+
+  function finishLive(ok) {
+    if (ok) return
+    if (state.bakedFailed && !state.baked) {
+      status('⚠ 没取到版本数据（本地烘焍清单与本机缓存都没有）。' +
+        '可以直接看 <a href="https://zh.minecraft.wiki/w/Java%E7%89%88%E7%89%88%E6%9C%AC%E5%8E%86%E5%8F%B2" target="_blank" rel="noopener">中文 Wiki 的版本历史</a>。', true)
+    }
   }
 
   boot()

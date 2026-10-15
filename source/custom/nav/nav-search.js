@@ -513,10 +513,38 @@
     if (!isCoarsePointer) {
       var gx = (x < r.left ? r.left : (x > r.right ? r.right : x)) - r.left
       var gy = (y < r.top ? r.top : (y > r.bottom ? r.bottom : y)) - r.top
-      if (panelGlow) panelGlow.style.transform = 'translate3d(' + (gx - 130).toFixed(2) + 'px,' + (gy - 90).toFixed(2) + 'px,0)'
-      if (panelEdgeLight) panelEdgeLight.style.transform = 'translate3d(' + (gx - 340).toFixed(2) + 'px,' + (gy - 120).toFixed(2) + 'px,0)'
+      // 光斑元素是"面板左上角 + translate"（CSS 里 position:absolute; left/top:0，
+      // 不是居中定位），所以光心 = 元素左上角 + (半宽, 半高)。这里把**元素本身**夹在
+      // 面板内：光心够得着边上，但元素不会整块越界。
+      // 踩过的坑：检索盒只有 43px 高，而这里原先是写死的 `gy - 90` —— 鼠标停在盒内
+      // 时 gy-90 恒为负，260×180 的光斑被整个推到上边界之外，只剩底边一条被
+      // overflow:hidden 切成硬边，看起来就是"光斑跑到检索框外面/位置不对"。
+      // 另外注意：判"面板比光斑还小时"不能只看左右/上下同一时刻的值 ——
+      // 面板刚展开、布局还在动的时候量到的尺寸会偏，直接把负向偏移写出去就漏了。
+      // 所以上下界一律先夹成合法区间（lo=0, hi=Math.max(0, …)），再取值。
+      if (panelGlow) {
+        var gw = panelGlow.offsetWidth || 260
+        var gh = panelGlow.offsetHeight || 180
+        /* 缩小比例：光斑本身 260×180（渐变椭圆 130×90），塞进 43px 高的检索盒时
+           等比缩一下，光心才落在指针上、而不是"一整片糊在框里"。
+           浏览器执行顺序是 translate 在前、scale 在后，所以要让缩放后的中心对准
+           指针，translate 必须取 (指针 - 元素尺寸)——元素左上角本来就在原点。 */
+        var k = Math.min(1, Math.max(0.42, Math.min(r.height / (gh * 0.72), r.width / (gw * 0.72))))
+        var tx = (gx - gw) * k
+        var ty = (gy - gh) * k
+        // 再兜一次底：别让元素完全跑出面板
+        tx = clampNum(tx, -gw * k, Math.max(-gw * k, r.width))
+        ty = clampNum(ty, -gh * k, Math.max(-gh * k, r.height))
+        panelGlow.style.transform = 'translate3d(' + tx.toFixed(2) + 'px,' + ty.toFixed(2) + 'px,0) scale(' + k.toFixed(3) + ')'
+      }
+      // 边缘环那层更大(680×240)，面板比它小得多 —— 夹住反而会把它钉在左上角，
+      // 所以照旧"光心对指针"。它是柔和的大范围照明，越出面板不会露出硬边。
+      if (panelEdgeLight) {
+        panelEdgeLight.style.transform = 'translate3d(' + (gx - 340).toFixed(2) + 'px,' + (gy - 120).toFixed(2) + 'px,0)'
+      }
     }
   }
+  function clampNum(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v) }
   // 桌面端才监听 mousemove 触发光斑跟随; 触屏端由 openBox 调用
   // updateSearchGlow 初始化为常亮(见 openBox)
   if (!isCoarsePointer) {

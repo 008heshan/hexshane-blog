@@ -19,6 +19,26 @@
   var nav = document.querySelector('#nav')
   if (!nav) return
 
+  function clampNum(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v) }
+
+  /* 光斑元素是"容器左上角 + translate"定位（CSS 里 position:absolute; left/top:0，
+     不是居中定位），所以光心 = 元素左上角 + (半宽, 半高)。这里只做一件必要的事：
+     把元素夹进容器，别让它整块跑到边界外（导航栏 54px 高、光斑 192×152，
+     指针贴栏顶时原来那套写死的偏移会把光斑整个推到栏外，只剩一条被
+     overflow:hidden 切出的硬边）。
+     注意：这里**不**做等比缩小 —— 主导航栏是通栏宽，光斑按高度缩会小得没效果；
+     真正需要缩的是检索盒那种"矮而窄"的面板，改在 nav-search.js 里按面板尺寸缩。 */
+  function clampGlowTransform(el, px, py, rect) {
+    if (!el || !rect) return 'translate3d(0,0,0)'
+    var w = el.offsetWidth || 0
+    var h = el.offsetHeight || 0
+    // 上下界一律先夹成合法区间再取值：容器比光斑小时 hi 会小于 lo，
+    // 直接传进 clamp 会写出负向偏移，光就跑到容器外面去了。
+    var x = clampNum(px - w / 2, 0, Math.max(0, rect.width - w))
+    var y = clampNum(py - h / 2, 0, Math.max(0, rect.height - h))
+    return 'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,0)'
+  }
+
   // 移动到 body 下（保持 fixed 视口定位）
   document.body.appendChild(nav);
 
@@ -131,8 +151,9 @@
       var cy = clamp(lastY, rect.top, rect.bottom)
       var px = cx - rect.left
       var py = cy - rect.top
-      spot.style.transform = 'translate3d(' + (px - 96).toFixed(2) + 'px,' + (py - 76).toFixed(2) + 'px,0)'
-      // 边缘环光心：edgeLight 中心(800,200) 平移到 (px,py)
+      spot.style.transform = clampGlowTransform(spot, px, py, rect)
+      // 边缘环是 1600×400 的大柔光层，容器比它小得多 —— 夹住反而会把它钉在左上角。
+      // 它是柔和的大范围照明，越界不会露出硬边，所以照旧"光心对指针"。
       edgeLight.style.transform = 'translate3d(' + (px - 800).toFixed(2) + 'px,' + (py - 200).toFixed(2) + 'px,0)'
     }
     // 常态跟手：一次 rAF 内位置+亮度直写目标值（无滞后，合成器动画）
@@ -384,9 +405,11 @@
       var gx = (x < r.left ? r.left : (x > r.right ? r.right : x)) - r.left
       var gy = (y < r.top ? r.top : (y > r.bottom ? r.bottom : y)) - r.top
       var glow = drop.querySelector('.nav-drop-glow')
-      if (glow) glow.style.transform = 'translate3d(' + (gx - 130).toFixed(2) + 'px,' + (gy - 90).toFixed(2) + 'px,0)'
+      // 只夹光斑，不夹边缘环：edge-light 是 680×240 的大柔光层，容器比它小得多，
+      // 夹住反而会把它钉在左上角（光心不再跟手）。它是柔和的大范围照明，
+      // 越出面板边界不会露出硬边。
+      if (glow) glow.style.transform = clampGlowTransform(glow, gx, gy, r)
       var el = drop.querySelector('.nav-drop-edge-light')
-      // edge-light 680x240，中心(340,120) 平移到指针(与导航 340x120 渐变参数一致)
       if (el) el.style.transform = 'translate3d(' + (gx - 340).toFixed(2) + 'px,' + (gy - 120).toFixed(2) + 'px,0)'
     })
   }

@@ -1132,8 +1132,8 @@ inject:
     # --- nav 顶部导航栏 + 检索 ---
     # 管理页密钥哈希需在 nav-search.js 之前加载（检索栏输入密钥进 /admin/）
     - <script src="/custom/admin/admin-key.js?v=20260911a"></script>
-    - <script src="/custom/nav/nav-core.js?v=20260911b"></script>
-    - <script src="/custom/nav/nav-search.js?v=20260911a"></script>
+    - <script src="/custom/nav/nav-core.js?v=20261015c"></script>
+    - <script src="/custom/nav/nav-search.js?v=20261015c"></script>
         # --- effects 背景/玻璃/光效 ---
     - <script src="/custom/effects/glass-bg.js?v=20260911a"></script>
     - <script src="/custom/effects/force-glow.js?v=20260911a"></script>
@@ -1146,7 +1146,7 @@ inject:
     - <script src="/custom/code/code-wrap-align.js?v=20260911a"></script>
     # --- 图片放大增强：小贴图（像素画）整数倍放大 + 最近邻，配合 lightbox: medium_zoom ---
     - <script src="/custom/widgets/image-zoom.js?v=20260911a"></script>
-    - <script src="/custom/widgets/mc-news.js?v=20261015b"></script>
+    - <script src="/custom/widgets/mc-news.js?v=20261015c"></script>
     # --- widgets 卡片/挂件/页脚 ---
     - <script src="/custom/widgets/announce-hover.js?v=20260911a"></script>
     # 作者卡片右侧滑出社媒条（抖音 / B站 / GitHub 仓库）
