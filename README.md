@@ -322,9 +322,10 @@ GitHub Pages 各自重新构建。要点：
 - `permissions: contents: write` 是必需的 —— 仓库的 Actions 默认权限是 **read**
   （实测 `repos/.../actions/permissions/workflow` = read），不写这一行推不回去。
   这样比存一个 PAT 少一个要维护的秘密
-- **"有没有变化"必须忽略 `baked` / `bakedAt` 两个时间戳**，只看实质内容：
-  否则每次跑都"有变化"，会变成每小时提交一次只有时间戳不同的无意义提交
-  （踩过：一开始只归零了 `baked`，漏了 `bakedAt`，离线重烘第二次照样改文件）
+- **"有没有变化"要忽略三类"环境状态"**，只比实质内容：`baked` / `bakedAt`（时间戳）、
+  `mojangOk`（这一次跑的时候连没连上 Mojang）。否则会变成每小时提交一次无意义提交 ——
+  这两条都是实测踩出来的：先漏了 `bakedAt`，后来本地 `--offline` 跑出的 `mojangOk:false`
+  又被 CI 翻回 `true`，机器人照样提交了一次。降级运行时 `mojangOk` 沿用上一次的值
 - 页面打开时仍会用 Mojang 接口核对一次：**那边已经出了更新的版本就当场显示出来**，
   并标明"中文说明要等下一次自动烘焙"。所以发新版不会因为等 CI 而显示陈旧数据
 
