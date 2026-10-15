@@ -61,6 +61,7 @@
 │  ├─ mc-news-wiki.js            # 上者的解析库：把 Wiki 条目 HTML 抽成「首段 + 新内容/更改」结构
 │  ├─ fix-ghpages-paths.js       # 镜像站构建后给 /custom/ 资源补子路径前缀
 │  ├─ browser-shot.js            # 无头 Chrome 交互验收（CDP）：点按钮 + 截图 + 收控制台报错
+│  ├─ element-gap.js             # 查"某个容器里多出一块空白"：子元素高度合计 + 逐行采样
 │  └─ measure-overflow-shell.html # 量"哪些元素比视口宽"的排查壳页（配合 --dump-dom）
 ├─ source/
 │  ├─ _posts/                    # 文章（Markdown）
