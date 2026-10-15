@@ -50,6 +50,7 @@ const HEIGHT = Number(arg('height', 900))
 const SETTLE = Number(arg('settle', 2500))
 const WAIT = Number(arg('wait', 900))
 const CLICKS = argAll('click')
+const SCROLL_TO = arg('scroll', null)
 const FULL = !!arg('full', false)
 const AS_JSON = !!arg('json', false)
 
@@ -166,6 +167,18 @@ async function main() {
 
     await send('Page.navigate', { url }, sid)
     await sleep(SETTLE)
+
+    // --scroll <选择器>：先把某个元素滚到视口中间（截图要连图带文字时很有用）
+    if (SCROLL_TO) {
+      const r = await send('Runtime.evaluate', {
+        expression: `(() => { const el = document.querySelector(${JSON.stringify(SCROLL_TO)});
+          if (!el) return 'NOT_FOUND';
+          el.scrollIntoView({ block: 'center' }); return 'OK'; })()`,
+        returnByValue: true
+      }, sid)
+      if (r.result && r.result.value === 'NOT_FOUND') errors.push('--scroll 选择器没找到元素：' + SCROLL_TO)
+      await sleep(500)
+    }
 
     const shots = []
     async function shoot(tag) {
