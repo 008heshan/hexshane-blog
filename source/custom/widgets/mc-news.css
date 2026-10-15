@@ -68,14 +68,16 @@
 /* ---------- 单张卡片 ---------- */
 #mc-news .mn-card { padding: 22px 24px; }
 
-/* 版本大图：撑满卡片宽度、贴到上边缘（用负外边距抵消卡片内边距），
-   16:9 从中心裁切。overflow 交给卡片自己的圆角去裁。 */
-#mc-news .mn-card { overflow: hidden; }
-
+/* 版本配图：Mojang 补丁说明自带的那张 540×540，构建期存到本站。
+   位置排在"版本号那行"下面、正文摘要上面 —— 和官方补丁说明页的顺序一致。
+   排版上不贴顶也不通栏：留出上边距、收窄到卡片内宽的 92%、圆角一圈细描边，
+   视觉上是一张"插图"而不是糊在卡片上的横幅。 */
 #mc-news .mn-shot {
-  margin: -22px -24px 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, .07);
-  background: rgba(0, 0, 0, .25);
+  margin: 16px 0 0;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, .22);
 }
 
 #mc-news .mn-shot img {
@@ -85,6 +87,8 @@
   object-fit: cover;
   object-position: center;
 }
+
+#mc-news .mn-shot + .mn-card__text { margin-top: 16px; }
 
 #mc-news .mn-card--empty { font-size: .92rem; line-height: 1.9; color: #a9bac6; }
 #mc-news .mn-card--empty a { color: var(--mn-ice) !important; }
@@ -237,7 +241,7 @@
   #mc-news .mn-hero { padding: 20px 18px; }
   #mc-news .mn-hero__title { font-size: 1.7rem !important; }
   #mc-news .mn-card { padding: 18px; }
-  #mc-news .mn-shot { margin: -18px -18px 14px; }
+  #mc-news .mn-shot { margin-top: 14px; }
   #mc-news .mn-shot img { aspect-ratio: 3 / 2; }
   #mc-news .mn-body { padding: 14px 14px; }
   #mc-news .mn-card__ver { font-size: 1.32rem; }

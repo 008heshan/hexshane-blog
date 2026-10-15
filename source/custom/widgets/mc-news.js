@@ -107,20 +107,19 @@
 
     return '' +
       '<article class="mn-card" data-version="' + esc(item.version) + '" data-file="' + esc(hasWiki ? item.wiki.file : '') + '">' +
-        /* 版本大图：Mojang 补丁说明自带的 540×540 配图，构建期就下到本站，
-           所以页面不依赖第三方图床。用 16:9 容器从中心裁切（原图是方的，
-           横幅比例更贴近启动器里的观感）。 */
-        (item.image && item.image.file
-          ? '<figure class="mn-shot">' +
-              '<img src="/mcnews/' + esc(item.image.file) + '" alt="' + esc('Minecraft ' + item.version + ' 版本配图') + '" loading="lazy" decoding="async">' +
-            '</figure>'
-          : '') +
+        /* 先写"版本号那行"，配图排它下面 —— 读者先看到"这是哪一版"，再看到更新配图，
+           顺序和 Mojang 官方补丁说明页一致，图片也就不会像硬贴在最上面的一张贴纸。 */
         '<div class="mn-card__kind">' + label + '</div>' +
         '<div class="mn-card__head">' +
           '<span class="mn-card__ver">' + esc(item.version) + '</span>' +
           '<span class="' + typeClass(item.type) + '">' + typeLabel(item.type) + '</span>' +
           '<span class="mn-card__date">' + zhDate(item.date) + '</span>' +
         '</div>' +
+        (item.image && item.image.file
+          ? '<figure class="mn-shot">' +
+              '<img src="/mcnews/' + esc(item.image.file) + '" alt="' + esc('Minecraft ' + item.version + ' 更新内容配图') + '" loading="lazy" decoding="async">' +
+            '</figure>'
+          : '') +
         (text
           ? '<p class="mn-card__text">' + esc(text) + '</p>'
           : '<p class="mn-card__text mn-card__text--muted">这一版还没有可显示的中文说明。</p>') +
