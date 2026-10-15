@@ -1,0 +1,658 @@
+{
+ "version": "26.4-snapshot-4",
+ "title": "Java版26.4-snapshot-4",
+ "revid": 1513682,
+ "fetchedAt": "2026-10-15",
+ "license": "CC BY-NC-SA 4.0 · 中文 Minecraft Wiki",
+ "licenseUrl": "https://zh.minecraft.wiki/w/Minecraft_Wiki:著作权",
+ "page": "https://zh.minecraft.wiki/w/Java%E7%89%8826.4-snapshot-4",
+ "intro": "26.4-snapshot-4 是 Java版26.4 的第4个快照，发布于2026年10月13日，加入了 脆冰 和冰裂隙，改进了 唱片机 ，并修复了一些漏洞。",
+ "sections": [
+  {
+   "title": "新内容",
+   "items": [
+    {
+     "text": "方块",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "脆冰",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "新的方块，自然生成于 冰封洞穴 的冰裂隙。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "与 蓝冰 水平相邻的水源和水流均会转化成脆冰。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "被生物踩踏时会产生裂纹，直至最终被破坏。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "冻尸 能够在其上行走而不破坏它。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        },
+        {
+         "text": "被带有 精准采集 魔咒的工具破坏后会掉落自身。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "text": "常规",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "地物定义格式",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "加入了 minecraft:crevasse 地物类型。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "在地形表面雕刻裂隙。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "格式：",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "text": "",
+       "lead": false,
+       "sub": [],
+       "children": [
+        {
+         "text": "* type ： crevasse",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "* max_width ：（2≤值≤8）最大横截面宽度。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "* max_length ：（4≤值≤16）最大长度。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "* min_footprint ：（1≤值≤32）雕刻前所需的最小连通水平覆盖范围。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "* cursor_surface_search_range ：（值>0）为寻找游标的下一位置而向下扫描的方块数的上限。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "* column_surface_search_range ：（值>0）为寻找可雕刻表面而向下扫描的方块数的上限。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "* twistiness ：（0.0≤值≤16.0）水平弯曲程度。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "* tapering ：（0.0≤值≤1.0）在裂隙每次生长时施加的收窄程度。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "* turn_factor ：（0.0≤值≤1.0）在裂隙每次生长时施加的旋转强度。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "* carve_depth ：原始地形表面下方的雕刻深度。需为一个整数提供器。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "* fill_depth ：原始地形表面下方的填充深度。需为一个整数提供器。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "* surface_block ：放置在裂隙开口上方的方块。需为一个 方块状态提供器 。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "* fill_block ：放置在指定填充深度及其下方的方块。需为一个方块状态提供器。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "* carvable_blocks ：指定裂隙放置时允许移除的方块。需为一个方块谓词。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "* acceptable_barrier ：指定允许作为屏障的一部分的预先存在的方块。需为一个方块谓词。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "标签",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "加入了 #jukebox_containers 方块和物品标签。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "可作为唱片机播放列表容器的方块。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        },
+        {
+         "text": "加入了 #face_occluding_ice_blocks 方块标签。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "冰、霜冰和脆冰与这些方块相邻时，相邻的接触面在渲染时总是被剔除。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        },
+        {
+         "text": "加入了 #ice_crevasse_replaceables 方块标签。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "冰裂隙生成时可以替换的方块。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        },
+        {
+         "text": "加入了 #does_not_break_brittle_ice 实体类型标签。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "不会使脆冰碎裂的生物。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        },
+        {
+         "text": "加入了 #no_hurt_sound 伤害类型标签。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "不会使生物播放受伤音效的伤害类型。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "更改",
+   "items": [
+    {
+     "text": "方块",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "唱片机",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "更改了纹理。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "现在在唱片机正上方放置装有 音乐唱片 的 箱子 、 陷阱箱 或 铜箱子 时，唱片机会按顺序循环播放箱子中的音乐唱片。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "音乐唱片按箱子内槽位顺序播放，会跳过空槽位和其他非音乐唱片物品，并最终循环回到起点。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "当一张音乐唱片播放完成时，唱片机会将其与箱子里的下一张音乐唱片交换。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "如果箱子里没有音乐唱片，唱片机里的音乐唱片将会循环播放而非停止。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "弹出当前播放的音乐唱片会播放下一个可用的音乐唱片。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "text": "蜂蜜块",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "现在 方块支撑形状 是完整方块。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "text": "生物",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "僵尸 和 尸壳",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "不再会受到 细雪 的伤害，并不再能获得 冰冻 效果。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "溺尸",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "现在在细雪内会转化为僵尸。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "不再会受到细雪的伤害，并不再能获得冰冻效果。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "流浪者 、 北极熊 和 雪傀儡",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "不再能获得冰冻效果。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "text": "世界生成",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "废弃矿井",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "现在会在冰封洞穴中自然生成。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "text": "常规",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "数据包",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "将数据包版本号更改为 124.0 。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "资源包",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "将资源包版本号更改为 100.1 。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "硫方怪原型定义格式",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "sound_settings 字段中的 hit_sound 和​ push_sound 字段现在是可选的。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "鸡音效变种定义格式",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "adult_sounds 和​ baby_sounds 字段中的 ambient_sound 、​ hurt_sound 、​ death_sound 和​ step_sound 字段现在是可选的。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "牛音效变种定义格式",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "ambient_sound 、​ hurt_sound 、​ death_sound 和​ step_sound 字段现在是可选的。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "猫音效变种定义格式",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "adult_sounds 和​ baby_sounds 字段中的 ambient_sound 、​ stray_ambient_sound 、​ hiss_sound 、​ hurt_sound 、​ death_sound 、​ eat_sound 、​ beg_for_food_sound 、​ purr_sound 和​ purreow_sound 字段现在是可选的。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "猪音效变种定义格式",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "adult_sounds 和​ baby_sounds 字段中的 ambient_sound 、​ hurt_sound 、​ death_sound 、​ step_sound 和​ eat_sound 字段现在是可选的。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "狼音效变种定义格式",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "adult_sounds 和​ baby_sounds 字段中的 ambient_sound 、​ hurt_sound 、​ death_sound 、​ step_sound 、​ growl_sound 、​ pant_sound 和​ whine_sound 字段现在是可选的。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "流体状态",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "移除了 flowing_water 和​ flowing_lava 流体类型。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "在流体类型中加入了以下字段：",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "level ：（1≤值≤8）流体的高度。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "source ：（布尔值）此流体是否是流体源。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "text": "魔咒定义格式",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "修改了 minecraft:explode 魔咒效果类型。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "small_particle 、​ large_particle 和​ sound 字段现在是可选的。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "text": "方块谓词",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "修改了 minecraft:matching_fluids 方块谓词类型。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "加入了 state 字段，匹配流体状态。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "格式：",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "text": "",
+       "lead": false,
+       "sub": [],
+       "children": [
+        {
+         "text": "state",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "< 流体属性 > ：匹配指定流体属性。可以为精确匹配，也可以为范围匹配。为范围匹配时，若流体属性值为数字字符串，则直接比较数值；若为布尔值字符串，则 \"true\" 为较大值。",
+           "lead": false,
+           "sub": [],
+           "children": [
+            {
+             "text": "min ：流体属性值的最小值。",
+             "lead": false,
+             "sub": [],
+             "children": []
+            },
+            {
+             "text": "max ：流体属性值的最大值。",
+             "lead": false,
+             "sub": [],
+             "children": []
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "text": "标签",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "向方块标签 #mineable/pickaxe 中加入了脆冰。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "向实体类型标签 #freeze_immune_entity_types 中加入了僵尸、溺尸和尸壳。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "从流体标签 #lava 和​ #water 中分别移除了流动状态的熔岩和水。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

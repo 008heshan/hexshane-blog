@@ -1,8 +1,9 @@
 /* ============================================================
    MC 新闻页（/mcnews/）
    ------------------------------------------------------------
-   作用域全部在 #mc-news 内。数据由 mc-news.js 实时拉取，这里只管排版：
-   Hero 状态条 / 最新正式版大卡 / 最近发布列表 / 展开的更新正文。
+   作用域全部在 #mc-news 内。页面只有两张卡：最新正式版 / 最新快照。
+   数据由 mc-news.js 取（构建期烘焍的中文正文 + Mojang 实时清单核对），
+   这里只管排版：Hero 状态行 / 两张卡 / 展开后的中文更新内容。
    材质沿用站点玻璃令牌，与其它页面一套观感。
    ============================================================ */
 
@@ -17,7 +18,6 @@
 
 #mc-news .mn-hero,
 #mc-news .mn-card,
-#mc-news .mn-item,
 #mc-news .mn-section--foot {
   background-color: var(--mn-film);
   background-image: var(--mn-sheen);
@@ -48,29 +48,35 @@
   font-size: 2.1rem !important; letter-spacing: .04em; color: #eaf2f8 !important;
 }
 
-#mc-news .mn-hero__sub { margin: 10px 0 0; font-size: .95rem; color: #b9c9d4; }
+#mc-news .mn-hero__sub { margin: 10px 0 0; font-size: .95rem; line-height: 1.85; color: #b9c9d4; }
+#mc-news .mn-hero__sub b { color: var(--mn-ice-2); font-weight: 500; }
 
 #mc-news .mn-status {
   margin-top: 16px;
   font-family: var(--sf-mono, monospace);
   font-size: .84rem;
+  line-height: 1.9;
   color: var(--mn-muted);
 }
 
 #mc-news .mn-status b { color: var(--mn-ice-2); font-weight: 500; }
 #mc-news .mn-status.is-error { color: #e8a07a; }
 
-/* ---------- 章节 ---------- */
-#mc-news .mn-section { margin: 30px 0 0; }
+/* ---------- 卡片容器 ---------- */
+#mc-news .mn-cards { display: flex; flex-direction: column; gap: 16px; }
 
-#mc-news .mn-h2 {
-  margin: 0 0 14px !important; padding: 0 0 0 12px !important;
-  border: 0 !important; border-left: 3px solid rgba(157, 192, 212, .55) !important;
-  font-size: 1.22rem !important; color: #e6eef4 !important;
-}
-
-/* ---------- 最新正式版大卡 ---------- */
+/* ---------- 单张卡片 ---------- */
 #mc-news .mn-card { padding: 22px 24px; }
+#mc-news .mn-card--empty { font-size: .92rem; line-height: 1.9; color: #a9bac6; }
+#mc-news .mn-card--empty a { color: var(--mn-ice) !important; }
+
+#mc-news .mn-card__kind {
+  margin-bottom: 10px;
+  font-family: var(--sf-mono, monospace);
+  font-size: .76rem;
+  letter-spacing: .12em;
+  color: var(--mn-muted);
+}
 
 #mc-news .mn-card__head {
   display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
@@ -82,7 +88,16 @@
 }
 
 #mc-news .mn-card__date { font-family: var(--sf-mono, monospace); font-size: .84rem; color: var(--mn-muted); }
-#mc-news .mn-card__text { margin: 12px 0 0; font-size: .93rem; color: #a9bac6; line-height: 1.75; }
+#mc-news .mn-card__text { margin: 14px 0 0; font-size: .93rem; color: #a9bac6; line-height: 1.8; }
+#mc-news .mn-card__text--muted { color: var(--mn-muted); }
+
+#mc-news .mn-card__note { margin: 8px 0 0; font-size: .8rem; color: var(--mn-muted); }
+#mc-news .mn-card__meta {
+  margin: 10px 0 0;
+  font-family: var(--sf-mono, monospace);
+  font-size: .76rem;
+  color: var(--mn-muted);
+}
 
 /* ---------- 类型徽章 ---------- */
 #mc-news .mn-tag {
@@ -97,17 +112,8 @@
 #mc-news .mn-tag--release { border-color: rgba(109, 219, 160, .45); background: rgba(109, 219, 160, .12); color: #8ee7b4; }
 #mc-news .mn-tag--snapshot { border-color: rgba(157, 192, 212, .4); background: rgba(157, 192, 212, .1); color: var(--mn-ice-2); }
 
-/* ---------- 列表 ---------- */
-#mc-news .mn-list { display: flex; flex-direction: column; gap: 10px; }
-
-#mc-news .mn-item { padding: 15px 18px; }
-
-#mc-news .mn-item__head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-#mc-news .mn-item__title { font-size: .98rem; color: #e9f2f8; font-weight: 500; }
-#mc-news .mn-item__date { font-family: var(--sf-mono, monospace); font-size: .8rem; color: var(--mn-muted); }
-#mc-news .mn-item__text { margin: 8px 0 0; font-size: .88rem; color: #9fb0bd; }
-
-#mc-news .mn-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+/* ---------- 按钮 ---------- */
+#mc-news .mn-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 
 #mc-news .mn-btn {
   display: inline-flex; align-items: center; gap: 6px;
@@ -125,46 +131,93 @@
 #mc-news .mn-btn:hover { background: rgba(255, 255, 255, .09); border-color: rgba(157, 192, 212, .45); }
 #mc-news .mn-btn[disabled] { opacity: .5; cursor: default; }
 
-/* ---------- 展开的正文（Mojang 官方 HTML） ---------- */
+/* ---------- 展开的中文更新内容 ---------- */
 #mc-news .mn-body {
-  margin-top: 14px;
-  padding: 16px 18px;
+  margin-top: 16px;
+  padding: 18px 20px;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, .07);
   background: rgba(0, 0, 0, .18);
-  font-size: .9rem;
-  color: #a9bac6;
-  max-height: 520px;
-  overflow: auto;
 }
 
-#mc-news .mn-body h1,
-#mc-news .mn-body h2,
-#mc-news .mn-body h3 {
+#mc-news .mn-empty { margin: 0; font-size: .88rem; line-height: 1.9; color: var(--mn-muted); }
+#mc-news .mn-empty a { color: var(--mn-ice) !important; }
+
+#mc-news .mn-doc { font-size: .9rem; color: #a9bac6; }
+
+#mc-news .mn-doc__intro {
+  margin: 0 0 18px;
+  padding: 0 0 14px 12px;
+  border-left: 2px solid rgba(157, 192, 212, .4);
+  line-height: 1.9;
+  color: #bccbd6;
+}
+
+#mc-news .mn-doc__sec + .mn-doc__sec { margin-top: 22px; }
+
+#mc-news .mn-doc__h {
+  margin: 0 0 12px !important; padding: 0 0 6px !important;
+  border: 0 !important; border-bottom: 1px solid rgba(255, 255, 255, .08) !important;
+  font-size: 1.05rem !important; color: #e6eef4 !important;
+}
+
+#mc-news .mn-doc__g {
   margin: 16px 0 8px !important; padding: 0 !important; border: 0 !important;
-  font-size: 1rem !important; color: #e6eef4 !important;
+  font-size: .9rem !important; color: var(--mn-ice) !important;
+  letter-spacing: .04em;
 }
-#mc-news .mn-body h1:first-child, #mc-news .mn-body h2:first-child { margin-top: 0 !important; }
-#mc-news .mn-body ul { margin: 8px 0; padding-left: 1.2em; }
-#mc-news .mn-body li { margin: 4px 0; }
-#mc-news .mn-body p { margin: 8px 0; }
-#mc-news .mn-body a { color: var(--mn-ice) !important; }
-#mc-news .mn-body img { max-width: 100%; border-radius: 8px; }
-#mc-news .mn-body code {
-  padding: 1px 5px; border-radius: 4px; background: rgba(255, 255, 255, .07);
-  font-family: var(--sf-mono, monospace); font-size: .88em;
+
+#mc-news .mn-doc__item { margin: 0 0 12px; }
+#mc-news .mn-doc__item + .mn-doc__item { margin-top: 12px; }
+
+#mc-news .mn-doc__lead { margin: 0 0 6px; font-size: .93rem; color: #e2ecf3; }
+#mc-news .mn-doc__kid { color: #d3e0e9; }
+
+#mc-news .mn-doc__sub,
+#mc-news .mn-doc__kids { margin: 0; padding-left: 1.15em; }
+#mc-news .mn-doc__sub > li,
+#mc-news .mn-doc__kids > li { margin: 5px 0; line-height: 1.8; }
+#mc-news .mn-doc__kids > li > ul { margin: 5px 0 0; padding-left: 1.15em; }
+#mc-news .mn-doc__kids > li > ul > li { margin: 4px 0; line-height: 1.75; color: #96a7b4; }
+
+#mc-news .mn-more {
+  margin-top: 10px;
+  padding: 6px 14px;
+  border-radius: 7px;
+  border: 1px solid var(--mn-line);
+  background: rgba(255, 255, 255, .04);
+  font-size: .82rem;
+  color: var(--mn-ice-2);
+  cursor: pointer;
 }
+#mc-news .mn-more:hover { background: rgba(255, 255, 255, .09); }
+
+#mc-news .mn-credit {
+  margin: 16px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, .07);
+  font-size: .78rem;
+  line-height: 1.9;
+  color: var(--mn-muted);
+}
+#mc-news .mn-credit a { color: var(--mn-ice) !important; }
+
+/* ---------- 页脚说明 ---------- */
+#mc-news .mn-section--foot { padding: 20px 22px; margin-top: 28px; }
+#mc-news .mn-foot__title {
+  margin: 0 0 12px !important; padding: 0 !important; border: 0 !important;
+  font-size: 1.02rem !important; color: #e6eef4 !important;
+}
+#mc-news .mn-section--foot p { margin: 0 0 10px; font-size: .86rem; color: #9fb0bd; line-height: 1.9; }
+#mc-news .mn-section--foot p:last-child { margin-bottom: 0; }
+#mc-news .mn-section--foot b { color: var(--mn-ice-2); font-weight: 500; }
 
 #mc-news .mn-skeleton { padding: 18px; color: var(--mn-muted); font-size: .9rem; }
-#mc-news .mn-section--foot { padding: 18px 20px; margin-top: 30px; }
-#mc-news .mn-section--foot p { margin: 0; font-size: .86rem; color: #9fb0bd; line-height: 1.8; }
-#mc-news .mn-section--foot code {
-  padding: 1px 5px; border-radius: 4px; background: rgba(255, 255, 255, .06);
-  font-family: var(--sf-mono, monospace); font-size: .88em;
-}
 
 @media (max-width: 768px) {
   #mc-news .mn-hero { padding: 20px 18px; }
   #mc-news .mn-hero__title { font-size: 1.7rem !important; }
   #mc-news .mn-card { padding: 18px; }
+  #mc-news .mn-body { padding: 14px 14px; }
+  #mc-news .mn-card__ver { font-size: 1.32rem; }
 }

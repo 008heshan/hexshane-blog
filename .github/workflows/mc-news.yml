@@ -1,0 +1,93 @@
+name: MC 新闻烘焙
+
+# 做什么：定时（以及手动）检查 Minecraft 有没有发新版本。中文正文存在仓库里，
+# 所以发新版时要把正文抓下来、烘焙进 source/mcnews/，提交回 main，
+# 由 Cloudflare Pages / GitHub Pages 各自的集成重新构建上线。
+#
+# 为什么不在浏览器里实时抓 Wiki：作者要求"存下来，不要每次打开都去调一次" ——
+# 一次要拉 200~400KB 的 Wiki 条目，还要在客户端解析，既慢又不可控。
+#
+# 频率：每小时一次。GitHub 的 cron 在高峰期最多会晚十几分钟，可以接受。
+# 想省钱可以改成一小时以外的间隔，或删掉 schedule 只留手动触发。
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: '无视缓存强制重抓（改了抽取规则时用）'
+        type: boolean
+        default: false
+
+# 需要写权限才能把烘焙结果提交回来。
+# 仓库默认是 read（实测 repos/.../actions/permissions/workflow = read），
+# 所以在 workflow 里显式声明 —— 这比存一个 PAT 更安全，也少一个要维护的秘密。
+permissions:
+  contents: write
+
+# 同一时间只跑一个；并发时后面的排队，不取消（免得中途留下半个 JSON）
+concurrency:
+  group: mc-news-bake
+  cancel-in-progress: false
+
+jobs:
+  bake:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: 烘焙 MC 版本数据
+        id: bake
+        run: |
+          if [ "${{ inputs.force }}" = "true" ]; then
+            node tools/build-mc-news.js --force
+          else
+            node tools/build-mc-news.js
+          fi
+
+      - name: 校验产物（结构不对就别提交）
+        run: |
+          node -e "
+          const fs=require('fs');
+          const j=JSON.parse(fs.readFileSync('source/mcnews/latest.json','utf8'));
+          if(!j.latest||!j.latest.version) throw new Error('latest.json 缺 latest');
+          for (const k of ['latest','snapshot']) {
+            const it=j[k]; if(!it) continue;
+            if(!it.wiki||!it.wiki.has) continue;
+            const p='source/mcnews/'+it.wiki.file;
+            const w=JSON.parse(fs.readFileSync(p,'utf8'));
+            if(!w.sections||!w.sections.length) throw new Error(p+' 没有 sections');
+            console.log(k, it.version, '正文', JSON.stringify(w.sections).length, '字符');
+          }
+          console.log('校验通过');
+          "
+
+      - name: 有没有变化
+        id: diff
+        run: |
+          if git diff --quiet -- source/mcnews; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "没有变化，不提交"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff --stat -- source/mcnews
+          fi
+
+      - name: 提交并推送
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          MSG="chore(mcnews): 自动烘焙 Minecraft 版本数据
+
+          $(node -e "const j=require('./source/mcnews/latest.json');console.log('最新正式版 '+j.latest.version+'（'+j.latest.date.slice(0,10)+'）'+(j.snapshot?'，最新快照 '+j.snapshot.version+'（'+j.snapshot.date.slice(0,10)+'）':''))")"
+          git add source/mcnews
+          git commit -m "$MSG"
+          git push origin HEAD:main

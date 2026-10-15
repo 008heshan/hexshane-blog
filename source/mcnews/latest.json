@@ -1,276 +1,45 @@
 {
-  "baked": "2026-10-15",
-  "source": "https://launchercontent.mojang.com/v2/javaPatchNotes.json",
-  "entries": [
-    {
-      "id": "26-4-snapshot-4",
-      "title": "Minecraft 26.4 Snapshot 4",
-      "version": "26.4-snapshot-4",
-      "type": "snapshot",
-      "date": "2026-10-13T12:05:46.000Z",
-      "shortText": "With 26.4 Snapshot 4, we're breaking out a cool new block, introducing Brittle Ice! And Jukeboxes can now keep the music going with playlists by putting your music discs in a chest above them, making dance parties much easier. Just be careful not to dance ",
-      "contentPath": "javaPatchNotes/26-4-snapshot-4.json"
-    },
-    {
-      "id": "8df071b98ac92911ae6caae35feb68506bca66894d16f41797164b9a9c6d1824",
-      "title": "Minecraft 26.4 Snapshot 3",
-      "version": "26.4-snapshot-3",
-      "type": "snapshot",
-      "date": "2026-10-06T12:54:26.000Z",
-      "shortText": "Brr! Does it feel colder all of a sudden? Minecraft LIVE revealed the first look at our next game drop – and it's frosty. Explore ice caves filled with glittering icicles and ice crystals, plus meet a not-so-chill new hostile mob! This frozen zombie varian",
-      "contentPath": "javaPatchNotes/8df071b98ac92911ae6caae35feb68506bca66894d16f41797164b9a9c6d1824.json"
-    },
-    {
-      "id": "26-4-snapshot-2",
-      "title": "Minecraft 26.4 Snapshot 2",
-      "version": "26.4-snapshot-2",
-      "type": "snapshot",
-      "date": "2026-09-29T11:32:57.000Z",
-      "shortText": "Hi there! It is time for the second snapshot for 26.4, featuring improved render distance fog, a new celestial occluder, and a fresh redesign of the F3 screen.Happy mining!ChangesWhen \"Improved Transparency\" is on, sky background and clouds that are behind",
-      "contentPath": "javaPatchNotes/26-4-snapshot-2.json"
-    },
-    {
-      "id": "26-4-snapshot-1",
-      "title": "Minecraft 26.4 Snapshot 1",
-      "version": "26.4-snapshot-1",
-      "type": "snapshot",
-      "date": "2026-09-22T13:38:53.000Z",
-      "shortText": "Welcome to the first snapshot of 26.4! We're kicking things off with a range of technical updates and improvements, including Vulkan becoming the default graphics API.ChangesWorld GenerationUpgrading worlds from before Caves and Cliffs will now also genera",
-      "contentPath": "javaPatchNotes/26-4-snapshot-1.json"
-    },
-    {
-      "id": "26-3",
-      "title": "Minecraft: Java Edition 26.3",
-      "version": "26.3",
-      "type": "release",
-      "date": "2026-09-15T11:23:02.000Z",
-      "shortText": "Wilderness Bound is out now in Minecraft Java Edition! Pack your supplies and set off on an expedition into the dappled forest where the trails end and adventure begins. Seek out abandoned camps, build outposts among the poplar trees, sleep under the stars",
-      "contentPath": "javaPatchNotes/26-3.json"
-    },
-    {
-      "id": "26-3-release-candidate-3",
-      "title": "Minecraft 26.3 Release Candidate 3",
-      "version": "26.3-rc-3",
-      "type": "snapshot",
-      "date": "2026-09-14T12:58:38.000Z",
-      "shortText": "They say that third time's the charm! Release Candidate 3 for 26.3 is here with yet another handful of fixes as we put the final touches on the Wilderness Bound game drop.Happy mining!Fixed bugs in 26.3 Release Candidate 3MC-311456 - VSync can be disabled ",
-      "contentPath": "javaPatchNotes/26-3-release-candidate-3.json"
-    },
-    {
-      "id": "26-3-release-candidate-2",
-      "title": "Minecraft 26.3 Release Candidate 2",
-      "version": "26.3-rc-2",
-      "type": "snapshot",
-      "date": "2026-09-11T10:34:40.000Z",
-      "shortText": "Today we are shipping a second release candidate for 26.3, the Wilderness Bound game drop coming on September 15th! If no critical issues are found, this will be the version that we ship for the eventual full release. Happy mining!Fixed bugs in 26.3 Releas",
-      "contentPath": "javaPatchNotes/26-3-release-candidate-2.json"
-    },
-    {
-      "id": "b4b6b172445c758986c9814c768719a4ddaf4da3d4ba4a2ea0a13fc04296a462",
-      "title": "Minecraft 26.3 Release Candidate 1",
-      "version": "26.3-rc-1",
-      "type": "snapshot",
-      "date": "2026-09-10T11:28:25.000Z",
-      "shortText": "Today we are shipping the first release candidate for 26.3, the Wilderness Bound game drop! If no critical issues are found, this will be the version that we ship for the eventual full release.Happy mining!Fixed bugs in 26.3 Release Candidate 1MC-311607 - ",
-      "contentPath": "javaPatchNotes/b4b6b172445c758986c9814c768719a4ddaf4da3d4ba4a2ea0a13fc04296a462.json"
-    },
-    {
-      "id": "ce09401e76e06d061699760968d6afa49e1fd852b51c23bc2c4784510092d901",
-      "title": "Minecraft 26.3 Pre-Release 3",
-      "version": "26.3-pre-3",
-      "type": "snapshot",
-      "date": "2026-09-08T13:04:44.000Z",
-      "shortText": "The road to release continues with pre-release 3! Today we're tackling another batch of bug fixes as we prepare for a full release of 26.3.Happy Mining!Technical ChangesThe Data Pack version is now 121.0Number ProvidersChanged minecraft:mod Float Provider ",
-      "contentPath": "javaPatchNotes/ce09401e76e06d061699760968d6afa49e1fd852b51c23bc2c4784510092d901.json"
-    },
-    {
-      "id": "2d614235aefd68fb1cdc8202d674f3d2717c80efdeb73f5364e63482b874fb9c",
-      "title": "Minecraft 26.3 Pre-Release 2",
-      "version": "26.3-pre-2",
-      "type": "snapshot",
-      "date": "2026-09-04T11:54:52.000Z",
-      "shortText": "Two pre-releases in one week!? That's right! Now that we're in the pre-release phase, we're no longer following our regular snapshot schedule. This also means we're spending more time hunting bugs as we get things ready for release, and this pre-release is",
-      "contentPath": "javaPatchNotes/2d614235aefd68fb1cdc8202d674f3d2717c80efdeb73f5364e63482b874fb9c.json"
-    },
-    {
-      "id": "9459bbbb7dd85b60a7c0034f11c032eac19b66a91fe04c799f6c6149c12302c4",
-      "title": "Minecraft 26.3 Pre-Release 1",
-      "version": "26.3-pre-1",
-      "type": "snapshot",
-      "date": "2026-09-01T11:29:01.000Z",
-      "shortText": "The first pre-release for 26.3 is here! There are technical changes, but we are now mainly fixing bugs, making improvements and putting on the final touches ahead of release.Happy mining!ChangesUIOn macOS, Exclusive Fullscreen is now available againOn macO",
-      "contentPath": "javaPatchNotes/9459bbbb7dd85b60a7c0034f11c032eac19b66a91fe04c799f6c6149c12302c4.json"
-    },
-    {
-      "id": "a58c45251f5b9a3174593fbf7de7663fb8d71fd17e7f3c797b7697791e68fb7b",
-      "title": "26.3-snapshot-10",
-      "version": "26.3-snapshot-10",
-      "type": "snapshot",
-      "date": "2026-08-25T12:53:43.000Z",
-      "shortText": "We've safely made it to 26.3 Snapshot 10! This week, the Dappled Forest panorama has made its way to the main menu, bringing cozy fall vibes every time you launch the game. This snapshot also includes a variety of technical changes and improvements, so dig",
-      "contentPath": "javaPatchNotes/a58c45251f5b9a3174593fbf7de7663fb8d71fd17e7f3c797b7697791e68fb7b.json"
-    },
-    {
-      "id": "c467c83eb0b270ec2e2fce567022fc7e6db49b3e4d238655a07741ee76edf306",
-      "title": "Minecraft 26.3 Snapshot 9",
-      "version": "26.3-snapshot-9",
-      "type": "snapshot",
-      "date": "2026-08-17T11:46:16.000Z",
-      "shortText": "Looks like this Snapshot couldn't wait until Tuesday! Arriving a day early, it brings new customization options for Realms. Owners can now increase render distance up to 25 chunks and separately configure render and simulation distance to find the balance ",
-      "contentPath": "javaPatchNotes/c467c83eb0b270ec2e2fce567022fc7e6db49b3e4d238655a07741ee76edf306.json"
-    },
-    {
-      "id": "1f573e65572785dbb791fc64ff8290a6ff0d72052a4f5a3e505467e31cecb15f",
-      "title": "Minecraft 26.3 Snapshot 8",
-      "version": "26.3-snapshot-8",
-      "type": "snapshot",
-      "date": "2026-08-12T09:39:37.000Z",
-      "shortText": "This Wednesday, a hot new Snapshot enters the Realm! That's right, in 26.3 Snapshot 8, Realm owners can now create and manage Invite Codes, making it easier than ever to join the fun.Alongside these additions, we've made further improvements to the World O",
-      "contentPath": "javaPatchNotes/1f573e65572785dbb791fc64ff8290a6ff0d72052a4f5a3e505467e31cecb15f.json"
-    },
-    {
-      "id": "50a6e5c5d834b50e99b2d397b43cea8152e8070884e21303a812cedba069d1b2",
-      "title": "Minecraft 26.3 Snapshot 7",
-      "version": "26.3-snapshot-7",
-      "type": "snapshot",
-      "date": "2026-08-04T11:49:07.000Z",
-      "shortText": "Step up your building and exploring with the final features entering testing! You can now find different maps in some abandoned camps and craft Concrete Stairs &#38 Slabs in 16 colors. Out now in 26.3 Snapshot 7!Happy exploring!New FeaturesAdded Concrete S",
-      "contentPath": "javaPatchNotes/50a6e5c5d834b50e99b2d397b43cea8152e8070884e21303a812cedba069d1b2.json"
-    },
-    {
-      "id": "0845b0f76a36df91e1e68e997bf5ea3cabecd3f32c084e64022fcb0f47a1a6ca",
-      "title": "Minecraft 26.3 Snapshot 6",
-      "version": "26.3-snapshot-6",
-      "type": "snapshot",
-      "date": "2026-07-28T12:25:51.000Z",
-      "shortText": "It's yet another Tuesday, and it seems that we've officially run out of quippy snapshot intros until the next delivery. Anyway, here's Snapshot 6, bringing some tweaks and improvements to the Abandoned Camp, a new World Options UI, as well as changing up h",
-      "contentPath": "javaPatchNotes/0845b0f76a36df91e1e68e997bf5ea3cabecd3f32c084e64022fcb0f47a1a6ca.json"
-    },
-    {
-      "id": "9dca6ac5b8d66187b24b60b554ae74720987e5c50530276b932efbd20c4bd13d",
-      "title": "Minecraft 26.3 Snapshot 5",
-      "version": "26.3-snapshot-5",
-      "type": "snapshot",
-      "date": "2026-07-21T11:45:42.000Z",
-      "shortText": "Happy Snapshot day! Today we are shipping the 5th snapshot of 26.3 with a fresh batch of updates and improvements.Happy mining!Technical ChangesThe Data Pack version is now 112.0The Resource Pack version is now 93.0Data Pack Version 112.0Codec for element ",
-      "contentPath": "javaPatchNotes/9dca6ac5b8d66187b24b60b554ae74720987e5c50530276b932efbd20c4bd13d.json"
-    },
-    {
-      "id": "21f9a68189304d9d7ddaba6e0fbe5e4c9d0e9c4571e22ab165277c196cc29752",
-      "title": "Minecraft 26.3 Snapshot 4",
-      "version": "26.3-snapshot-4",
-      "type": "snapshot",
-      "date": "2026-07-16T13:59:30.000Z",
-      "shortText": "Known IssuesExclusive fullscreen mode on Windows may cause the game to crash in certain situations, especially when using multiple monitorsEntering Exclusive fullscreen mode crashes the game on WaylandNew FeaturesPlayers in spectator mode can now interact ",
-      "contentPath": "javaPatchNotes/21f9a68189304d9d7ddaba6e0fbe5e4c9d0e9c4571e22ab165277c196cc29752.json"
-    },
-    {
-      "id": "b25a8cf2637ff6243021f3dd2feec4873b21b8ac64d8a7e5249fcbf50b107597",
-      "title": "Minecraft 26.3 Snapshot 3",
-      "version": "26.3-snapshot-3",
-      "type": "snapshot",
-      "date": "2026-07-07T12:03:01.000Z",
-      "shortText": "Tuesday? Pfft. It's snapshot day! Today's snapshot introduces two brand-new features coming to 26.3: perfect for anyone that loves to camp in comfort. The cushion, coming in 16 color variants, finally brings the ability to sit down around a campfire. To go",
-      "contentPath": "javaPatchNotes/b25a8cf2637ff6243021f3dd2feec4873b21b8ac64d8a7e5249fcbf50b107597.json"
-    },
-    {
-      "id": "470a6a68414e0047b96c69055590c9ff6cbcfb1f7090c1d365b407efd73027da",
-      "title": "Minecraft 26.3 Snapshot 2",
-      "version": "26.3-snapshot-2",
-      "type": "snapshot",
-      "date": "2026-06-30T12:45:43.000Z",
-      "shortText": "We're back with the second snapshot for 26.3! This week brings a new rendering option designed to improve transparency handling in Minecraft Java. We've also optimized certain mob behaviors when players aren't nearby, made a few gameplay adjustments, inclu",
-      "contentPath": "javaPatchNotes/470a6a68414e0047b96c69055590c9ff6cbcfb1f7090c1d365b407efd73027da.json"
-    },
-    {
-      "id": "ad9490cdc606b7f26f49e650ccd8474ddb5832293160bbcd29e1c6d8c17625a2",
-      "title": "Minecraft 26.3 Snapshot 1",
-      "version": "26.3-snapshot-1",
-      "type": "snapshot",
-      "date": "2026-06-23T11:57:02.000Z",
-      "shortText": "Word around the campfire is the new forest biome is out in testing! But if nobody's been to the dappled forest before, who built the abandoned camp? And what loot did they leave among the poplar trees and red shrubs? Scout out the place and set up shelter ",
-      "contentPath": "javaPatchNotes/ad9490cdc606b7f26f49e650ccd8474ddb5832293160bbcd29e1c6d8c17625a2.json"
-    },
-    {
-      "id": "28a6efbe05d3b3218794c99361246dfbc0f476a7e2d58fb85759c3e865e25a75",
-      "title": "Minecraft: Java Edition 26.2",
-      "version": "26.2",
-      "type": "release",
-      "date": "2026-06-16T12:03:33.000Z",
-      "shortText": "Chaos Cubed has landed in Minecraft Java Edition! Explore a striking cave biome filled with bubbling sulfur pools, build with sulfur and cinnabar, and discover the sulfur cube's curious appetite for blocks! From bouncing and sliding to explosive surprises,",
-      "contentPath": "javaPatchNotes/28a6efbe05d3b3218794c99361246dfbc0f476a7e2d58fb85759c3e865e25a75.json"
-    },
-    {
-      "id": "5eb343b164ba2cd99f8cfa76b6774e6498053cccf4858613f0c52a02891e7153",
-      "title": "Minecraft 26.2 Release Candidate 2",
-      "version": "26.2-rc-2",
-      "type": "snapshot",
-      "date": "2026-06-12T11:32:28.000Z",
-      "shortText": "A second release candidate has arrived! In this one we are fixing a couple of critical issues found in the previous release candidate.Happy mining!Fixed bugs in 26.2 Release Candidate 2MC-308731 - With a specific setup, a survival player can become softloc",
-      "contentPath": "javaPatchNotes/5eb343b164ba2cd99f8cfa76b6774e6498053cccf4858613f0c52a02891e7153.json"
-    },
-    {
-      "id": "93d22d92b9445682794bbad81f9b9f97b5ccf45998a3d98e7e16a12722589f63",
-      "title": "Minecraft 26.2 Release Candidate 1",
-      "version": "26.2-rc-1",
-      "type": "snapshot",
-      "date": "2026-06-11T11:57:50.000Z",
-      "shortText": "Today we are shipping the first release candidate for 26.2 and the Chaos Cubed game drop! If no critical issues are found, this will be the version that we ship for the eventual full release.Happy mining!Fixed bugs in 26.2 Release Candidate 1MC-308716 Pres",
-      "contentPath": "javaPatchNotes/93d22d92b9445682794bbad81f9b9f97b5ccf45998a3d98e7e16a12722589f63.json"
-    },
-    {
-      "id": "e39e0b53ea0b8cc4d9540193d301d1ae991d177751ffc3c09912697adc1a01fa",
-      "title": "Minecraft 26.2 Pre-Release 6",
-      "version": "26.2-pre-6",
-      "type": "snapshot",
-      "date": "2026-06-10T12:20:24.000Z",
-      "shortText": "Today we're shipping the 26.2 Pre-Release 6. This version includes a fix that allows proper spectating after dying in a hardcore world.Happy mining!ChangesRespawning (as a spectator) in a hardcore world no longer turns off the spectators_generate_chunks ga",
-      "contentPath": "javaPatchNotes/e39e0b53ea0b8cc4d9540193d301d1ae991d177751ffc3c09912697adc1a01fa.json"
-    },
-    {
-      "id": "462d1b67c4c4d2897b073939e4722225ccc7bc439149cea0d3d3596e132880d2",
-      "title": "Minecraft 26.2 Pre-Release 5",
-      "version": "26.2-pre-5",
-      "type": "snapshot",
-      "date": "2026-06-08T13:04:25.000Z",
-      "shortText": "Today it is time for 26.2 Pre-Release 5, with a change to Hardcore mode settings along with other fixes! As announced at Minecraft Live, the drop is set to release on June 16!Happy (careful) hardcore mining!ChangesThe game setting for Graphics API now chan",
-      "contentPath": "javaPatchNotes/462d1b67c4c4d2897b073939e4722225ccc7bc439149cea0d3d3596e132880d2.json"
-    },
-    {
-      "id": "06886fed06979f840a536f5632cab715383e37ca2c272b702a4544fa6181e6c4",
-      "title": "Minecraft 26.2 Pre-Release 4",
-      "version": "26.2-pre-4",
-      "type": "snapshot",
-      "date": "2026-06-04T12:38:47.000Z",
-      "shortText": "Today we are releasing 26.2 Pre-Release 4, with a couple of fixes and tweaks to the Chaos Cubed drop. As announced at Minecraft Live, the drop is set to release on June 16!Happy crafting!ChangesWhen the game is overwhelmed with particles, instead of removi",
-      "contentPath": "javaPatchNotes/06886fed06979f840a536f5632cab715383e37ca2c272b702a4544fa6181e6c4.json"
-    },
-    {
-      "id": "42d12d658c9091ccc141d87deaac7c125e2485d75e09239d74ecbf0f31ca1d46",
-      "title": "Minecraft 26.2 Pre-Release 3",
-      "version": "26.2-pre-3",
-      "type": "snapshot",
-      "date": "2026-06-02T11:48:29.000Z",
-      "shortText": "Today we are shipping the third pre-release for 26.2, with a few changes and fixes!With today's pre-release we're reverting a fix that patched an exploit, known as \"Attribute Swapping\", for unrelated reasons. Please note that this does not mean \"Attribute ",
-      "contentPath": "javaPatchNotes/42d12d658c9091ccc141d87deaac7c125e2485d75e09239d74ecbf0f31ca1d46.json"
-    },
-    {
-      "id": "012123174b0222c913a0da9e99ebc904d3fb8bd181bc4b9b51182e0aab2a77fc",
-      "title": "Minecraft 26.2 Pre-Release 2",
-      "version": "26.2-pre-2",
-      "type": "snapshot",
-      "date": "2026-05-28T12:45:31.000Z",
-      "shortText": "Happy Thursday! Today we are bringing you Pre-Release 2, with a few bug fixes and improvements.Happy Mining!Technical ChangesThe Data Pack version is now 107.0Fixed bugs in 26.2 Pre-Release 2MC-305475 Tripwire above the player's head gets triggered twice w",
-      "contentPath": "javaPatchNotes/012123174b0222c913a0da9e99ebc904d3fb8bd181bc4b9b51182e0aab2a77fc.json"
-    },
-    {
-      "id": "260e07961f3ad8a4a059832eebfd9efd46b422f6966d0432dfb840299a44836c",
-      "title": "Minecraft 26.2 Pre-Release 1",
-      "version": "26.2-pre-1",
-      "type": "snapshot",
-      "date": "2026-05-26T13:48:31.000Z",
-      "shortText": "Today we're rolling out the first pre-release for 26.2! From this point on, you should mostly see bug fixes as we prepare for release. Pre-releases also break away from the usual Tuesday snapshot rhythm, so keep an eye out for the next one!With this pre-re",
-      "contentPath": "javaPatchNotes/260e07961f3ad8a4a059832eebfd9efd46b422f6966d0432dfb840299a44836c.json"
-    }
-  ]
+ "baked": "2026-10-15",
+ "bakedAt": "2026-10-15T10:33:52.943Z",
+ "mojangOk": false,
+ "source": "https://launchercontent.mojang.com/v2/javaPatchNotes.json",
+ "wikiSource": "https://zh.minecraft.wiki/api.php",
+ "latest": {
+  "version": "26.3",
+  "type": "release",
+  "date": "2026-09-15T11:23:02.000Z",
+  "title": "Minecraft: Java Edition 26.3",
+  "shortText": "Wilderness Bound is out now in Minecraft Java Edition! Pack your supplies and set off on an expedition into the dappled forest where the trails end and adventure begins. Seek out abandoned camps, build outposts among the poplar trees, sleep under the stars",
+  "contentPath": "javaPatchNotes/26-3.json",
+  "wiki": {
+   "has": true,
+   "file": "wiki/26.3.json",
+   "revid": 1509437,
+   "fetchedAt": "2026-10-15",
+   "introLead": "26.3 是 奔赴荒野 的正式版，也是 Java版 的一次 小更新 ，发布于2026年9月15日。此次更新新增了 斑驳森林 生物群系，加入了 杨树 及其系列方块，以及相关自然方块，另加入了 台阶 和 楼梯 的 羊毛 和 混凝土 材质变种、 坐垫 和 麦秆床 ，以及 废弃营地 ，并修复了一些漏洞。"
+  },
+  "links": {
+   "en": "https://minecraft.wiki/w/Java_Edition_26.3",
+   "zh": "https://zh.minecraft.wiki/w/Java%E7%89%8826.3"
+  }
+ },
+ "snapshot": {
+  "version": "26.4-snapshot-4",
+  "type": "snapshot",
+  "date": "2026-10-13T12:05:46.000Z",
+  "title": "Minecraft 26.4 Snapshot 4",
+  "shortText": "With 26.4 Snapshot 4, we're breaking out a cool new block, introducing Brittle Ice! And Jukeboxes can now keep the music going with playlists by putting your music discs in a chest above them, making dance parties much easier. Just be careful not to dance ",
+  "contentPath": "javaPatchNotes/26-4-snapshot-4.json",
+  "wiki": {
+   "has": true,
+   "file": "wiki/26.4-snapshot-4.json",
+   "revid": 1513682,
+   "fetchedAt": "2026-10-15",
+   "introLead": "26.4-snapshot-4 是 Java版26.4 的第4个快照，发布于2026年10月13日，加入了 脆冰 和冰裂隙，改进了 唱片机 ，并修复了一些漏洞。"
+  },
+  "links": {
+   "en": "https://minecraft.wiki/w/Java_Edition_26.4-snapshot-4",
+   "zh": "https://zh.minecraft.wiki/w/Java%E7%89%8826.4-snapshot-4"
+  }
+ }
 }

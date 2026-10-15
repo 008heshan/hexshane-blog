@@ -1120,7 +1120,7 @@ inject:
     # --- widgets 产品发布页（IEML）：样式作用域限定在 #ieml-page，不影响其它页面 ---
     - <link rel="stylesheet" href="/custom/widgets/product-page.css?v=20260911d">
     # --- widgets MC 新闻页（/mcnews/）：作用域限定在 #mc-news ---
-    - <link rel="stylesheet" href="/custom/widgets/mc-news.css?v=20260911a">
+    - <link rel="stylesheet" href="/custom/widgets/mc-news.css?v=20261015b">
     # --- widgets 404 页（/404.html）：作用域限定在 #nf-page ---
     - <link rel="stylesheet" href="/custom/widgets/not-found.css?v=20261015a">
     # --- 科幻/科技/极客皮肤（必须放在最后，覆盖上面所有自定义样式） ---
@@ -1146,7 +1146,7 @@ inject:
     - <script src="/custom/code/code-wrap-align.js?v=20260911a"></script>
     # --- 图片放大增强：小贴图（像素画）整数倍放大 + 最近邻，配合 lightbox: medium_zoom ---
     - <script src="/custom/widgets/image-zoom.js?v=20260911a"></script>
-    - <script src="/custom/widgets/mc-news.js?v=20260911a"></script>
+    - <script src="/custom/widgets/mc-news.js?v=20261015b"></script>
     # --- widgets 卡片/挂件/页脚 ---
     - <script src="/custom/widgets/announce-hover.js?v=20260911a"></script>
     # 作者卡片右侧滑出社媒条（抖音 / B站 / GitHub 仓库）

@@ -46,7 +46,9 @@
 
 ```
 .
-├─ .github/workflows/pages.yml   # GitHub Pages 备用部署（npm ci → build:ghpages → deploy）
+├─ .github/workflows/
+│  ├─ pages.yml                  # GitHub Pages 备用部署（npm ci → build:ghpages → deploy）
+│  └─ mc-news.yml                # MC 版本数据定时烘焙（每小时检查，有新版就抓中文正文并提交回来）
 ├─ scripts/                      # Hexo 插件（generator / filter / helper）—— 会被自动加载执行
 │  ├─ articles-generator.js      # /articles/ 列表页（复用首页卡片样式，支持分页）
 │  ├─ index-pin-order.js         # 首页置顶：sticky 数字越小越靠前
@@ -55,11 +57,15 @@
 │  ├─ fix-shiki-fences.js        # 修复 shiki 插件代码围栏贪婪匹配
 │  └─ translate-posts.js         # 构建期翻译（需配置 deepl_api_key，默认不启用）
 ├─ tools/                        # 维护工具（只能手动调用；不能放 scripts/，那里会被自动执行）
+│  ├─ build-mc-news.js           # MC 版本数据烘焙：Mojang 定版本 + 中文 Wiki 取正文 → source/mcnews/
+│  ├─ mc-news-wiki.js            # 上者的解析库：把 Wiki 条目 HTML 抽成「首段 + 新内容/更改」结构
 │  ├─ fix-ghpages-paths.js       # 镜像站构建后给 /custom/ 资源补子路径前缀
-│  └─ measure-overflow-shell.html # 无头浏览器量"哪些元素比视口宽"的排查壳页（配合 CDP/--dump-dom）
+│  ├─ browser-shot.js            # 无头 Chrome 交互验收（CDP）：点按钮 + 截图 + 收控制台报错
+│  └─ measure-overflow-shell.html # 量"哪些元素比视口宽"的排查壳页（配合 --dump-dom）
 ├─ source/
 │  ├─ _posts/                    # 文章（Markdown）
 │  ├─ 404.md                     # 404 页（构建成根目录 404.html，见下文「404 页」）
+│  ├─ mcnews/                    # MC 新闻页数据：latest.json + wiki/<版本>.json（构建期烘焙，见下文）
 │  ├─ img/posts/<文章名>/        # 文章插图（自托管，不外链图床）
 │  ├─ img/favicon.svg 等         # 站点图标一套（svg + 32/180/512 png）
 │  ├─ _data/announcement.yml     # 侧栏公告（后台 /admin/ 可写）
@@ -269,6 +275,64 @@ git add -A && git commit -m "post: 文章标题" && git push
 
 想换回朴素样式：把 `inject.head` 里的 `sci-fi.css`、`inject.bottom` 里的
 `starlink.js` / `hero-fx.js` / `author-dock.js` 注释掉即可。
+
+## MC 新闻页（/mcnews/）
+
+页面只显示两张卡：**最新正式版** 与 **最新快照**。中文更新内容不是打开页面时去拉的，
+而是构建期烘焙好、随仓库发布 —— 一次 Wiki 条目有 200~400KB，每次打开都拉既慢又不可控。
+
+### 数据怎么来的
+
+| 用途 | 来源 | 说明 |
+| --- | --- | --- |
+| 版本号 / 类型 / 发布日期 | Mojang 官方启动器接口 | `launchercontent.mojang.com/v2/javaPatchNotes.json`，这就是"出新版本"最准的信号 |
+| 中文正文 | 中文 Minecraft Wiki | `zh.minecraft.wiki/api.php?action=parse&…`（带 `Access-Control-Allow-Origin: *`） |
+
+- **必须走 `api.php`**：直接抓 `zh.minecraft.wiki/w/...` 网页会被 bot 拦截返回 403，
+  只有 API 入口放行（这条是实测出来的，别改回去）
+- 只抽条目的「**新内容 / 更改**」两节（首段 + 分组 + 条目列表），
+  不要信息框、维护提示横幅（"此条目仍需完善"）、导航盒、参考列表 —— 那些搬上页面很难看
+- 快照那一档**排除 pre-release / rc**（Mojang 接口里它们的 `type` 也叫 `snapshot`）
+
+### 产物（都提交进仓库）
+
+```
+source/mcnews/
+├─ latest.json           # 页面清单：两张卡的版本/日期 + 首段摘要 + 中文正文文件名（约 2KB）
+└─ wiki/<版本>.json      # 单版中文正文（首段 + 两节条目树），点「展开」时才拉
+```
+
+分成两个文件是因为**正式版的完整改动动辄上千条**（26.3 有 668 + 732 条，JSON 250KB）：
+塞进页面清单就等于每次打开都白等。卡片上先显示 `introLead`（首段截到约 160 字），
+点「展开」再取那一版的正文文件。正文渲染也是分块的（每 150 条一个「继续显示」按钮），
+避免一口气往 DOM 里插一千多行。
+
+### 怎么更新
+
+```bash
+node tools/build-mc-news.js            # 缺哪版抓哪版（有缓存就不动），最后重写 latest.json
+node tools/build-mc-news.js --force    # 无视缓存全部重抓
+node tools/build-mc-news.js --offline  # 只用本地缓存重烘（改解析/渲染规则时用，不联网）
+```
+
+自动化：`.github/workflows/mc-news.yml` 每小时（`17 * * * *`）跑一次，也支持手动触发
+（`workflow_dispatch`，可勾选强制重抓）。有变化就提交回 `main`，触发 Cloudflare Pages 与
+GitHub Pages 各自重新构建。要点：
+
+- `permissions: contents: write` 是必需的 —— 仓库的 Actions 默认权限是 **read**
+  （实测 `repos/.../actions/permissions/workflow` = read），不写这一行推不回去。
+  这样比存一个 PAT 少一个要维护的秘密
+- **"有没有变化"必须忽略 `baked` / `bakedAt` 两个时间戳**，只看实质内容：
+  否则每次跑都"有变化"，会变成每小时提交一次只有时间戳不同的无意义提交
+  （踩过：一开始只归零了 `baked`，漏了 `bakedAt`，离线重烘第二次照样改文件）
+- 页面打开时仍会用 Mojang 接口核对一次：**那边已经出了更新的版本就当场显示出来**，
+  并标明"中文说明要等下一次自动烘焙"。所以发新版不会因为等 CI 而显示陈旧数据
+
+### 正文渲染的两个坑
+
+- `source/mcnews/index.md` 里**不能用 `<h2 class="mn-h2">`**：主题的 `h2::before` 会给所有 h2
+  加一条装饰竖线，留在顶部会像"卡片上面挂了个空标签"。页内小标题一律用 h3 + 自定义 class
+- 卡片 `meta` 行的"抓取于 / rev"用的是**抽取那一刻**记录的值，不是文件 mtime
 
 ## 运维备忘
 
