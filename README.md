@@ -286,6 +286,7 @@ git add -A && git commit -m "post: 文章标题" && git push
 | 用途 | 来源 | 说明 |
 | --- | --- | --- |
 | 版本号 / 类型 / 发布日期 | Mojang 官方启动器接口 | `launchercontent.mojang.com/v2/javaPatchNotes.json`，这就是"出新版本"最准的信号 |
+| **版本配图** | 同上接口的 `image.url` | 每条补丁说明自带一张 540×540 的图（启动器里那个更新横幅）；构建期下载到本站，页面不从第三方拿图 |
 | 中文正文 | 中文 Minecraft Wiki | `zh.minecraft.wiki/api.php?action=parse&…`（带 `Access-Control-Allow-Origin: *`） |
 
 - **必须走 `api.php`**：直接抓 `zh.minecraft.wiki/w/...` 网页会被 bot 拦截返回 403，
@@ -298,8 +299,10 @@ git add -A && git commit -m "post: 文章标题" && git push
 
 ```
 source/mcnews/
-├─ latest.json           # 页面清单：两张卡的版本/日期 + 首段摘要 + 中文正文文件名（约 2KB）
-└─ wiki/<版本>.json      # 单版中文正文（首段 + 两节条目树），点「展开」时才拉
+├─ latest.json           # 页面清单：两张卡的版本/日期 + 首段摘要 + 正文与配图文件名（约 2KB）
+├─ wiki/<版本>.json      # 单版中文正文（首段 + 两节条目树），点「展开」时才拉
+└─ img/<版本>.jpg        # 该版配图（Mojang 540×540），卡片上用 16:9 中心裁切
+   └─ .manifest.json     # 配图指纹（URL + 抓取日期），用来判断要不要重下
 ```
 
 分成两个文件是因为**正式版的完整改动动辄上千条**（26.3 有 668 + 732 条，JSON 250KB）：

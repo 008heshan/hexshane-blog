@@ -1,0 +1,16 @@
+{
+ "26.3": {
+  "url": "https://launchercontent.mojang.com/v2/images/dappledcamp540x540.jpg",
+  "file": "img/26.3.jpg",
+  "title": "dappled camp 540x540.jpg",
+  "bytes": 86086,
+  "fetchedAt": "2026-10-15"
+ },
+ "26.4-snapshot-4": {
+  "url": "https://launchercontent.mojang.com/v2/images/2026101313.44.02540x540.jpg",
+  "file": "img/26.4-snapshot-4.jpg",
+  "title": "2026-10-13_13.44.02 540x540.jpg",
+  "bytes": 52920,
+  "fetchedAt": "2026-10-15"
+ }
+}

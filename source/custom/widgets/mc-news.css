@@ -67,6 +67,25 @@
 
 /* ---------- 单张卡片 ---------- */
 #mc-news .mn-card { padding: 22px 24px; }
+
+/* 版本大图：撑满卡片宽度、贴到上边缘（用负外边距抵消卡片内边距），
+   16:9 从中心裁切。overflow 交给卡片自己的圆角去裁。 */
+#mc-news .mn-card { overflow: hidden; }
+
+#mc-news .mn-shot {
+  margin: -22px -24px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, .07);
+  background: rgba(0, 0, 0, .25);
+}
+
+#mc-news .mn-shot img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  object-position: center;
+}
+
 #mc-news .mn-card--empty { font-size: .92rem; line-height: 1.9; color: #a9bac6; }
 #mc-news .mn-card--empty a { color: var(--mn-ice) !important; }
 
@@ -218,6 +237,8 @@
   #mc-news .mn-hero { padding: 20px 18px; }
   #mc-news .mn-hero__title { font-size: 1.7rem !important; }
   #mc-news .mn-card { padding: 18px; }
+  #mc-news .mn-shot { margin: -18px -18px 14px; }
+  #mc-news .mn-shot img { aspect-ratio: 3 / 2; }
   #mc-news .mn-body { padding: 14px 14px; }
   #mc-news .mn-card__ver { font-size: 1.32rem; }
 }

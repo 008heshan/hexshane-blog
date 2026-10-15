@@ -107,6 +107,14 @@
 
     return '' +
       '<article class="mn-card" data-version="' + esc(item.version) + '" data-file="' + esc(hasWiki ? item.wiki.file : '') + '">' +
+        /* 版本大图：Mojang 补丁说明自带的 540×540 配图，构建期就下到本站，
+           所以页面不依赖第三方图床。用 16:9 容器从中心裁切（原图是方的，
+           横幅比例更贴近启动器里的观感）。 */
+        (item.image && item.image.file
+          ? '<figure class="mn-shot">' +
+              '<img src="/mcnews/' + esc(item.image.file) + '" alt="' + esc('Minecraft ' + item.version + ' 版本配图') + '" loading="lazy" decoding="async">' +
+            '</figure>'
+          : '') +
         '<div class="mn-card__kind">' + label + '</div>' +
         '<div class="mn-card__head">' +
           '<span class="mn-card__ver">' + esc(item.version) + '</span>' +
@@ -171,12 +179,13 @@
     describeStatus(items)
   }
 
-  /* 实时接口的条目 → 卡片数据（没有中文正文，走英文摘要） */
+  /* 实时接口的条目 → 卡片数据（没有中文正文，走英文摘要；也没有本地大图） */
   function liveItem(e) {
     var links = wikiLinks(e.version)
     return {
       version: e.version, type: e.type, date: e.date, title: e.title,
       shortText: e.shortText, contentPath: e.contentPath,
+      image: null,
       wiki: { has: false, file: null, introLead: '' },
       links: { en: links.en, zh: links.zh },
       _live: true

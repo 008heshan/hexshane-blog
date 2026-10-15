@@ -36,6 +36,7 @@ const OUT_DIR = path.join(ROOT, 'source', 'mcnews')
 const OUT_FILE = path.join(OUT_DIR, 'latest.json')
 
 const MOJANG_LIST = 'https://launchercontent.mojang.com/v2/javaPatchNotes.json'
+const MOJANG_ORIGIN = 'https://launchercontent.mojang.com'
 const ZH_API = 'https://zh.minecraft.wiki/api.php'
 const EN_WIKI = (v) => 'https://minecraft.wiki/w/Java_Edition_' + encodeURIComponent(v).replace(/%2E/g, '.')
 const ZH_WIKI = (v) => 'https://zh.minecraft.wiki/w/' + encodeURIComponent('Java版' + v)
@@ -162,17 +163,68 @@ async function ensureWiki(version) {
   return rec
 }
 
-/* ---------- 3. 组装 ---------- */
+/* ---------- 2.5 版本大图（Mojang 补丁说明自带的 image 字段） ----------
+   每条补丁说明都带一张 540×540 的配图（就是启动器里那个更新横幅），
+   地址形如 /v2/images/xxx540x540.jpg（相对路径，要拼上 launchercontent 域名）。
+   和正文一样存进仓库 —— 别让页面去第三方拿图（国内不一定通，也少一个外部依赖）。 */
+const IMG_DIR = 'img'
+const IMG_OUT_DIR = path.join(OUT_DIR, IMG_DIR)
+/* 指纹存在单独一份清单里，而不是每张图配一个 .json ——
+   后者会被 Hexo 一起复制到 public/，服务器上就多出几个没用的文件。 */
+const IMG_MANIFEST = path.join(IMG_OUT_DIR, '.manifest.json')
 
-function pickName(record) {
-  const name = (record && record.note && record.note.versionName) || ''
-  return name.replace(/^Minecraft:?\s*/i, '').trim()
+function readImgManifest() {
+  try { return JSON.parse(fs.readFileSync(IMG_MANIFEST, 'utf8')) } catch (e) { return {} }
 }
+
+function imageAbsUrl(e) {
+  const u = e && e.image && e.image.url
+  if (!u) return null
+  return u.startsWith('http') ? u : MOJANG_ORIGIN + u
+}
+
+/* 同一版换了配图也要跟着换（用 URL 当指纹）。下载失败不影响其它内容 —— 只是没图。 */
+async function ensureImage(e, manifest) {
+  const url = imageAbsUrl(e)
+  if (!url) return null
+  const ext = (/\.(jpe?g|png|webp)$/i.exec(url) || [])[1] || 'jpg'
+  const file = IMG_DIR + '/' + e.version + '.' + ext.toLowerCase()
+  const dest = path.join(OUT_DIR, file)
+  const known = manifest[e.version]
+  const ok = known && known.url === url && fs.existsSync(dest) && fs.statSync(dest).size > 1000
+  if (!FORCE && ok) {
+    debug('大图缓存命中 ' + e.version)
+    return { file, url, title: known.title || '', bytes: fs.statSync(dest).size }
+  }
+  if (OFFLINE) {
+    if (ok) return { file, url, title: known.title || '', bytes: fs.statSync(dest).size }
+    log('⚠ ' + e.version + '：离线模式且没有本地大图，跳过')
+    return null
+  }
+  try {
+    const res = await fetch(url, { headers: { 'User-Agent': UA } })
+    if (!res.ok) throw new Error('HTTP ' + res.status)
+    const ct = res.headers.get('content-type') || ''
+    const buf = Buffer.from(await res.arrayBuffer())
+    // 必须是真图片：这个域名出问题时返回的是 HTML 报错页（同 share.js 字体那个坑）
+    if (!/^image\//.test(ct) || buf.length < 1000) throw new Error('返回的不是图片（' + ct + '，' + buf.length + ' 字节）')
+    fs.mkdirSync(IMG_OUT_DIR, { recursive: true })
+    fs.writeFileSync(dest, buf)
+    manifest[e.version] = { url, file, title: (e.image && e.image.title) || '', bytes: buf.length, fetchedAt: new Date().toISOString().slice(0, 10) }
+    log('· ' + e.version + '：已存版本大图 ' + path.relative(ROOT, dest) + '（' + Math.round(buf.length / 1024) + 'KB）')
+    return { file, url, title: (e.image && e.image.title) || '', bytes: buf.length }
+  } catch (err) {
+    log('⚠ ' + e.version + '：大图下载失败（' + err.message + '）—— 卡片不显示配图，其它内容不受影响')
+    return ok ? { file, url: known.url, title: known.title || '', bytes: known.bytes || 0 } : null
+  }
+}
+
+/* ---------- 3. 组装 ---------- */
 
 /* 页面清单里的每一项：只放"卡片不点开就要显示"的东西。
    完整中文正文按版本放 source/mcnews/wiki/<版本>.json，点「展开」时才拉 ——
    26.3 的正文 JSON 有 250KB，打开页面就白等人。 */
-function toItem(e, rec) {
+function toItem(e, rec, img) {
   const intro = (rec && rec.intro) || ''
   return {
     version: e.version,
@@ -181,6 +233,7 @@ function toItem(e, rec) {
     title: e.title || '',
     shortText: e.shortText || '',
     contentPath: e.contentPath || '',
+    image: img || null,
     wiki: {
       has: !!(rec && (rec.intro || (rec.sections && rec.sections.length))),
       file: rec ? WIKI_DIR + '/' + e.version + '.json' : null,
@@ -257,14 +310,29 @@ async function main() {
     }
   }
 
+  /* 版本大图：只给真正要显示的那两张卡下载（不在 targets 里的历史版本不折腾） */
+  const images = {}
+  const imgManifest = readImgManifest()
+  for (const t of targets) {
+    const img = await ensureImage(t, imgManifest)
+    images[t.version] = img
+    const old = prevByVersion[t.version]
+    const oldUrl = old && old.image && old.image.url
+    if (!!oldUrl !== !!img || (img && oldUrl !== img.url)) changed = true
+  }
+  if (Object.keys(imgManifest).length) {
+    fs.mkdirSync(IMG_OUT_DIR, { recursive: true })
+    fs.writeFileSync(IMG_MANIFEST, JSON.stringify(imgManifest, null, 1) + '\n', 'utf8')
+  }
+
   const out = {
     baked: new Date().toISOString().slice(0, 10),
     bakedAt: new Date().toISOString(),
     mojangOk,
     source: MOJANG_LIST,
     wikiSource: ZH_API,
-    latest: toItem(latest, wikiByVersion[latest.version]),
-    snapshot: snapshot ? toItem(snapshot, wikiByVersion[snapshot.version]) : null
+    latest: toItem(latest, wikiByVersion[latest.version], images[latest.version]),
+    snapshot: snapshot ? toItem(snapshot, wikiByVersion[snapshot.version], images[snapshot.version]) : null
   }
 
   // 版本号变了也算变化
