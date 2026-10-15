@@ -1,7 +1,7 @@
 {
  "baked": "2026-10-15",
- "bakedAt": "2026-10-15T10:33:52.943Z",
- "mojangOk": false,
+ "bakedAt": "2026-10-15T10:37:15.010Z",
+ "mojangOk": true,
  "source": "https://launchercontent.mojang.com/v2/javaPatchNotes.json",
  "wikiSource": "https://zh.minecraft.wiki/api.php",
  "latest": {
