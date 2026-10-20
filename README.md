@@ -333,6 +333,29 @@ GitHub Pages 各自重新构建。要点：
 - 页面打开时仍会用 Mojang 接口核对一次：**那边已经出了更新的版本就当场显示出来**，
   并标明"中文说明要等下一次自动烘焙"。所以发新版不会因为等 CI 而显示陈旧数据
 
+### 纪元大事记（页面底部的静态板块）
+
+「MC 纪元大事记」记版本号之外的节点（入口、玩法、生态层面的大事），排在两张卡下面、
+「关于这个页面」上面。它是**静态 HTML**，直接写在 `source/mcnews/index.md` 里：
+
+```html
+<ol class="mn-tl" role="list">
+  <li class="mn-tl__item">
+    <time class="mn-tl__date" datetime="2026-10-20">2026-10-20</time>
+    <p class="mn-tl__text">事件正文。</p>
+  </li>
+</ol>
+```
+
+- 新增一条 = 在 `<ol>` 里加一个 `<li>`，**新的写在最上面**（按时间倒序），日期同步改
+  `datetime` 与文字；改完推进 `mc-news.css` 的 `?v=`（改样式时）或直接构建（只改内容时）
+- 为什么不走 JSON + JS：事件属于"内容"而不是接口数据 —— 少一个请求、少一处失败点，
+  客户端脚本挂了这段也还在。也意味着**它不会**被 `tools/build-mc-news.js` 覆盖
+- 只有一条时**不画竖轨**（`#mc-news .mn-tl:has(> .mn-tl__item:only-child)::before`），
+  否则圆点底下会挂一小截线，像没画完；两条以上自动出现竖轨连接各节点
+- 板块标题用 h3 且显式 `::before { content: none }` —— 主题给 `#article-container` 里的
+  h3 加了 FontAwesome 前缀图标和左内边距，不关掉会整体右移、跟卡片排版对不齐
+
 ### 正文渲染的两个坑
 
 - `source/mcnews/index.md` 里**不能用 `<h2 class="mn-h2">`**：主题的 `h2::before` 会给所有 h2

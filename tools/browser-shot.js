@@ -170,14 +170,16 @@ async function main() {
 
     // --scroll <选择器>：先把某个元素滚到视口中间（截图要连图带文字时很有用）
     if (SCROLL_TO) {
-      const r = await send('Runtime.evaluate', {
-        expression: `(() => { const el = document.querySelector(${JSON.stringify(SCROLL_TO)});
+      const scrollJs = `(() => { const el = document.querySelector(${JSON.stringify(SCROLL_TO)});
           if (!el) return 'NOT_FOUND';
-          el.scrollIntoView({ block: 'center' }); return 'OK'; })()`,
-        returnByValue: true
-      }, sid)
+          el.scrollIntoView({ block: 'center' }); return 'OK'; })()`
+      const r = await send('Runtime.evaluate', { expression: scrollJs, returnByValue: true }, sid)
       if (r.result && r.result.value === 'NOT_FOUND') errors.push('--scroll 选择器没找到元素：' + SCROLL_TO)
       await sleep(500)
+      /* 再滚一次：目标前面的内容常常是异步渲染出来的（卡片、图片、字体），
+         第一次滚动之后页面高度会变，位置就被顶掉了。 */
+      await send('Runtime.evaluate', { expression: scrollJs, returnByValue: true }, sid)
+      await sleep(300)
     }
 
     const shots = []

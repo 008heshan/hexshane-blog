@@ -18,6 +18,7 @@
 
 #mc-news .mn-hero,
 #mc-news .mn-card,
+#mc-news .mn-chron,
 #mc-news .mn-section--foot {
   background-color: var(--mn-film);
   background-image: var(--mn-sheen);
@@ -236,12 +237,87 @@
 }
 #mc-news .mn-credit a { color: var(--mn-ice) !important; }
 
+/* ---------- 纪元大事记（时间线） ----------
+   内容是**静态**写在 source/mcnews/index.md 里的，不走 JS ——
+   事件属于"内容"而不是接口数据：少一个请求、少一处失败点，JS 挂了这段也还在。
+   新增一条 = 在 <ol class="mn-tl"> 里加一个 <li>（新的写最上面，按时间倒序）。 */
+#mc-news .mn-chron { padding: 22px 24px; margin-top: 28px; }
+
+#mc-news .mn-chron__title,
+#mc-news .mn-foot__title {
+  padding: 0 !important;
+  border: 0 !important;
+  font-size: 1.02rem !important;
+  line-height: 1.6;
+  color: #e6eef4 !important;
+}
+/* 主题会给 #article-container 里的 h3 加一个 FontAwesome 前缀图标 + 左内边距
+   （_layout/post.styl 的 beautify/headStyle）。这里必须显式关掉，
+   否则标题前面挂个小图标、整体右移一截，跟卡片里的排版对不齐。 */
+#mc-news .mn-chron__title::before,
+#mc-news .mn-foot__title::before { content: none !important; }
+#mc-news .mn-chron__title { margin: 0 0 8px !important; }
+#mc-news .mn-foot__title { margin: 0 0 12px !important; }
+
+#mc-news .mn-chron__sub {
+  margin: 0 0 18px;
+  font-size: .84rem;
+  line-height: 1.8;
+  color: var(--mn-muted);
+}
+
+#mc-news .mn-tl {
+  position: relative;
+  margin: 0;
+  padding: 0 0 0 22px;
+  list-style: none;
+}
+/* 竖轨：两端淡出，避免端点像被切断 */
+#mc-news .mn-tl::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 10px;
+  bottom: 12px;
+  width: 1px;
+  background: linear-gradient(180deg, rgba(157, 192, 212, .55), rgba(157, 192, 212, .18));
+}
+/* 只有一条时不要竖轨：否则圆点底下挂一小截线，像没画完 */
+#mc-news .mn-tl:has(> .mn-tl__item:only-child)::before { content: none; }
+
+#mc-news .mn-tl__item { position: relative; margin: 0 0 18px; }
+#mc-news .mn-tl__item:last-child { margin-bottom: 0; }
+
+/* 节点圆点：left:-22px 让它落在 .mn-tl 的左边缘，圆心与竖轨（left:4px + 1px）对齐 */
+#mc-news .mn-tl__item::before {
+  content: '';
+  position: absolute;
+  left: -22px;
+  top: 6px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--mn-ice);
+  box-shadow: 0 0 0 4px rgba(157, 192, 212, .1);
+}
+
+#mc-news .mn-tl__date {
+  display: block;
+  font-family: var(--sf-mono, monospace);
+  font-size: .78rem;
+  letter-spacing: .06em;
+  color: var(--mn-ice);
+}
+
+#mc-news .mn-tl__text {
+  margin: 6px 0 0;
+  font-size: .93rem;
+  line-height: 1.85;
+  color: #bccbd6;
+}
+
 /* ---------- 页脚说明 ---------- */
 #mc-news .mn-section--foot { padding: 20px 22px; margin-top: 28px; }
-#mc-news .mn-foot__title {
-  margin: 0 0 12px !important; padding: 0 !important; border: 0 !important;
-  font-size: 1.02rem !important; color: #e6eef4 !important;
-}
 #mc-news .mn-section--foot p { margin: 0 0 10px; font-size: .86rem; color: #9fb0bd; line-height: 1.9; }
 #mc-news .mn-section--foot p:last-child { margin-bottom: 0; }
 #mc-news .mn-section--foot b { color: var(--mn-ice-2); font-weight: 500; }
@@ -255,4 +331,7 @@
   #mc-news .mn-shot { margin-top: 14px; aspect-ratio: 3 / 2; }
   #mc-news .mn-body { padding: 14px 14px; }
   #mc-news .mn-card__ver { font-size: 1.32rem; }
+  #mc-news .mn-chron { padding: 18px; }
+  #mc-news .mn-tl { padding-left: 20px; }
+  #mc-news .mn-tl__item::before { left: -20px; }
 }

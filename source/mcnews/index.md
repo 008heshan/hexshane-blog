@@ -1,7 +1,7 @@
 ---
 title: MC 新闻
 date: 2026-09-11 12:00:00
-updated: 2026-10-15 18:40:00
+updated: 2026-10-20 19:20:00
 comments: false
 ---
 
@@ -14,6 +14,17 @@ comments: false
   </section>
 
   <div id="mn-cards" class="mn-cards"><div class="mn-skeleton">加载中…</div></div>
+
+  <section class="mn-chron">
+    <h3 class="mn-chron__title">MC 纪元大事记</h3>
+    <p class="mn-chron__sub">版本号之外的节点 —— 那些改变过入口、玩法或整条生态的事。</p>
+    <ol class="mn-tl" role="list">
+      <li class="mn-tl__item">
+        <time class="mn-tl__date" datetime="2026-10-20">2026-10-20</time>
+        <p class="mn-tl__text">目前主流启动器因不可抗因素，关闭了原版游戏下载功能。</p>
+      </li>
+    </ol>
+  </section>
 
   <section class="mn-section--foot">
     <h3 class="mn-foot__title">关于这个页面</h3>
