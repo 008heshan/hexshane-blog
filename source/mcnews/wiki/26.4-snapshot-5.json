@@ -1,0 +1,143 @@
+{
+ "version": "26.4-snapshot-5",
+ "title": "Java版26.4-snapshot-5",
+ "revid": 1517870,
+ "fetchedAt": "2026-10-20",
+ "license": "CC BY-NC-SA 4.0 · 中文 Minecraft Wiki",
+ "licenseUrl": "https://zh.minecraft.wiki/w/Minecraft_Wiki:著作权",
+ "page": "https://zh.minecraft.wiki/w/Java%E7%89%8826.4-snapshot-5",
+ "intro": "26.4-snapshot-5 是 Java版26.4 的第5个快照，发布于2026年10月20日，加入了 Packed Ice Bricks 系列方块和1个新进度，并修复了一些漏洞。",
+ "sections": [
+  {
+   "title": "新内容",
+   "items": [
+    {
+     "text": "方块",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "Packed Ice Bricks",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "浮冰的砖变种。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "可以使用4个浮冰合成。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "有台阶、楼梯和墙变种，可以通过合成或切石获得。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "Chiseled Packed Ice",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "浮冰的雕纹变种。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "可以使用2个 Packed Ice Brick Slab 合成，也可以通过切石获得。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "text": "游戏内容",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "进度",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "加入了1个新进度：",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "What Goes Around Comes Around",
+           "lead": false,
+           "sub": [],
+           "children": [
+            {
+             "text": "用 冰球 杀死 冻尸 获得。",
+             "lead": false,
+             "sub": [],
+             "children": []
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "更改",
+   "items": [
+    {
+     "text": "常规",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "数据包",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "将数据包版本号更改为 125.0 。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "资源包",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "将资源包版本号更改为 100.2 。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

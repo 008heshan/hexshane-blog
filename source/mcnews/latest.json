@@ -1,6 +1,6 @@
 {
- "baked": "2026-10-15",
- "bakedAt": "2026-10-15T11:48:59.448Z",
+ "baked": "2026-10-20",
+ "bakedAt": "2026-10-20T15:02:12.173Z",
  "mojangOk": true,
  "source": "https://launchercontent.mojang.com/v2/javaPatchNotes.json",
  "wikiSource": "https://zh.minecraft.wiki/api.php",
@@ -30,28 +30,28 @@
   }
  },
  "snapshot": {
-  "version": "26.4-snapshot-4",
+  "version": "26.4-snapshot-5",
   "type": "snapshot",
-  "date": "2026-10-13T12:05:46.000Z",
-  "title": "Minecraft 26.4 Snapshot 4",
-  "shortText": "With 26.4 Snapshot 4, we're breaking out a cool new block, introducing Brittle Ice! And Jukeboxes can now keep the music going with playlists by putting your music discs in a chest above them, making dance parties much easier. Just be careful not to dance ",
-  "contentPath": "javaPatchNotes/26-4-snapshot-4.json",
+  "date": "2026-10-20T12:15:06.000Z",
+  "title": "Minecraft 26.4 Snapshot 5",
+  "shortText": "Zuri is throwing Ice Balls at a Frostibe from a Packed Ice Brick house",
+  "contentPath": "javaPatchNotes/26-4-snapshot-5.json",
   "image": {
-   "file": "img/26.4-snapshot-4.jpg",
-   "url": "https://launchercontent.mojang.com/v2/images/2026101313.44.02540x540.jpg",
-   "title": "2026-10-13_13.44.02 540x540.jpg",
-   "bytes": 52920
+   "file": "img/26.4-snapshot-5.jpg",
+   "url": "https://launchercontent.mojang.com/v2/images/264snapshot5540x540.jpg",
+   "title": "26_4_snapshot_5 540x540.jpg",
+   "bytes": 60492
   },
   "wiki": {
    "has": true,
-   "file": "wiki/26.4-snapshot-4.json",
-   "revid": 1513682,
-   "fetchedAt": "2026-10-15",
-   "introLead": "26.4-snapshot-4 是 Java版26.4 的第4个快照，发布于2026年10月13日，加入了 脆冰 和冰裂隙，改进了 唱片机 ，并修复了一些漏洞。"
+   "file": "wiki/26.4-snapshot-5.json",
+   "revid": 1517870,
+   "fetchedAt": "2026-10-20",
+   "introLead": "26.4-snapshot-5 是 Java版26.4 的第5个快照，发布于2026年10月20日，加入了 Packed Ice Bricks 系列方块和1个新进度，并修复了一些漏洞。"
   },
   "links": {
-   "en": "https://minecraft.wiki/w/Java_Edition_26.4-snapshot-4",
-   "zh": "https://zh.minecraft.wiki/w/Java%E7%89%8826.4-snapshot-4"
+   "en": "https://minecraft.wiki/w/Java_Edition_26.4-snapshot-5",
+   "zh": "https://zh.minecraft.wiki/w/Java%E7%89%8826.4-snapshot-5"
   }
  }
 }
