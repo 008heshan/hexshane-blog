@@ -1,6 +1,6 @@
 {
- "baked": "2026-10-20",
- "bakedAt": "2026-10-20T15:02:12.173Z",
+ "baked": "2026-10-27",
+ "bakedAt": "2026-10-27T20:03:25.852Z",
  "mojangOk": true,
  "source": "https://launchercontent.mojang.com/v2/javaPatchNotes.json",
  "wikiSource": "https://zh.minecraft.wiki/api.php",
@@ -30,28 +30,28 @@
   }
  },
  "snapshot": {
-  "version": "26.4-snapshot-5",
+  "version": "26.4-snapshot-6",
   "type": "snapshot",
-  "date": "2026-10-20T12:15:06.000Z",
-  "title": "Minecraft 26.4 Snapshot 5",
-  "shortText": "Zuri is throwing Ice Balls at a Frostibe from a Packed Ice Brick house",
-  "contentPath": "javaPatchNotes/26-4-snapshot-5.json",
+  "date": "2026-10-27T13:40:29.000Z",
+  "title": "Minecraft 26.4 Snapshot 6",
+  "shortText": "Kai is ice fishing, sitting on a light blue cushion in front of an igloo made of snow bricks.",
+  "contentPath": "javaPatchNotes/26-4-snapshot-6.json",
   "image": {
-   "file": "img/26.4-snapshot-5.jpg",
-   "url": "https://launchercontent.mojang.com/v2/images/264snapshot5540x540.jpg",
-   "title": "26_4_snapshot_5 540x540.jpg",
-   "bytes": 60492
+   "file": "img/26.4-snapshot-6.jpg",
+   "url": "https://launchercontent.mojang.com/v2/images/26.4snapshot6540x540.jpg",
+   "title": "26.4-snapshot-6 540x540.jpg",
+   "bytes": 69206
   },
   "wiki": {
    "has": true,
-   "file": "wiki/26.4-snapshot-5.json",
-   "revid": 1517870,
-   "fetchedAt": "2026-10-20",
-   "introLead": "26.4-snapshot-5 是 Java版26.4 的第5个快照，发布于2026年10月20日，加入了 Packed Ice Bricks 系列方块和1个新进度，并修复了一些漏洞。"
+   "file": "wiki/26.4-snapshot-6.json",
+   "revid": 1523483,
+   "fetchedAt": "2026-10-27",
+   "introLead": "26.4-snapshot-6 是 Java版26.4 的第6个快照，发布于2026年10月27日，加入了 雪砖 系列方块，并修复了一些漏洞。"
   },
   "links": {
-   "en": "https://minecraft.wiki/w/Java_Edition_26.4-snapshot-5",
-   "zh": "https://zh.minecraft.wiki/w/Java%E7%89%8826.4-snapshot-5"
+   "en": "https://minecraft.wiki/w/Java_Edition_26.4-snapshot-6",
+   "zh": "https://zh.minecraft.wiki/w/Java%E7%89%8826.4-snapshot-6"
   }
  }
 }

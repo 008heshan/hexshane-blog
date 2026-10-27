@@ -19,5 +19,12 @@
   "title": "26_4_snapshot_5 540x540.jpg",
   "bytes": 60492,
   "fetchedAt": "2026-10-20"
+ },
+ "26.4-snapshot-6": {
+  "url": "https://launchercontent.mojang.com/v2/images/26.4snapshot6540x540.jpg",
+  "file": "img/26.4-snapshot-6.jpg",
+  "title": "26.4-snapshot-6 540x540.jpg",
+  "bytes": 69206,
+  "fetchedAt": "2026-10-27"
  }
 }

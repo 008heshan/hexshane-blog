@@ -1,0 +1,604 @@
+{
+ "version": "26.4-snapshot-6",
+ "title": "Java版26.4-snapshot-6",
+ "revid": 1523483,
+ "fetchedAt": "2026-10-27",
+ "license": "CC BY-NC-SA 4.0 · 中文 Minecraft Wiki",
+ "licenseUrl": "https://zh.minecraft.wiki/w/Minecraft_Wiki:著作权",
+ "page": "https://zh.minecraft.wiki/w/Java%E7%89%8826.4-snapshot-6",
+ "intro": "26.4-snapshot-6 是 Java版26.4 的第6个快照，发布于2026年10月27日，加入了 雪砖 系列方块，并修复了一些漏洞。",
+ "sections": [
+  {
+   "title": "新内容",
+   "items": [
+    {
+     "text": "方块",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "雪砖",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "雪块 的砖变种。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "可以使用4个雪块合成。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "有 台阶 、 楼梯 和 墙 变种，且无法通过切石获得。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "硫方怪吸收时使用“快速滑行”硫方怪原型。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "只在用锹挖掘破坏时掉落自身。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "text": "游戏内容",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "硫方怪原型",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "加入了新的特殊原型：",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "Cold：与快速滑行原型的属性相同，但是具有浮力，并会在移动时将下方的 水 替换为 霜冰 ，与 冰霜行者 类似。",
+           "lead": false,
+           "sub": [],
+           "children": [
+            {
+             "text": "只在水上方有空气时才会生成霜冰。",
+             "lead": false,
+             "sub": [],
+             "children": []
+            },
+            {
+             "text": "吸收 蓝冰 时使用。",
+             "lead": false,
+             "sub": [],
+             "children": []
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "text": "常规",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "密度函数",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "加入了 minecraft:domain_warp 密度函数类型。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "为采样坐标添加偏移以采样输入密度函数。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "若偏移快速、大规模变动，则会对性能有显著影响。此密度函数只应该少量使用。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "格式：",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "text": "",
+       "lead": false,
+       "sub": [],
+       "children": [
+        {
+         "text": "* type ： minecraft:domain_warp",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "* input ：要采样的密度函数。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "以下三项字段必须至少存在一项：",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "offset_x ：X轴上的偏移。需为一个密度函数，默认为0.0。此字段的值会被隐式截断到整数。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "offset_y ：Y轴上的偏移。需为一个密度函数，默认为0.0。此字段的值会被隐式截断到整数。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "offset_z ：Z轴上的偏移。需为一个密度函数，默认为0.0。此字段的值会被隐式截断到整数。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "标签",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "加入了流体标签： #swimmable ，表示玩家可以在其中游泳的流体。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "加入了物品标签： #sulfur_cube_archetype/cold ，表示放进硫方怪内可以使其转变为Cold原型的物品。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "加入了实体类型标签：",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "#swimming ，被认为可以在水中游泳的实体类型。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "#flying ，被认为可以飞行的实体类型。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "更改",
+   "items": [
+    {
+     "text": "方块",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "浮冰砖 及其变种",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "现在只在用镐挖掘破坏时掉落自身。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "脆冰",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "流浪者 站在其上面时不再会使其碎裂。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "潜影贝 附着在其上面时现在会使其碎裂。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "冰晶",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "加入了环境音效，冰晶下方为 浮冰 时有概率播放。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "睡莲",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "现在可以放置在脆冰上表面。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "text": "生物",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "生物",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "在某些情况下，摔落到熔岩中的生物可能会受到比以前更少的摔落伤害。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "僵尸村民",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "现在生成在 冰封洞穴 中的僵尸村民是雪原外观。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "text": "常规",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "数据包",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "将数据包版本号更改为 125.1 。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "资源包",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "将资源包版本号更改为 101.0 。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "默认JVM选项",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "游戏现在会根据玩家的系统内存自动设置Java堆大小，最高占用25%，最多4GB。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "硫方怪原型定义格式",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "加入了 location_based_effects 字段。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "可选，定义此硫方怪原型的 位置依赖效果 。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "格式：",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "text": "location_based_effexts",
+       "lead": false,
+       "sub": [],
+       "children": [
+        {
+         "text": "：一个封装了谓词的位置依赖效果。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "* effect ：一个位置依赖效果。",
+           "lead": false,
+           "sub": [],
+           "children": [
+            {
+             "text": "该位置依赖效果的子标签。",
+             "lead": false,
+             "sub": [],
+             "children": []
+            }
+           ]
+          },
+          {
+           "text": "requirements ：此效果生效需满足的谓词。不允许引用谓词文件，也不允许使用位置信息谓词检查所处的结构片段。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "text": "密度函数",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "修改了 minecraft:gradient 密度函数类型。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "现在如果 axis 字段是 y ，则 from_coordinate 和​ to_coordinate 字段现在额外可接受一个 垂直锚点 。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "text": "模板池",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "为模板池元素额外加入了 corner_constraint 字段。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "通过在模板元素边界箱角落采样密度函数以限制模板元素的放置。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "格式：",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "text": "corner_constraint",
+       "lead": false,
+       "sub": [],
+       "children": [
+        {
+         "text": "* density_function ：要用于采样的密度函数。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "* acceptable_density ：要使得测试通过，所允许的密度函数值的取值范围。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "如果类型为 双精度浮点数 ，则精确匹配。但因 Double.compareTo 先将浮点数转换为长整型再进行比较，故实际上无法保证精确匹配。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "如果类型为 列表 ，则将列表元素分别视为匹配闭区间的两个端点。下限不得大于上限。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "：闭区间下限。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "：闭区间上限。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "如果类型为 对象 ，则分别指定闭区间的两个端点。下限不得大于上限。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "* min_inclusive ：匹配下限（含）。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "* max_inclusive ：匹配上限（含）。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        },
+        {
+         "text": "padding ：（0≤值≤8）边界箱的内边距。默认为0。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "corners ：要检查的角落范围，必须是 all 、​ top 和​ bottom 之一。默认为 all 。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "* required_corners ：（1≤值≤8）要使得测试通过，所需测试通过的角落数目的最小值。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "如果类型为 整型 ，则精确匹配。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "如果类型为 列表 ，则将列表元素分别视为匹配闭区间的两个端点。下限不得大于上限。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "：闭区间下限。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "：闭区间上限。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "如果类型为 对象 ，则分别指定闭区间的两个端点。下限不得大于上限。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "* min_inclusive ：匹配下限（含）。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "* max_inclusive ：匹配上限（含）。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
