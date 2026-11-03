@@ -1,0 +1,305 @@
+{
+ "version": "26.4-snapshot-7",
+ "title": "Java版26.4-snapshot-7",
+ "revid": 1529753,
+ "fetchedAt": "2026-11-03",
+ "license": "CC BY-NC-SA 4.0 · 中文 Minecraft Wiki",
+ "licenseUrl": "https://zh.minecraft.wiki/w/Minecraft_Wiki:著作权",
+ "page": "https://zh.minecraft.wiki/w/Java%E7%89%8826.4-snapshot-7",
+ "intro": "26.4-snapshot-7 是 Java版26.4 的第7个快照，发布于2026年11月3日，加入了 方解石 系列方块、 雕纹灵魂页岩 和新的 音乐唱片 ，更改了 全景图 ，并修复了一些漏洞。",
+ "sections": [
+  {
+   "title": "新内容",
+   "items": [
+    {
+     "text": "方块",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "方解石柱",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "方解石的柱变种。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "方解石台阶",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "方解石的台阶变种。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "方解石楼梯",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "方解石的楼梯变种。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "方解石墙",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "方解石的墙变种。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "磨制方解石",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "方解石的磨制变种。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "可以使用4个方解石合成，也可以通过切石获得。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "有台阶、楼梯和墙变种，可以通过合成或切石获得。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "磨制方解石砖",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "磨制方解石的砖变种。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "可以使用4个磨制方解石合成，也可以通过切石获得。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "有台阶、楼梯和墙变种，可以通过合成或切石获得。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "雕纹灵魂页岩",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "可在 远古城市 的 箱子 中找到。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "text": "物品",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "音乐唱片",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "加入了新的音乐唱片 Flurry 。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "音乐作者为 Hyper Potions 。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "可以在 雪屋 地下室的箱子中找到。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "通过红石比较器输出的红石信号强度为7。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "更改",
+   "items": [
+    {
+     "text": "生物",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "冻尸",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "去除了纹理文件中的多余像素。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "僵尸",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "现在穿戴任意皮革盔甲时，不再会在 细雪 内转化为冻尸。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "骷髅",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "现在穿戴任意皮革盔甲时，不再会在细雪内转化为流浪者。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "流浪者",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "现在会在 冰冻深海 、 冻洋 、 冰封山峰 、 冻河 、 尖峭山峰 、 积雪山坡 生物群系生成。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "鹦鹉",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "现在能模仿冻尸的声音。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "text": "常规",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "全景图",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "更新了主菜单全景图以匹配 2026年第4次小更新 。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "数据包",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "将数据包版本号更改为 126.0 。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "资源包",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "将资源包版本号更改为 102.0 。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
