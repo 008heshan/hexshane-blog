@@ -1,0 +1,461 @@
+{
+ "version": "26.4-snapshot-8",
+ "title": "Java版26.4-snapshot-8",
+ "revid": 1534476,
+ "fetchedAt": "2026-11-10",
+ "license": "CC BY-NC-SA 4.0 · 中文 Minecraft Wiki",
+ "licenseUrl": "https://zh.minecraft.wiki/w/Minecraft_Wiki:著作权",
+ "page": "https://zh.minecraft.wiki/w/Java%E7%89%8826.4-snapshot-8",
+ "intro": "26.4-snapshot-8 是 Java版26.4 的第8个快照，发布于2026年11月10日，修复了一些漏洞。",
+ "sections": [
+  {
+   "title": "新内容",
+   "items": [
+    {
+     "text": "命令格式",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "参数类型",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "加入了 minecraft:pattern 参数类型。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "用于进行 正则表达式 匹配的参数。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "加入此参数类型是为了给服务端模组和插件加入的命令提供更好的支持。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "text": "常规",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "语言",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "加入了爪哇语和查瓦卡诺语。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "数据生成器",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "加入了战利品上下文需求报告，位于 reports/loot_context_requirements.json ，包含数据包内容校验的相关信息。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "标签",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "加入了 #triggers_ambient_ice_block_sounds 方块标签。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "包含所有会使 冰 播放环境音效的方块。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        },
+        {
+         "text": "加入了 #triggers_ambient_ice_crystal_sounds 方块标签。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "包含所有会使 冰晶 播放环境音效的方块。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "更改",
+   "items": [
+    {
+     "text": "物品",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "冰球",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "降低了冰球的伤害。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "音乐唱片Flurry",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "将名称从“flurry”更改为“Flurry”。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "text": "生物",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "亡灵生物",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "现在所有亡灵生物免疫 冰冻 效果。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "text": "命令格式",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "参数类型",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "现在，内联定义或是引用数据包内容的参数若无法通过校验将导致命令解析失败。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "text": "常规",
+     "lead": true,
+     "group": true,
+     "sub": [],
+     "children": [
+      {
+       "text": "数据包",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "将数据包版本号更改为 127.0 。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "在以下位置出现的大部分校验错误将不再阻止对应内容被加载：",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "战利品表 （ minecraft:loot_table ）",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "谓词 （ minecraft:predicate ）",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "物品修饰器 （ minecraft:item_modifier ）",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "槽位源 （ minecraft:slot_source ）",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "数值提供器 （ minecraft:context_int_provider 和​ minecraft:context_float_provider ）",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "村民交易 （ minecraft:villager_trade ）",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "进度 （ minecraft:advancement ）中的准则触发器",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "魔咒效果组件 （ minecraft:enchantment_effect_component_type ）的实例中的 requirements 字段",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        },
+        {
+         "text": "以下情形现在会被视为错误，可能会阻止数据包加载或导致命令解析失败：",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "待校验的内容尝试递归地引用自身。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "运行时传入的 战利品上下文 无法提供待校验的内容所需的战利品上下文参数。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        },
+        {
+         "text": "内容只有在没有条件限制或者条件限制所需的所有战利品上下文参数均存在时才会被校验。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "这意味着带条件限制的内容可以用于避免校验错误。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "以下字段是条件限制：",
+           "lead": false,
+           "sub": [],
+           "children": [
+            {
+             "text": "minecraft:number_dispatcher 通用数值提供器类型中，各情形的 conditions 字段",
+             "lead": false,
+             "sub": [],
+             "children": []
+            },
+            {
+             "text": "村民交易定义格式中的 merchant_predicate 字段",
+             "lead": false,
+             "sub": [],
+             "children": []
+            },
+            {
+             "text": "战利品表随机池、战利品表抽取项和物品修饰器中的 conditions 字段",
+             "lead": false,
+             "sub": [],
+             "children": []
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "text": "资源包",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "将资源包版本号更改为 103.0 。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "调试屏幕",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "现在调试屏幕可以用于追踪 环境属性 的值。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        }
+       ]
+      },
+      {
+       "text": "战利品上下文",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "将 minecraft:command 参数集拆分为了 minecraft:command_predicate 和​ minecraft:command_modifier 参数集。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "前者用于命令中的谓词（如 /execute if predicate ... ），后者用于命令中的物品修饰器（如 /item ... modify ）。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "text": "数据生成器",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "修改了命令报告的格式。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "参数信息现在位于 argument 字段中，而不是被合并到父节点中。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "现在会包含和参数补全建议有关的信息。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "text": "着色器 与后处理管线",
+       "lead": true,
+       "sub": [],
+       "children": [
+        {
+         "text": "重构了 terrain.vsh 以解码新的顶点数据包。",
+         "lead": false,
+         "sub": [],
+         "children": []
+        },
+        {
+         "text": "顺序无关透明算法相关的着色器现在依赖于子通道。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "修改了 core/oit_composite.fsh 、​ core/oit_depth_bounds_cull.fsh 、​ include/oit_depth_sample.glsl 和​ include/oit_sample.glsl 。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        },
+        {
+         "text": "修改了水遮罩的的处理方式以支持顺序无关透明算法中的子通道。",
+         "lead": false,
+         "sub": [],
+         "children": [
+          {
+           "text": "现在它被渲染到一个单独的、在地形渲染期间被采样的目标，而不是被渲染到地形深度缓冲区。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "修改了 core/rendertype_water_mask.fsh 和​ core/terrain.fsh 。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "移除了 core/blit_depth.fsh 。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          },
+          {
+           "text": "无论是否启用了顺序无关透明算法都会都会使用新的处理方式。",
+           "lead": false,
+           "sub": [],
+           "children": []
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
